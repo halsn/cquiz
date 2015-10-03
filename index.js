@@ -1,28 +1,32 @@
-var cool = require('cool-ascii-faces');
+
 var express = require('express');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
-
 app.use(express.static(__dirname + '/public'));
+
+app.set('view engin', 'jade');
 
 // views is directory for all template files
 app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
 
-app.get('/', function(request, response) {
-  response.render('pages/index')
+app.get('/', function (req, res) {
+    res.render('pages/index.jade');
 });
 
-app.get('/cool', function(request, response) {
-  response.send(cool());
+
+app.get('/login', function (req, res) {
+    res.render('pages/login.jade');
 });
 
-app.get('/hello', function(req, res) {
-    res.send('Hello there!');
+app.post('/login', function (req, res) {
+    res.end('hello there');
 })
 
-app.listen(app.get('port'), function() {
-  console.log('Node app is running on port', app.get('port'));
-});
+app.get('/signup', function (req, res) {
+    res.render('pages/signup.jade');
+})
 
+app.listen(app.get('port'), function () {
+    console.log('Node app is running on port', app.get('port'));
+});

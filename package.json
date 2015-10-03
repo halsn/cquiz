@@ -7,21 +7,23 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "ejs": "2.3.3",
-    "express": "4.13.3",
-    "cool-ascii-faces": "~1.3.x"
+    "express": "^4.13.3",
+    "mongodb": "^2.0.43",
+    "qrcode-js": "0.0.2"
   },
   "engines": {
     "node": "0.12.7"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
+    "url": "https://coding.net/u/hosn/p/cquiz/git"
   },
   "keywords": [
     "node",
-    "heroku",
     "express"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.0"
+  }
 }
