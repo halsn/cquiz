@@ -1,7 +1,0 @@
-{
-  "name": "cquiz",
-  "description": "A class quiz Node.js app using Express 4",
-  "repository": "https://git.coding.net/hosn/cquiz.git",
-  "keywords": ["node", "express"],
-  "image": "heroku/nodejs"
-}

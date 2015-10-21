@@ -1,19 +1,25 @@
 {
-  "name": "node-js-getting-started",
-  "version": "0.1.5",
+  "name": "cquiz",
+  "version": "0.0.0",
   "description": "A sample Node.js app using Express 4",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "nodejs app.js"
   },
   "dependencies": {
+    "bcryptjs": "^2.3.0",
+    "body-parser": "^1.14.1",
+    "cookie-parser": "^1.4.0",
+    "ejs": "^2.3.4",
     "express": "^4.13.3",
+    "express-session": "^1.11.3",
     "jade": "^1.11.0",
     "mongodb": "^2.0.43",
+    "mongoose": "^4.1.9",
     "qrcode-js": "0.0.2"
   },
   "engines": {
-    "node": "0.12.7"
+    "node": "0.10.7"
   },
   "repository": {
     "type": "git",
