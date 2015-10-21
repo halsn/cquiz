@@ -15,12 +15,12 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(session({
-  resave: false, // don't save session if unmodified
-  saveUninitialized: false, // don't create session until something stored
-  secret: 'shhhh, very secret',
-  cookie: {
-      maxAge: 1000 * 60 * 30
-  }  
+    resave: false, // don't save session if unmodified
+    saveUninitialized: false, // don't create session until something stored
+    secret: 'shhhh, very secret',
+    cookie: {
+        maxAge: 1000 * 60 * 30
+    }
 }));
 
 app.set('view engine', 'ejs');

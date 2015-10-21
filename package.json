@@ -4,7 +4,7 @@
   "description": "A sample Node.js app using Express 4",
   "main": "app.js",
   "scripts": {
-    "start": "nodejs app.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "bcryptjs": "^2.3.0",
@@ -19,7 +19,7 @@
     "qrcode-js": "0.0.2"
   },
   "engines": {
-    "node": "0.10.7"
+    "node": "0.12.7"
   },
   "repository": {
     "type": "git",
