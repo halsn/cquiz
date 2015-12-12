@@ -1,0 +1,27 @@
+include ./includes/head.jade
+    title 登陆
+    style.
+        .container {
+            max-width: 430px;
+        }
+        .form-signin-heading {
+            text-align: center;
+        }
+
+body
+    .container.center-block
+        form.form-signin(role="form")
+            h2.form-signin-heading 注册
+            label.sr-only(for="inputEmail") 邮箱
+            input.input-lg#inputEmail.form-control(type="email", placeholder="邮箱" required)
+            br
+            label.sr-only(for="inputPassWord") 密码
+            input.input-lg#inputPassWord.form-control(type="password", placeholder="密码" required)
+            br
+            label.sr-only(for="checkPassWord") 确认密码
+            input.input-lg#checkPassWord.form-control(type="password", placeholder="确认密码" required)
+            br
+            button.btn.btn-lg.btn-primary.btn-block(type="submit") 注册
+            br
+        button.btn.btn-lg.btn-success.btn-block 登陆
+include ./includes/foot.jade

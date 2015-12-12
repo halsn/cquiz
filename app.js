@@ -4,10 +4,11 @@ var router = require('./routes/main');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var jade = require('jade');
 var app = module.exports = express();
 
 app.set('port', (process.env.PORT || 5000));
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/static'));
 
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -23,7 +24,7 @@ app.use(session({
     }
 }));
 
-app.set('view engine', 'ejs');
+app.set('view engine', 'jade');
 // views is directory for all template files
 app.set('views', __dirname + '/views');
 
