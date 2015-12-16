@@ -1,9 +1,8 @@
 'use strict';
 var User = require('../lib/user');
 var login = function (req, res) {
-    res.locals.err = '';
     if (req.method === 'GET') {
-        res.locals.err = null;
+        res.locals.err = '';
         res.render('login');
     } else {
         var name = req.body.username,

@@ -1,5 +1,5 @@
 include ./includes/head.jade
-    title 登陆
+    title 注册
     style.
         .container {
             max-width: 430px;
@@ -10,18 +10,20 @@ include ./includes/head.jade
 
 body
     .container.center-block
-        form.form-signin(role="form")
+        form.form-signin(role="form", method="post")
             h2.form-signin-heading 注册
-            label.sr-only(for="inputEmail") 邮箱
-            input.input-lg#inputEmail.form-control(type="email", placeholder="邮箱" required)
+            label.sr-only(for="inputUsername") 用户名
+            input.input-lg#inputEmail.form-control(type="text", name="username", placeholder="用户名" required)
             br
             label.sr-only(for="inputPassWord") 密码
-            input.input-lg#inputPassWord.form-control(type="password", placeholder="密码" required)
+            input.input-lg#inputPassWord.form-control(type="password", name="password", placeholder="密码" required)
             br
             label.sr-only(for="checkPassWord") 确认密码
-            input.input-lg#checkPassWord.form-control(type="password", placeholder="确认密码" required)
+            input.input-lg#checkPassWord.form-control(type="password", name="ckpassword", placeholder="确认密码" required)
             br
             button.btn.btn-lg.btn-primary.btn-block(type="submit") 注册
             br
-        button.btn.btn-lg.btn-success.btn-block 登陆
+        a.btn.btn-lg.btn-link.pull-right(href="/login") 登陆
+        if err
+            .show.alert.alert-danger(role="alert") #{err}
 include ./includes/foot.jade

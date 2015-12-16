@@ -1,14 +1,14 @@
 'use strict';
 var User = require('../lib/user');
 var signup = function (req, res) {
-    res.locals.err = '';
     if (req.method === 'GET') {
+        res.locals.err = '';
         res.render('signup');
     } else if (req.method === 'POST') {
         var name = req.body.username,
             pass = req.body.password,
             ckps = req.body.ckpassword;
-        if (pass !== ckps) { 
+        if (pass !== ckps) {
             res.locals.err = '两次输入密码不一致';
             return res.render('signup');
         }
@@ -20,7 +20,7 @@ var signup = function (req, res) {
                 res.render('signup');
             } else {
                 res.status(200);
-                res.redirect('/login');   
+                res.redirect('/login');
             }
         });
     }
