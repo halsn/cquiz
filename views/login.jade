@@ -1,31 +1,28 @@
 include ./includes/head.jade
-    title 登陆
-    style.
-        .container {
-            max-width: 430px;
-        }
-        .form-signin-heading {
-            text-align: center;
-        }
-        .alert {
-            margin-top: 50px;
-        }
+  title 登陆
 body
-    .container.center-block
-        form.form-signin(role="form", method="post")
-            h2.form-signin-heading 登陆
-            label.sr-only(for="inputName") 用户名
-            input.input-lg#inputName.form-control(type="text", name="username", placeholder="用户名" required)
-            br
-            label.sr-only(for="inputPassWord") 密码
-            input.input-lg#inputPassWord.form-control(type="password", name="password", placeholder="密码" required)
-            .checkbox
-                label
-                    input(type="checkbox", value="remember-me")
-                    记住密码
-            button.btn.btn-lg.btn-primary.btn-block(type="submit") 登陆
-        a.btn.btn-lg.btn-link.pull-left(href="/signup") 注册
-        a.btn.btn-lg.btn-link.pull-right(href="/forget") 忘记密码
-        if err
-            .show.alert.alert-danger(role="alert") #{err}
+  .mdl-layout.mdl-js-layout.mdl-color--grey-200.login-layout
+    main.mdl-layout__content.login-content
+      .mdl-card.mdl-shadow--6dp
+        .mdl-card__title.mdl-color--primary.mdl-color-text--white
+          h2.mdl-card__title-text CQuiz
+        .mdl-card__supporting-text
+          form#login-form(role="form", method="post")
+            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+              input.mdl-textfield__input(type="email", v-model="email", name="useremail")
+              label.mdl-textfield__label 邮箱
+            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+              input.mdl-textfield__input(type="password", v-model="pass", name="userpass")
+              label.mdl-textfield__label 密码
+            label.mdl-checkbox.mdl-js-checkbox.mdl-js-ripple-effect
+              input.mdl-checkbox__input(type="checkbox")
+              span.mdl-checkbox__label 记住密码
+            button#login-btn-submit.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(type="submit", @click="submit") 登陆
+        .mdl-card__actions.mdl-card--border
+          a.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored(href="/forget") 忘记密码
+          a.pull-right.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored(href="/signup") 注册
+      if err
+        .alert.alert-danger
+          button.close &times;
+          p #{err}
 include ./includes/foot.jade

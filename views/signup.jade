@@ -1,29 +1,32 @@
 include ./includes/head.jade
-    title 注册
-    style.
-        .container {
-            max-width: 430px;
-        }
-        .form-signin-heading {
-            text-align: center;
-        }
-
+  title 注册
+  style.
+    .invalid {
+      color: red;
+    }
 body
-    .container.center-block
-        form.form-signin(role="form", method="post")
-            h2.form-signin-heading 注册
-            label.sr-only(for="inputUsername") 用户名
-            input.input-lg#inputEmail.form-control(type="text", name="username", placeholder="用户名" required)
-            br
-            label.sr-only(for="inputPassWord") 密码
-            input.input-lg#inputPassWord.form-control(type="password", name="password", placeholder="密码" required)
-            br
-            label.sr-only(for="checkPassWord") 确认密码
-            input.input-lg#checkPassWord.form-control(type="password", name="ckpassword", placeholder="确认密码" required)
-            br
-            button.btn.btn-lg.btn-primary.btn-block(type="submit") 注册
-            br
-        a.btn.btn-lg.btn-link.pull-right(href="/login") 登陆
-        if err
-            .show.alert.alert-danger(role="alert") #{err}
+  .mdl-layout.mdl-js-layout.mdl-color--grey-200(style="align-items: center;")
+    main.mdl-layout__content(style="padding: 0 25px;")
+      .mdl-card.mdl-shadow--6dp
+        .mdl-card__title.mdl-color--primary.mdl-color-text--white
+          h2.mdl-card__title-text CQuiz
+        .mdl-card__supporting-text
+          form#signup-form(role="form", method="post")
+            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+              input.mdl-textfield__input(type="email", v-model="email", name="useremail")
+              label.mdl-textfield__label 邮箱
+            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+              input.mdl-textfield__input(type="password", pattern="[0-9,A-Z,a-z,_]{6,}", v-model="pass", name="userpass")
+              label.mdl-textfield__label 密码
+              span.mdl-textfield__error 支持数字,字母,下划线,至少6个字符
+            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+              input.mdl-textfield__input(type="password", pattern="[0-9,A-Z,a-z]{6,}", v-model="ckps", name="userckps")
+              label.mdl-textfield__label 确认密码
+            button#signup-btn-submit.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(style="width:100%;",type="submit",@click="submit") 注册
+        .mdl-card__actions.mdl-card--border
+          a.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored.pull-right(href="/login") 登陆
+      if err
+        .alert.alert-danger
+          button.close &times;
+          p #{err}
 include ./includes/foot.jade

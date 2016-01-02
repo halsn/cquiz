@@ -1,1 +1,0 @@
-{"/home/hosn/Documents/cquiz/gulpfile.js":{"sha1":"14a9a4a6ee17997e70b58467595c3406156a5f85","tasks":{"templates":{"name":"templates","dependencies":""},"jade-watch":{"name":"jade-watch","dependencies":"templates"},"default":{"name":"default","dependencies":"templates"}}}}
