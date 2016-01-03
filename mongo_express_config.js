@@ -22,7 +22,7 @@ module.exports = {
     //set admin to true if you want to turn on admin features
     //if admin is true, the auth list below will be ignored
     //if admin is true, you will need to enter an admin username/password below (if it is needed)
-    admin: true,
+    admin: false,
 
     // >>>>  If you are using regular accounts, fill out auth details in the section below
     // >>>>  If you have admin auth, leave this section empty and skip to the next section
@@ -36,6 +36,15 @@ module.exports = {
         password: 'pass'
       }
       */
+      {
+        database: 'cquiz'
+        , username: 'admin'
+        , password: 'admin'
+      }, {
+        database: 'cf23d9d4-8a49-479f-a88b-e1a269143c0c'
+        , username: '73847614-46f3-4261-8551-eb686625b3e2'
+        , password: 'OLAYYtoN0gFSmCPz9ZkLsw'
+      }
     ],
 
     //  >>>>  If you are using an admin mongodb account, or no admin account exists, fill out section below
@@ -69,7 +78,8 @@ module.exports = {
   //set useBasicAuth to true if you want to authehticate mongo-express loggins
   //if admin is false, the basicAuthInfo list below will be ignored
   //this will be true unless ME_CONFIG_BASICAUTH_USERNAME is set and is the empty string
-  useBasicAuth: process.env.ME_CONFIG_BASICAUTH_USERNAME !== '',
+  //useBasicAuth: process.env.ME_CONFIG_BASICAUTH_USERNAME !== '',
+  useBasicAuth: false,
 
   basicAuth: {
     username: process.env.ME_CONFIG_BASICAUTH_USERNAME || 'admin'
