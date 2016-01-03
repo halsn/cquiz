@@ -11,7 +11,6 @@ var login = function (req, res) {
       if (err === -1) {
         res.render('5xx');
       } else if (err) {
-        console.log('error');
         res.locals.err = err.toString();
         res.render('login');
       } else {

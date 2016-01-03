@@ -1,5 +1,13 @@
 include ./includes/head.jade
   title CQuiz
 body
-  h1 Welcome come to CQuiz
+  .mdl-layout.mdl-js-layout.mdl-layout--fixed-header
+    header.mdl-layout__header.mdl-layout__header--scroll
+      .mdl-layout__header-row
+        span.mdl-layout__title CQuiz
+        .mdl-layout-spacer
+        nav.mdl-navigation
+          a.mdl-navigation__link(href="/signup") 注册
+          a.mdl-navigation__link(href="/login") 登陆
+    main.mdl-layout__content
 include ./includes/foot.jade

@@ -15,6 +15,7 @@
     , "mongodb": "^2.0.43"
     , "mongoose": "^4.1.9"
     , "jade": "^1.11.0"
+    , "mongo-express": "^0.28.4"
   }
   , "engines": {
     "node": "0.12.7"

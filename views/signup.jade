@@ -1,9 +1,5 @@
 include ./includes/head.jade
   title 注册
-  style.
-    .invalid {
-      color: red;
-    }
 body
   .mdl-layout.mdl-js-layout.mdl-color--grey-200(style="align-items: center;")
     main.mdl-layout__content(style="padding: 0 25px;")
@@ -16,7 +12,7 @@ body
               input.mdl-textfield__input(type="email", v-model="email", name="useremail")
               label.mdl-textfield__label 邮箱
             .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
-              input.mdl-textfield__input(type="password", pattern="[0-9,A-Z,a-z,_]{6,}", v-model="pass", name="userpass")
+              input.mdl-textfield__input(type="password", pattern="[0-9,A-Z,a-z,_]{6,30}", v-model="pass", name="userpass")
               label.mdl-textfield__label 密码
               span.mdl-textfield__error 支持数字,字母,下划线,至少6个字符
             .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
@@ -29,4 +25,4 @@ body
         .alert.alert-danger
           button.close &times;
           p #{err}
-include ./includes/foot.jade
+  include ./includes/foot.jade
