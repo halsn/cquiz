@@ -38,8 +38,8 @@ module.exports = {
       */
       {
         database: 'cquiz'
-        , username: 'admin'
-        , password: 'admin'
+        , username: ''
+        , password: ''
       }, {
         database: 'cf23d9d4-8a49-479f-a88b-e1a269143c0c'
         , username: '73847614-46f3-4261-8551-eb686625b3e2'
@@ -78,8 +78,7 @@ module.exports = {
   //set useBasicAuth to true if you want to authehticate mongo-express loggins
   //if admin is false, the basicAuthInfo list below will be ignored
   //this will be true unless ME_CONFIG_BASICAUTH_USERNAME is set and is the empty string
-  //useBasicAuth: process.env.ME_CONFIG_BASICAUTH_USERNAME !== '',
-  useBasicAuth: false,
+  useBasicAuth: process.env.ME_CONFIG_BASICAUTH_USERNAME !== '',
 
   basicAuth: {
     username: process.env.ME_CONFIG_BASICAUTH_USERNAME || 'admin'
