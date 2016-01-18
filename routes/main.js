@@ -9,11 +9,11 @@ var router = express.Router();
 module.exports = router;
 
 router.notFound = function (req, res) {
-    res.render('404');
+  res.render('404');
 }
 
 router.get('/', function (req, res) {
-    res.render('index');
+  res.render('index');
 });
 
 router.get('/login', login).post('/login', login);

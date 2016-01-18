@@ -31,10 +31,10 @@ gulp.task('scripts', function () {
 });
 
 gulp.task('default', ['jade', 'scripts', 'sass'], function () {
-
   browserSync.init({
     proxy: 'localhost:5000'
   });
+
   gulp.watch('./views/*.jade', ['jade']);
   gulp.watch('./dev/js/*.js', ['scripts']);
   gulp.watch('./dev/sass/*.sass', ['sass']);
