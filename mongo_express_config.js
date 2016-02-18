@@ -17,9 +17,9 @@ if (process.env.NODE_ENV === 'development') {
   });
 } else {
   authList.push({
-    database: 'cf23d9d4-8a49-479f-a88b-e1a269143c0c',
-    username: '73847614-46f3-4261-8551-eb686625b3e2',
-    password: 'OLAYYtoN0gFSmCPz9ZkLsw'
+    database: 'db',
+    username: '31ab9491-1055-4f19-91de-251d12b1096a',
+    password: '25bb3a43-8b1c-436e-93eb-93d3118051a4'
   });
 }
 
