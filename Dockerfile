@@ -8,4 +8,4 @@ COPY . /usr/src/app
 
 EXPOSE 80
 
-ENTRYPOINT node app.js
+ENTRYPOINT node app.js --production
