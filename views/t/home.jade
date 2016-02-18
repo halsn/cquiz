@@ -1,0 +1,116 @@
+include ../includes/head.jade
+  link(href="/css/home.css", rel="stylesheet")
+  title Home
+body
+  .mdl-layout.mdl-js-layout.mdl-layout--fixed-drawer.mdl-layout--fixed-header#app
+    header.mdl-layout__header
+      .mdl-layout__header-row
+        span.mdl-layout__title Home
+        .mdl-layout-spacer
+        button#hdrbtn.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--icon
+          i.material-icons more_vert
+        ul.mdl-menu.mdl-menu--bottom-right.mdl-js-menu.mdl-js-ripple-effect(for="hdrbtn")
+          li
+            a.align-center.mdl-menu__item(href="/logout") 退出登陆
+      .mdl-layout__tab-bar.mdl-js-ripple-effect
+        a.mdl-layout__tab(:href="tab.url", v-for="tab in tabs") {{tab.title}}
+    .border-none.mdl-layout__drawer.mdl-color--blue-grey-900.mdl-color-text--blue-grey-50
+      header.home-drawer-header
+        img.home-user-avator(src="/images/user.jpg")
+        span.home-user-info #{useremail}
+      nav.home-drawer-nav.mdl-navigation.mdl-color--blue-grey-800
+        a.align-center.mdl-navigation__link(href="#", @click="setCourseTabs") 课程管理
+        a.align-center.mdl-navigation__link(href="#", @click="setClassTabs") 授课班次
+        a.align-center.mdl-navigation__link(href="#", @click="setInfoTabs") 个人信息
+    main.mdl-layout__content.mdl-color--grey-100
+      section.mdl-layout__tab-panel#course-tab-1
+        .mdl-grid
+          .mdl-cell.mdl-cell--12-col
+            h4 已添加课程
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-for="(cardIdx, card) in cards")
+            .mdl-card__title.mdl-card--border
+              p.mdl-card__title-text(v-text="card.name+'--'+card.term+'('+card.duration+'课时)'")
+              button.mdl-button.mdl-js-button.mdl-button--icon(@click="toggleCard($event)")
+                i.material-icons.full-text fullscreen
+            .mdl-card__supporting-text.body.hide
+              .mdl-grid
+                .mdl-cell.mdl-cell--4-col.mdl-card.mdl-shadow--4dp(v-for="(chapIdx, chapter) in card.chapters", track-by="$index")
+                  .mdl-card__title.mdl-card--border
+                    span.editable(@click="editChapter($event)", v-text="chapter.title | validChapter")
+                    input.editInput.hide(type="text", @blur="editChapter($event)", v-model="chapter.title | validChapter")
+                    button.mdl-button.mdl-js-button.mdl-button--icon(@click="removeChapter(chapIdx, cardIdx)")
+                      i.material-icons remove
+                  .mdl-card__supporting-text
+                    .tag.inline(v-for="(tagIdx, tag) in chapter.tags", track-by="$index")
+                      span.editable.label-info(@click="editTag($event, tagIdx, chapIdx, cardIdx)", v-text="tag | validTag")
+                      input.label-info.editInput.hide(type="text", @blur="editTag($event, tagIdx, chapIdx, cardIdx)", v-model="tag | validTag")
+                    button.mdl-button.mdl-js-button.mdl-button--icon(@click="addTag(chapIdx, cardIdx)")
+                      i.material-icons add
+                .mdl-cell.mdl-cell--4-col.mdl-card.add-chapter
+                  button.mdl-button.mdl-js-button.mdl-button--fab(@click="addChapter(cardIdx)")
+                    i.material-icons note_add
+            .mdl-card__actions.mdl-card--border.body.hide
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="save(cardIdx)") 保存
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="del(cardIdx)") 删除
+      section.mdl-layout__tab-panel#course-tab-2
+        .mdl-grid
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+            .mdl-card__supporting-text
+              .mdl-textfield.input
+                label 课程名：
+                input.mdl-textfield__input(type="text", v-model="course.name | validName")
+              .mdl-textfield.input
+                label 课时：
+                input.mdl-textfield__input(type="number", min="1", max="64", v-model="course.duration", @keypress="check($event)")
+              .select
+                label 学期：
+                select(v-model="course.term")
+                  option(selected) 2015-2016第一学期
+                  option 2015-2016第二学期
+                  option 2016-2017第一学期
+                  option 2016-2017第二学期
+            .mdl-card__actions.mdl-card--border
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="add($event)") 添加
+      section.mdl-layout__tab-panel#course-tab-3
+        .mdl-grid
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+            .mdl-card__supporting-text.width-calc-30
+              .select
+                label 课程：
+                select(v-model="course._id")
+                  option(v-for="course in courses", v-text="course.name+'-'+course.term", :value="course._id")
+              .select
+                label 章节：
+                select(v-model="course.chapter")
+                  option(v-for="(index, chapter) in courses[idx].chapters", v-text="chapter.title", :value="chapter.title", track-by="$index")
+              .mdl-textfield.input
+                label 文件：
+                input.mdl-textfield__input(type="file", @change="read($event)")
+              .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+                .mdl-card__supporting-text.width-calc-30
+                  table.mdl-data-table.table
+                    thead
+                      tr
+                        th 序号
+                        th 题目
+                        th 类型
+                        th 选项
+                        th 参考答案
+                    tbody
+                      tr(v-for="data in jsonData")
+                        td(v-text="$index + 1")
+                        td(v-text="data.题目")
+                        td(v-text="data.类型")
+                        td(v-text="data.选项")
+                        td(v-text="data.参考答案")
+            .mdl-card__actions.mdl-card--border
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="save($event)") 录入
+      section.mdl-layout__tab-panel#class-tab-1 c1
+      section.mdl-layout__tab-panel#class-tab-2 c2
+      section.mdl-layout__tab-panel#class-tab-3 c3
+      section.mdl-layout__tab-panel#class-tab-4 c4
+      section.mdl-layout__tab-panel#class-tab-5 c5
+      section.mdl-layout__tab-panel#info-tab-1 i1
+      section.mdl-layout__tab-panel#info-tab-2 i2
+    .tip#tip.hide 
+  include ../includes/foot.jade

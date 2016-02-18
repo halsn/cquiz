@@ -1,5 +1,5 @@
-var forget = function (req, res) {
-    res.render('forget');
-};
+'use strict';
 
-module.exports = forget;
+module.exports = function (req, res) {
+  res.render('forget');
+}

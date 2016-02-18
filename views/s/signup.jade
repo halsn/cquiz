@@ -1,11 +1,16 @@
-include ./includes/head.jade
+include ../includes/head.jade
+  link(href="/css/signup.css", rel="stylesheet")
   title 注册
 body
-  .mdl-layout.mdl-js-layout.mdl-color--grey-200(style="align-items: center;")
-    main.mdl-layout__content(style="padding: 0 25px;")
+  .mdl-layout.mdl-js-layout.mdl-layout--fixed-header.mdl-color--grey-200.item-center
+    header.mdl-layout__header.mdl-layout__header--scroll
+      .mdl-layout__header-row
+        a.mdl-button.mdl-js-button.mdl-button--icon.back-button(href="/")
+          i.material-icons arrow_back
+    main.mdl-layout__content.content
       .mdl-card.mdl-shadow--6dp
         .mdl-card__title.mdl-color--primary.mdl-color-text--white
-          h2.mdl-card__title-text CQuiz
+          h2.mdl-card__title-text 学生入口
         .mdl-card__supporting-text
           form#signup-form(role="form", method="post")
             .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
@@ -20,9 +25,9 @@ body
               label.mdl-textfield__label 确认密码
             button#signup-btn-submit.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(style="width:100%;",type="submit",@click="submit") 注册
         .mdl-card__actions.mdl-card--border
-          a.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored.pull-right(href="/login") 登陆
+          a.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored.pull-right(href="/s/login") 登陆
       if err
         .alert.alert-danger
           button.close &times;
           p #{err}
-  include ./includes/foot.jade
+  include ../includes/foot.jade

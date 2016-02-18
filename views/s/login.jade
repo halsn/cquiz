@@ -1,0 +1,33 @@
+include ../includes/head.jade
+  link(href="/css/login.css", rel="stylesheet")
+  title 登陆
+body
+  .mdl-layout.mdl-js-layout.mdl-layout--fixed-header.mdl-color--grey-200.item-center
+    header.mdl-layout__header.mdl-layout__header--scroll
+      .mdl-layout__header-row
+        a.mdl-button.mdl-js-button.mdl-button--icon.back-button(href="/")
+          i.material-icons arrow_back
+    main.mdl-layout__content.content
+      .mdl-card.mdl-shadow--6dp
+        .mdl-card__title.mdl-color--primary.mdl-color-text--white
+          h2.mdl-card__title-text 学生入口
+        .mdl-card__supporting-text
+          form#login-form(role="form", method="post")
+            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+              input.mdl-textfield__input(type="email", v-model="email", name="useremail")
+              label.mdl-textfield__label 邮箱
+            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+              input.mdl-textfield__input(type="password", v-model="pass", name="userpass")
+              label.mdl-textfield__label 密码
+            label.mdl-checkbox.mdl-js-checkbox.mdl-js-ripple-effect
+              input.mdl-checkbox__input(type="checkbox")
+              span.mdl-checkbox__label 记住密码
+            button#login-btn-submit.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(type="submit", @click="submit") 登陆
+        .mdl-card__actions.mdl-card--border
+          a.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored(href="/forget") 忘记密码
+          a.pull-right.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored(href="/s/signup") 注册
+      if err
+        .alert.alert-danger
+          button.close &times;
+          p #{err}
+include ../includes/foot.jade

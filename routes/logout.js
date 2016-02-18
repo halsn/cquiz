@@ -1,11 +1,11 @@
-var logout = function (req, res) {
-    req.session.destroy(function (err) {
-        if (err) {
-            res.render('5xx');
-        } else {
-            res.redirect('/');
-        }
-    });
-}
+'use strict';
 
-module.exports = logout;
+module.exports = function (req, res) {
+  req.session.destroy(err => {
+    if (err) {
+      res.render('5xx');
+    } else {
+      res.redirect('/');
+    }
+  });
+}

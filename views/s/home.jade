@@ -1,4 +1,5 @@
-include ./includes/head.jade
+include ../includes/head.jade
+  link(href="/css/home.css", rel="stylesheet")
   title Home
 body
   .mdl-layout.mdl-js-layout.mdl-layout--fixed-drawer.mdl-layout--fixed-header
@@ -10,13 +11,13 @@ body
           i.material-icons more_vert
         ul.mdl-menu.mdl-menu--bottom-right.mdl-js-menu.mdl-js-ripple-effect(for="hdrbtn")
           li
-            a.align-center.mdl-menu__item(href="logout") 退出登陆
+            a.align-center.mdl-menu__item(href="/logout") 退出登陆
     .border-none.mdl-layout__drawer.mdl-color--blue-grey-900.mdl-color-text--blue-grey-50
       header.home-drawer-header
-        img.home-user-avator(src="images/user.jpg")
+        img.home-user-avator(src="/images/user.jpg")
         span.home-user-info #{useremail}
       nav.home-drawer-nav.mdl-navigation.mdl-color--blue-grey-800
-        a.align-center.mdl-navigation__link(href="#") 设置习题
-        a.align-center.mdl-navigation__link(href="#") 情况统计
+        a.align-center.mdl-navigation__link(href="#") 我的课程
+        a.align-center.mdl-navigation__link(href="#") 个人信息
     main.mdl-layout__content.mdl-color--grey-100
-  include ./includes/foot.jade
+  include ../includes/foot.jade

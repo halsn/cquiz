@@ -8,10 +8,25 @@ if (typeof process.env.MONGODB_PORT === 'string') {
   process.env.ME_CONFIG_MONGODB_PORT = mongoConnection.port;
 }
 
+var authList = [];
+if (process.env.NODE_ENV === 'development') {
+  authList.push({
+    database: 'cquiz',
+    username: '',
+    password: ''
+  });
+} else {
+  authList.push({
+    database: 'cf23d9d4-8a49-479f-a88b-e1a269143c0c',
+    username: '73847614-46f3-4261-8551-eb686625b3e2',
+    password: 'OLAYYtoN0gFSmCPz9ZkLsw'
+  });
+}
+
 module.exports = {
   mongodb: {
-    server: process.env.ME_CONFIG_MONGODB_SERVER || 'localhost'
-    , port: process.env.ME_CONFIG_MONGODB_PORT || 27017,
+    server: process.env.ME_CONFIG_MONGODB_SERVER || 'localhost',
+    port: process.env.ME_CONFIG_MONGODB_PORT || 27017,
 
     //autoReconnect: automatically reconnect if connection is lost
     autoReconnect: true,
@@ -26,54 +41,35 @@ module.exports = {
 
     // >>>>  If you are using regular accounts, fill out auth details in the section below
     // >>>>  If you have admin auth, leave this section empty and skip to the next section
-    auth: [
-      /*
-       * Add the the name, the username, and the password of the databases you want to connect to
-       * Add as many databases as you want!
-      {
-        database: 'test',
-        username: 'user',
-        password: 'pass'
-      }
-      */
-      {
-        database: 'cquiz'
-        , username: ''
-        , password: ''
-      }, {
-        database: 'cf23d9d4-8a49-479f-a88b-e1a269143c0c'
-        , username: '73847614-46f3-4261-8551-eb686625b3e2'
-        , password: 'OLAYYtoN0gFSmCPz9ZkLsw'
-      }
-    ],
+    auth: authList,
 
     //  >>>>  If you are using an admin mongodb account, or no admin account exists, fill out section below
     //  >>>>  Using an admin account allows you to view and edit all databases, and view stats
 
     //leave username and password empty if no admin account exists
-    adminUsername: process.env.ME_CONFIG_MONGODB_ADMINUSERNAME || ''
-    , adminPassword: process.env.ME_CONFIG_MONGODB_ADMINPASSWORD || '',
+    adminUsername: process.env.ME_CONFIG_MONGODB_ADMINUSERNAME || '',
+    adminPassword: process.env.ME_CONFIG_MONGODB_ADMINPASSWORD || '',
 
     //whitelist: hide all databases except the ones in this list  (empty list for no whitelist)
     whitelist: [],
 
     //blacklist: hide databases listed in the blacklist (empty list for no blacklist)
     blacklist: []
-  , },
+  },
 
   site: {
     // baseUrl: the URL that mongo express will be located at - Remember to add the forward slash at the stard and end!
-    baseUrl: '/'
-    , host: '0.0.0.0'
-    , port: 8081
-    , cookieSecret: process.env.ME_CONFIG_SITE_COOKIESECRET || 'cookiesecret'
-    , sessionSecret: process.env.ME_CONFIG_SITE_SESSIONSECRET || 'sessionsecret'
-    , cookieKeyName: 'mongo-express'
-    , requestSizeLimit: process.env.ME_CONFIG_REQUEST_SIZE || '100kb'
-    , sslEnabled: process.env.ME_CONFIG_SITE_SSL_ENABLED || false
-    , sslCert: process.env.ME_CONFIG_SITE_SSL_CRT_PATH || ''
-    , sslKey: process.env.ME_CONFIG_SITE_SSL_KEY_PATH || ''
-  , },
+    baseUrl: '/',
+    host: '0.0.0.0',
+    port: 8081,
+    cookieSecret: process.env.ME_CONFIG_SITE_COOKIESECRET || 'cookiesecret',
+    sessionSecret: process.env.ME_CONFIG_SITE_SESSIONSECRET || 'sessionsecret',
+    cookieKeyName: 'mongo-express',
+    requestSizeLimit: process.env.ME_CONFIG_REQUEST_SIZE || '100kb',
+    sslEnabled: process.env.ME_CONFIG_SITE_SSL_ENABLED || false,
+    sslCert: process.env.ME_CONFIG_SITE_SSL_CRT_PATH || '',
+    sslKey: process.env.ME_CONFIG_SITE_SSL_KEY_PATH || ''
+  },
 
   //set useBasicAuth to true if you want to authehticate mongo-express loggins
   //if admin is false, the basicAuthInfo list below will be ignored
@@ -81,9 +77,9 @@ module.exports = {
   useBasicAuth: process.env.ME_CONFIG_BASICAUTH_USERNAME !== '',
 
   basicAuth: {
-    username: process.env.ME_CONFIG_BASICAUTH_USERNAME || 'admin'
-    , password: process.env.ME_CONFIG_BASICAUTH_PASSWORD || 'pass'
-  , },
+    username: process.env.ME_CONFIG_BASICAUTH_USERNAME || 'admin',
+    password: process.env.ME_CONFIG_BASICAUTH_PASSWORD || 'pass'
+  },
 
   options: {
     //documentsPerPage: how many documents you want to see at once in collection view
@@ -106,7 +102,7 @@ module.exports = {
 
     //readOnly: if readOnly is true, components of writing are not visible.
     readOnly: false
-  , },
+  },
 
   // Specify the default keyname that should be picked from a document to display in collections list.
   // Keynames can be specified for every database and collection.
@@ -122,4 +118,4 @@ module.exports = {
   defaultKeyNames: {
 
   }
-, };
+};

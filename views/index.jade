@@ -1,13 +1,14 @@
 include ./includes/head.jade
-  title CQuiz
+  link(href="css/index.css", rel="stylesheet")
+  title 过程化考核
 body
   .mdl-layout.mdl-js-layout.mdl-layout--fixed-header
     header.mdl-layout__header.mdl-layout__header--scroll
       .mdl-layout__header-row
-        span.mdl-layout__title CQuiz
+        span.mdl-layout__title 过程化考核
         .mdl-layout-spacer
         nav.mdl-navigation
-          a.mdl-navigation__link(href="/signup") 注册
-          a.mdl-navigation__link(href="/login") 登陆
+          a.mdl-navigation__link(href="/t/login") 教师入口
+          a.mdl-navigation__link(href="/s/login") 学生入口
     main.mdl-layout__content
 include ./includes/foot.jade
