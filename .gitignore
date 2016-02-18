@@ -21,3 +21,5 @@ node_modules
 .lock-wscript
 dist
 dev
+*.swp
+*.docx
