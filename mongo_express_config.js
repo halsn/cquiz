@@ -9,17 +9,18 @@ if (typeof process.env.MONGODB_PORT === 'string') {
 }
 
 var authList = [];
-if (process.env.NODE_ENV === 'development') {
+if (!process.env.VCAP_SERVICES) {
   authList.push({
     database: 'cquiz',
     username: '',
     password: ''
   });
 } else {
+  var mongo = (JSON.parse(process.env.VCAP_SERVICES))['mongodb-2.4'][0]['credentials'];
   authList.push({
-    database: 'db',
-    username: '31ab9491-1055-4f19-91de-251d12b1096a',
-    password: '25bb3a43-8b1c-436e-93eb-93d3118051a4'
+    database: mongo.db,
+    username: mongo.username,
+    password: mongo.password
   });
 }
 
