@@ -17,7 +17,8 @@ if (!process.env.VCAP_SERVICES) {
     password: ''
   });
 } else {
-  mongo = (JSON.parse(process.env.VCAP_SERVICES))['mongodb-2.4'][0]['credentials'];
+  var env = JSON.parse(process.env.VCAP_SERVICES);
+  mongo = env['mongodb-2.4'][0]['credentials'];
   authList.push({
     database: mongo.db,
     username: mongo.username,
