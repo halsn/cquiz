@@ -13,7 +13,7 @@ var port = (process.env.VCAP_APP_PORT || 5000);
 var host = (process.env.VCAP_APP_HOST || '0.0.0.0');
 
 app.use(express.static(__dirname + '/static'));
-//app.use('/mongo', mongoExpress(mongoExpressConfig));
+app.use('/mongo', mongoExpress(mongoExpressConfig));
 
 app.use(compression());
 app.use(cookieParser());
