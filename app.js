@@ -9,9 +9,11 @@ var mongoExpressConfig = require('./mongo_express_config');
 var compression = require('compression');
 var app = express();
 
-app.set('port', (process.env.PORT || 5000));
+var port = (process.env.VCAP_APP_PORT || 5000);
+var host = (process.env.VCAP_APP_HOST || '0.0.0.0');
+
 app.use(express.static(__dirname + '/static'));
-app.use('/mongo', mongoExpress(mongoExpressConfig));
+//app.use('/mongo', mongoExpress(mongoExpressConfig));
 
 app.use(compression());
 app.use(cookieParser());
@@ -33,6 +35,6 @@ app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
 
 app.use(router);
-app.listen(app.get('port'), '0.0.0.0', () => {
-  console.log(`Node app is running on http:\/\/127.0.0.1:${app.get('port')}`);
+app.listen(port, host, () => {
+  console.log(`Node app is running on http:\/\/127.0.0.1:${port}`);
 });
