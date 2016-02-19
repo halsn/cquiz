@@ -16,15 +16,10 @@
     "mongoose": "^4.1.9",
     "jade": "^1.11.0",
     "mongo-express": "^0.28.4",
-    "compression": "^1.6.1",
-    "vue-router": "^0.7.10",
-    "material-design-lite": "^1.0.6",
-    "vue-resource": "^0.7.0",
-    "xlsx": "^0.8.0",
-    "xlsx-browserify-shim": "^0.0.5"
+    "compression": "^1.6.1"
   },
   "engines": {
-    "node": "^4.2.4",
+    "node": "4.2.4",
     "npm": "2.14.12"
   },
   "repository": {
