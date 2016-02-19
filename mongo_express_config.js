@@ -9,6 +9,7 @@ if (typeof process.env.MONGODB_PORT === 'string') {
 }
 
 var authList = [];
+var mongo = {};
 if (!process.env.VCAP_SERVICES) {
   authList.push({
     database: 'cquiz',
@@ -16,7 +17,7 @@ if (!process.env.VCAP_SERVICES) {
     password: ''
   });
 } else {
-  var mongo = (JSON.parse(process.env.VCAP_SERVICES))['mongodb-2.4'][0]['credentials'];
+  mongo = (JSON.parse(process.env.VCAP_SERVICES))['mongodb-2.4'][0]['credentials'];
   authList.push({
     database: mongo.db,
     username: mongo.username,
@@ -26,8 +27,8 @@ if (!process.env.VCAP_SERVICES) {
 
 module.exports = {
   mongodb: {
-    server: process.env.ME_CONFIG_MONGODB_SERVER || 'localhost',
-    port: process.env.ME_CONFIG_MONGODB_PORT || 27017,
+    server: mongo.host || 'localhost',
+    port: mongo.port || 27017,
 
     //autoReconnect: automatically reconnect if connection is lost
     autoReconnect: true,
