@@ -33,7 +33,7 @@
   },
   "keywords": ["node", "express"],
   "license": "MIT",
-  "devDependencies": {
+  /*"devDependencies": {
     "gulp": "^3.9.0",
     "browser-sync": "^2.10.1",
     "gulp-jade": "^1.1.0",
@@ -52,5 +52,5 @@
     "browserify-shim": "^3.8.12",
     "gulp-uglify": "^1.5.1",
     "gulp-nodemon": "^2.0.6"
-  }
+  }*/
 }
