@@ -22,7 +22,8 @@ var opts = {
 
 var babelOpts = {
   ignore: ['./dev/js/vendor/*'],
-  compact: false
+  compact: false,
+  presets: ['es2015']
 };
 
 var b = browserify(opts).transform(babel.configure(babelOpts));
@@ -61,10 +62,21 @@ gulp.task('scripts', function () {
   bundle();
 });
 
-gulp.task('compress', function () {
-  return gulp.src('./static/js/bundle.js')
-    .pipe(uglify().on('error', gutil.log))
+gulp.task('compressJS', function () {
+  return b.bundle()
+    .on('error', err => console.log(err))
+    .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe(uglify())
     .pipe(gulp.dest('./static/js'));
+});
+
+gulp.task('compressCSS', function () {
+  return gulp.src('./dev/sass/**/*.sass')
+    .pipe(sass({
+      outputStyle: 'compressed'
+    }))
+    .pipe(gulp.dest('./static/css'));
 });
 
 gulp.task('default', ['start', 'jade', 'sass', 'scripts'], function () {
