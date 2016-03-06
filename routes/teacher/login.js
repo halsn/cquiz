@@ -1,5 +1,5 @@
 'use strict';
-var Teacher = require('../../lib/teacher.js');
+var Teacher = require('../../lib/teacher');
 
 module.exports.get = function (req, res) {
   res.locals.err = '';

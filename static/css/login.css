@@ -5705,17 +5705,27 @@ _:-ms-input-placeholder, :root .mdl-slider.mdl-slider.is-upgraded {
 .inline {
   display: inline; }
 
+.block {
+  display: block; }
+
+.full-width {
+  width: 100%; }
+
 .tip {
   height: 40px;
   background-color: transparent;
-  margin: 0 auto;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
   padding: 10px 10px 10px 10px;
   border-radius: 5px 5px 0 0;
   max-width: 30%;
   max-height: 10%;
   height: auto;
   text-align: left;
-  overflow: hidden; }
+  overflow: hidden;
+  z-index: 99; }
 
 .select {
   border: none;
@@ -5764,7 +5774,7 @@ _:-ms-input-placeholder, :root .mdl-slider.mdl-slider.is-upgraded {
         .table th:nth-child(1) {
           width: 20%; } }
     .table th:nth-child(2) {
-      width: 44%; }
+      width: 34%; }
       @media screen and (min-width: 1px) and (max-width: 768px) {
         .table th:nth-child(2) {
           width: 80%; } }
@@ -5783,7 +5793,83 @@ _:-ms-input-placeholder, :root .mdl-slider.mdl-slider.is-upgraded {
       @media screen and (min-width: 1px) and (max-width: 768px) {
         .table th:nth-child(5) {
           display: none; } }
+    .table th:nth-child(5) {
+      width: 10%; }
+      @media screen and (min-width: 1px) and (max-width: 768px) {
+        .table th:nth-child(5) {
+          display: none; } }
   .table td {
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; }
+
+.table-class {
+  table-layout: fixed;
+  width: 100%; }
+  .table-class th {
+    text-align: left; }
+    .table-class th:nth-child(1) {
+      width: 20%; }
+      @media screen and (min-width: 1px) and (max-width: 768px) {
+        .table-class th:nth-child(1) {
+          width: 20%; } }
+    .table-class th:nth-child(2) {
+      width: 20%; }
+      @media screen and (min-width: 1px) and (max-width: 768px) {
+        .table-class th:nth-child(2) {
+          width: 30%; } }
+    .table-class th:nth-child(3) {
+      width: 20%; }
+      @media screen and (min-width: 1px) and (max-width: 768px) {
+        .table-class th:nth-child(3) {
+          width: 50%; } }
+    .table-class th:nth-child(4) {
+      width: 20%; }
+      @media screen and (min-width: 1px) and (max-width: 768px) {
+        .table-class th:nth-child(4) {
+          display: none; } }
+    .table-class th:nth-child(5) {
+      width: 20%; }
+      @media screen and (min-width: 1px) and (max-width: 768px) {
+        .table-class th:nth-child(5) {
+          display: none; } }
+  .table-class td {
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; }
+
+.range {
+  border: none;
+  width: 300px;
+  max-width: 100%;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  padding: 0 0 20px 0; }
+  .range > label {
+    width: 30%;
+    font-size: 1.4em; }
+  .range .mdl-slider__container {
+    width: 100%; }
+
+.pub-table {
+  width: 100%;
+  table-layout: fixed; }
+  .pub-table th {
+    text-align: left; }
+    .pub-table th:nth-child(1) {
+      width: 20%; }
+    .pub-table th:nth-child(2) {
+      width: 20%; }
+    .pub-table th:nth-child(3) {
+      width: 30%; }
+    .pub-table th:nth-child(4) {
+      width: 30%; }
+  .pub-table td {
     text-align: left;
     overflow: hidden;
     white-space: nowrap;

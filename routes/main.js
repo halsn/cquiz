@@ -10,6 +10,9 @@ var sHome = require('./student/home');
 var tCourse = require('./api/t/_course');
 var tTeacher = require('./api/t/_teacher');
 var tQset = require('./api/t/_qset');
+var tClass = require('./api/t/_class');
+var tTest = require('./api/t/_test');
+var qr = require('./api/qr');
 
 module.exports = router;
 
@@ -50,6 +53,22 @@ router
   .post('/api/t/qset', tQset.post)
   .put('/api/t/qset', tQset.put)
   .delete('/api/t/qset', tQset.del);
+
+router
+  .get('/api/t/class', tClass.get)
+  .post('/api/t/class', tClass.post)
+  .put('/api/t/class', tClass.put)
+  .delete('/api/t/class', tClass.del);
+
+
+router
+  .get('/api/t/test/:uuid', tTest.get)
+  .post('/api/t/test', tTest.post)
+  .put('/api/t/test/:uuid', tTest.put)
+  .delete('/api/t/test/:uuid', tTest.del);
+
+router
+  .get('/api/qr', qr.get);
 
 router.get('*', (req, res) => {
   res.status(404).render('404');

@@ -1,5 +1,7 @@
 var Course = require('../../../lib/course');
 var Teacher = require('../../../lib/teacher');
+var Qset = require('../../../lib/qset');
+var Class = require('../../../lib/class');
 
 function _get(req, res) {
   if (!req.session.user) return res.end('no auth');
@@ -9,8 +11,7 @@ function _get(req, res) {
     })
     .exec((err, docs) => {
       if (err) return res.render('5xx');
-      res.json(docs);
-      res.end();
+      res.json(docs).end();
     });
 }
 
@@ -29,6 +30,7 @@ function _put(req, res) {
   if (!req.session.user) return res.status(500).end('no auth');
   var id = req.body._id;
   var chapters = req.body.chapters;
+  var titles = chapters.map(c => c.title);
   if (new Set(chapters.map(c => c.title)).size !== chapters.length) return res.status(500).end();
   Course.update({
     _id: id
@@ -38,7 +40,15 @@ function _put(req, res) {
     }
   }, (err, doc) => {
     if (err) return res.status(500).end();
-    res.status(200).end();
+    Qset.find({
+        ref_course: id
+      })
+      .where('ref_chapter').nin(titles)
+      .remove()
+      .exec((err, sets) => {
+        if (err) return res.status(500).end();
+        res.status(200).end();
+      });
   });
 }
 
@@ -49,7 +59,19 @@ function _del(req, res) {
     _id: id
   }, err => {
     if (err) return res.status(500).end();
-    res.status(200).end();
+    Class.remove({
+      ref_course: id
+    }).exec(err => {
+      if (err) return res.status(500).end();
+      else {
+        Qset.remove({
+          ref_course: id
+        }).exec(err => {
+          if (err) return res.status(500).end();
+          res.status(200).end();
+        });
+      }
+    });
   });
 }
 

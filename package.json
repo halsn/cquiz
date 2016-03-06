@@ -16,7 +16,9 @@
     "mongoose": "^4.1.9",
     "jade": "^1.11.0",
     "mongo-express": "^0.28.4",
-    "compression": "^1.6.1"
+    "compression": "^1.6.1",
+    "node-uuid": "^1.4.7",
+    "qr-image": "^3.1.0"
   },
   "engines": {
     "node": "4.2.4",
@@ -27,5 +29,6 @@
     "url": "https://coding.net/u/hosn/p/cquiz/git"
   },
   "keywords": ["node", "express"],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {}
 }

@@ -1,0 +1,65 @@
+include ./includes/head.jade
+  link(href="/css/test.css", rel="stylesheet")
+  title 答题中
+body
+  .mdl-layout.mdl-js-layout.mdl-layout--fixed-header.mdl-color--grey-200#testApp
+    header.mdl-layout__header
+      .mdl-layout__header-row
+        h6(v-if="pass && !showAns") 剩余时间：{{ min }}分{{ sec }}秒
+    main.mdl-layout__content.mdl-color--grep-100
+      .mdl-grid(v-if="pass")
+        .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-for="(qidx, quiz) in quizs", v-show="show[qidx]")
+          .mdl-card__title.mdl-card--border
+            h5 {{ qidx+1 }}.（{{ quiz.genre }}）{{ quiz.describe.content }}
+          .mdl-card__supporting-text
+            .mdl-grid
+              .mdl-cell.mdl-cell--12-col(v-for="(sidx, sel) in quiz.selections")
+                p {{ charMap[sidx] }}.{{ sel }}
+              .mdl-cell.mdl-cell--12-col(v-if="quiz.genre === '多选题' && !showAns")
+                label.mdl-checkbox.mdl-js-checkbox.mdl-js-ripple-effect(v-for="(oidx, sel) in quiz.selections")
+                  input.mdl-checkbox__input(type="checkbox", :value="oidx", v-model="answered[qidx]")
+                  span.mdl-checkbox__label {{ charMap[oidx] }}
+              .mdl-cell.mdl-cell--12-col(v-if="quiz.genre === '单选题' && !showAns")
+                label.mdl-radio.mdl-js-radio.mdl-js-ripple-effect.block(v-for="(oidx, sel) in quiz.selections")
+                  input.mdl-radio__button(type="radio", :name="qidx", :value="oidx", v-model="answered[qidx]")
+                  span.mdl-radio__label {{ charMap[oidx] }}
+              .mdl-cell.mdl-cell--12-col(v-if="quiz.genre === '判断题' && !showAns")
+                label.mdl-radio.mdl-js-radio.mdl-js-ripple-effect.block
+                  input.mdl-radio__button(type="radio", :name="qidx", :value="1", v-model="answered[qidx]")
+                  span.mdl-radio__label 正确
+                label.mdl-radio.mdl-js-radio.mdl-js-ripple-effect.block
+                  input.mdl-radio__button(type="radio", :name="qidx", :value="0", v-model="answered[qidx]")
+                  span.mdl-radio__label 错误
+              .mdl-cell.mdl-cell--12-col(v-if="quiz.genre === '问答题' && !showAns")
+                .mdl-textfield.mdl-js-textfield.full-width
+                  textarea.mdl-textfield__input(type="text", v-model="answered[qidx]")
+                  label.mdl-textfield__label 请填写内容
+              .mdl-cell.mdl-cell--12-col(v-if="showAns")
+                h5 参考答案
+                p {{ quiz.answers }}
+          .mdl-card__actions.mdl-card--border
+            button.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(style="width:50%", @click="pre($event, qidx)") 上一题
+            button.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(style="width:50%", @click="next($event, qidx)") 下一题
+        .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-show="finished")
+          .mdl-card__title.mdl-card--border
+            h5 提交的答案
+          .mdl-card__supporting-text(v-if="!showAns")
+            p {{ disans }}
+          .mdl-card__supporting-text(v-if="showAns")
+            p(v-for="(didx, dis) in disanswered") {{ didx+1 }}.{{ dis }}
+              i.material-icons.mdl-color-text--red-600(v-show="!icons[didx]") error
+              i.material-icons.mdl-color-text--green-600(v-show="icons[didx]") done
+          .mdl-card__actions.mdl-card--border(v-if="!lock")
+            button.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(style="width:100%", @click="send($event)") 提交
+      .mdl-card.mdl-shadow--6dp(style="margin:20px auto", v-if="!pass")
+        .mdl-card__supporting-text
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+            input.mdl-textfield__input(type="text", v-model="no")
+            label.mdl-textfield__label 学号
+          button.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(style="width:100%;margin-top:20px", @click="start($event)") 开始！
+      .alert.alert-danger(style="margin:20px auto", v-if="miss")
+        p 学号未匹配，请联系授课教师
+      .alert.alert-danger(style="margin:20px auto", v-if="lock")
+        p 测试已失效
+    .tip#tip.hide
+include ./includes/foot.jade

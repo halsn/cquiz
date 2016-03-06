@@ -29,7 +29,7 @@ body
             h4 已添加课程
           .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-for="(cardIdx, card) in cards")
             .mdl-card__title.mdl-card--border
-              p.mdl-card__title-text(v-text="card.name+'--'+card.term+'('+card.duration+'课时)'")
+              p.mdl-card__title-text(v-text="card.name+'-'+card.term+'('+card.duration+'课时)'")
               button.mdl-button.mdl-js-button.mdl-button--icon(@click="toggleCard($event)")
                 i.material-icons.full-text fullscreen
             .mdl-card__supporting-text.body.hide
@@ -50,7 +50,7 @@ body
                   button.mdl-button.mdl-js-button.mdl-button--fab(@click="addChapter(cardIdx)")
                     i.material-icons note_add
             .mdl-card__actions.mdl-card--border.body.hide
-              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="save(cardIdx)") 保存
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="save(cardIdx, $event)") 保存
               button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="del(cardIdx)") 删除
       section.mdl-layout__tab-panel#course-tab-2
         .mdl-grid
@@ -59,9 +59,10 @@ body
               .mdl-textfield.input
                 label 课程名：
                 input.mdl-textfield__input(type="text", v-model="course.name | validName")
-              .mdl-textfield.input
+              .range
                 label 课时：
-                input.mdl-textfield__input(type="number", min="1", max="64", v-model="course.duration", @keypress="check($event)")
+                input.mdl-slider.mdl-js-slider(type="range", min="16", max="64", value="32", step="8", v-model="course.duration")
+                span(v-text="course.duration")
               .select
                 label 学期：
                 select(v-model="course.term")
@@ -85,7 +86,22 @@ body
                   option(v-for="(index, chapter) in courses[idx].chapters", v-text="chapter.title", :value="chapter.title", track-by="$index")
               .mdl-textfield.input
                 label 文件：
-                input.mdl-textfield__input(type="file", @change="read($event)")
+                input.mdl-textfield__input(type="file", @change="read($event)", @click="read($event)")
+              p
+                i.material-icons.mdl-color-text--blue-600 info
+                Excel文件第一行请按下表内容填写，全部内容填写在第一个表单中，目前支持判断题，单选题，多选题，问答题
+              p
+                i.material-icons.mdl-color-text--blue-600 info
+                判断题参考答案只能为‘正确’或‘错误’
+              p
+                i.material-icons.mdl-color-text--blue-600 info
+                判断题选择题选项开头必须为'A.'的格式，参考答案为[A-Z],用','隔开，点和逗号全部为英文符号
+              p
+                i.material-icons.mdl-color-text--blue-600 info
+                知识点必须为当前章节里的知识点，不得为空
+              p
+                i.material-icons.mdl-color-text--blue-600 info
+                本章节习题以最后一次录入为准
               .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
                 .mdl-card__supporting-text.width-calc-30
                   table.mdl-data-table.table
@@ -96,6 +112,7 @@ body
                         th 类型
                         th 选项
                         th 参考答案
+                        th 知识点
                     tbody
                       tr(v-for="data in jsonData")
                         td(v-text="$index + 1")
@@ -103,14 +120,216 @@ body
                         td(v-text="data.类型")
                         td(v-text="data.选项")
                         td(v-text="data.参考答案")
+                        td(v-text="data.知识点")
             .mdl-card__actions.mdl-card--border
               button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="save($event)") 录入
-      section.mdl-layout__tab-panel#class-tab-1 c1
-      section.mdl-layout__tab-panel#class-tab-2 c2
-      section.mdl-layout__tab-panel#class-tab-3 c3
-      section.mdl-layout__tab-panel#class-tab-4 c4
-      section.mdl-layout__tab-panel#class-tab-5 c5
-      section.mdl-layout__tab-panel#info-tab-1 i1
-      section.mdl-layout__tab-panel#info-tab-2 i2
-    .tip#tip.hide 
+      section.mdl-layout__tab-panel#course-tab-4
+        .mdl-grid
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+            .mdl-card__supporting-text.width-calc-30
+              .select
+                label 课程：
+                select(v-model="course._id")
+                  option(v-for="course in courses", v-text="course.name+'-'+course.term", :value="course._id")
+              .select
+                label 章节：
+                select(v-model="course.chapter")
+                  option(v-for="(index, chapter) in courses[idx].chapters", v-text="chapter.title", :value="chapter.title", track-by="$index")
+              .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+                .mdl-card__supporting-text.width-calc-30
+                  table.mdl-data-table.table
+                    thead
+                      tr
+                        th 序号
+                        th 题目
+                        th 类型
+                        th 选项
+                        th 参考答案
+                        th 知识点
+                    tbody
+                      tr(v-for="quiz in quizs")
+                        td(v-text="$index + 1")
+                        td(v-text="quiz.describe.content")
+                        td(v-text="quiz.genre")
+                        td(v-text="quiz.selections")
+                        td(v-text="quiz.answers")
+                        td(v-text="quiz.ref_point")
+            .mdl-card__actions.mdl-card--border
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="get($event)") 查询
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="del($event)") 删除
+      section.mdl-layout__tab-panel#class-tab-1
+        .mdl-grid
+          .mdl-cell.mdl-cell--12-col
+            h4 已添加班次
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-for="(cidx, class) in classes")
+            .mdl-card__title.mdl-card--border
+              p.mdl-card__title-text(v-text="class.class_name")
+              button.mdl-button.mdl-js-button.mdl-button--icon(@click="toggleCard($event)")
+                i.material-icons.full-text fullscreen
+            .mdl-card__supporting-text.width-calc-30.hide.body
+              table.mdl-data-table.table-class
+                thead
+                  tr
+                    th 序号
+                    th 姓名
+                    th 学号
+                    th 专业
+                    th 班级
+                tbody
+                  tr(v-for="student in class.ref_students")
+                    td(v-text="$index + 1")
+                    td(v-text="student.name")
+                    td(v-text="student.no")
+                    td(v-text="student.spercialty")
+                    td(v-text="student.className")
+            .mdl-card__actions.mdl-card--border.hide.body
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="del(cidx)") 删除
+      section.mdl-layout__tab-panel#class-tab-2
+        .mdl-grid
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+            .mdl-card__supporting-text
+              .select
+                label 课程：
+                select(v-model="course")
+                  option(v-for="course in courses", v-text="course.name+'-'+course.term", :value="course")
+              .mdl-textfield.input
+                label 班级名：
+                input.mdl-textfield__input(type="text", v-model="className | validName")
+            .mdl-card__actions.mdl-card--border
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="addClass($event)") 添加
+      section.mdl-layout__tab-panel#class-tab-3
+        .mdl-grid
+          .mdl-cell.mdl-card.mdl-cell--12-col.mdl-shadow--2dp
+            .mdl-card__supporting-text.width-calc-30
+              .select
+                label 班次：
+                select(v-model="Class")
+                  option(v-for="(idx, class) in classes", v-text="class.class_name", :value="class")
+              .mdl-textfield.input
+                label 名单：
+                input.mdl-textfield__input(type="file", @change="read($event)", @click="read($event)")
+              p
+                i.material-icons.mdl-color-text--blue-600 info
+                Excel文件第一行请按下表内容填写，全部内容填写在第一个表单中
+              p
+                i.material-icons.mdl-color-text--blue-600 info
+                本班次学生名单以最后一次录入为准
+              .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+                .mdl-card__supporting-text.width-calc-30
+                  table.mdl-data-table.table-class
+                    thead
+                      tr
+                        th 序号
+                        th 姓名
+                        th 学号
+                        th 专业
+                        th 班级
+                    tbody
+                      tr(v-for="data in jsonData")
+                        td(v-text="$index + 1")
+                        td(v-text="data.姓名")
+                        td(v-text="data.学号")
+                        td(v-text="data.专业")
+                        td(v-text="data.班级")
+            .mdl-card__actions.mdl-card--border
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="save($event)") 录入
+      section.mdl-layout__tab-panel#class-tab-4
+        .mdl-grid
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+            .mdl-card__supporting-text.width-calc-30
+              .select
+                label 班次：
+                select(v-model="Class", @change="get")
+                  option(v-for="class in classes", v-text="class.class_name", :value="class")
+              .range
+                label 用时：
+                input.mdl-slider.mdl-js-slider(type="range", min="5", max="30", value="10", step="5", v-model="duration")
+                span(v-text="duration")
+              .range
+                label 判断：
+                input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxjudgeNum", value="0", step="1", v-model="judgeNum")
+                span(v-text="judgeNum")
+              .range
+                label 单选：
+                input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxsingleNum", value="0", step="1", v-model="singleNum")
+                span(v-text="singleNum")
+              .range
+                label 多选：
+                input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxmultiNum", value="0", step="1", v-model="multiNum")
+                span(v-text="multiNum")
+              .range
+                label 问答：
+                input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxaskNum", value="0", step="1", v-model="askNum")
+                span(v-text="askNum")
+              .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+                .mdl-card__supporting-text.width-calc-30
+                  table.mdl-data-table.mdl-js-data-table.mdl-data-table--selectable.pub-table(@click="getQuizNum($event)")
+                    thead
+                      tr
+                        th 序号
+                        th 章节
+                        th 习题数
+                    tbody
+                      tr(v-for="(idx, qset) in qsets")
+                        td(v-text="idx + 1")
+                        td(v-text="qset.ref_chapter")
+                        td(v-text="qset.quizs.length")
+                  h5 题目总数：{{ quizNum }}
+                  h5 需完成数：{{ expireNum }}
+                  h5 学生总数：{{ studentNum }}
+            .mdl-card__actions.mdl-card--border
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="pub($event)") 发布
+      section.mdl-layout__tab-panel#class-tab-5
+        .mdl-grid
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+            .mdl-card__supporting-text.width-calc-30
+              .select
+                label 班次：
+                select(v-model="classId", @change="get")
+                  option(v-for="class in classes", :value="class._id", v-text="class.class_name")
+              .select
+                label 时间：
+                select(v-model="test", @change="clearStatus")
+                  option(v-for="test in testList", :value="test", v-text="test.createAt | formatTime")
+            .mdl-card__actions.mdl-card--border
+              button.mdl-button.mdl-js-button.mdl-button--primary(@click="getStatus($event)") 获取状态
+              a.pull-right.mdl-button.mdl-js-button.mdl-button--icon(:href="qrurl", target="blank", @click="share($event)")
+                i.material-icons share
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--icon(@click="analysis($event)")
+                i.material-icons assessment
+          .mdl-cell.mdl-cell--12-col(v-show="showStatus")
+            h5 未完成同学名单
+            p {{ unfinishList | formatUnfinish }}
+          .mdl-cell.mdl-cell--12-col(v-show="showStatus")
+            h5 已完成同学列表
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-show="showStatus", v-for="(sidx, s) in finishedList")
+            .mdl-card__title.mdl-card--border
+              p.mdl-card__title-text {{ s.name }}-{{ s.no }}
+            .mdl-card__supporting-text.width-calc-30
+              .mdl-grid
+                .mdl-cell.mdl-cell--12-col(v-show="!s.isChecked")
+                  h5 未批改题目
+                .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-for="(qidx, q) in s.ref_quizs", v-if="q.genre==='问答题'", v-show="!s.isChecked")
+                  .mdl-card__supporting-text.width-calc-30
+                    p 问题描述： {{ q.describe.content }}
+                    p 参考答案：{{ q.answers }}
+                    p 提交的答案：{{ q.answered }}
+                    .range
+                      label 评分：
+                      input.mdl-slider.mdl-js-slider(type="range", min="0", max="10", value="5", step="1", v-model="q.score")
+                      span(v-text="q.score")
+                .mdl-cell.mdl-cell--12-col(v-show="s.isChecked")
+                  h5 测试结果
+                  p 题目总数：{{ s.ref_quizs.length }}
+                  p 正确数目：{{ s.ref_quizs | getRightNum}}
+                  p 错误数目：{{ s.ref_quizs | getWrongNum }}
+                  p 总分：{{ s.ref_quizs | getSum }}
+                  p 问答题得分：{{ s.ref_quizs | getAskScore}}
+                  p 其他题得分：{{ s.ref_quizs | getOtherScore}}
+                  p 总得分：{{ s.ref_quizs | getSumScore }}
+            .mdl-card__actions.mdl-card--border(v-show="!s.isChecked")
+              button.pull-right.mdl-button.mdl-js-button(@click="save($event, sidx)") 保存
+      section.mdl-layout__tab-panel#info-tab-1 todo
+      section.mdl-layout__tab-panel#info-tab-2 todo
+  .tip#tip.hide 
   include ../includes/foot.jade
