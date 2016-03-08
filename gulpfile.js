@@ -14,6 +14,14 @@ var babel = require('babelify');
 var exec = require('child_process').exec;
 
 var opts = {
+  entries: './dev/js/main.js',
+  debug: true,
+  cache: {},
+  packageCache: {},
+  plugin: [watchify]
+};
+
+var optt = {
   entries: './dev/js/test.js',
   debug: true,
   cache: {},
@@ -28,7 +36,7 @@ var babelOpts = {
 };
 
 var b = browserify(opts).transform(babel.configure(babelOpts));
-var t = browserify(opts).transform(babel.configure(babelOpts));
+var t = browserify(optt).transform(babel.configure(babelOpts));
 
 function bundle() {
   return b.bundle()
