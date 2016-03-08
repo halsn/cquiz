@@ -32,7 +32,7 @@ body
                   span.mdl-radio__label 错误
               .mdl-cell.mdl-cell--12-col(v-if="quiz.genre === '问答题' && !showAns")
                 .mdl-textfield.mdl-js-textfield.full-width
-                  textarea.mdl-textfield__input(type="text", v-model="answered[qidx]")
+                  textarea.mdl-textfield__input(type="text", v-model="answered[qidx]", @paste="paste($event)")
                   label.mdl-textfield__label 请填写内容
               .mdl-cell.mdl-cell--12-col(v-if="showAns")
                 h5 参考答案
@@ -62,4 +62,4 @@ body
       .alert.alert-danger(style="margin:20px auto", v-if="lock")
         p 测试已失效
     .tip#tip.hide
-include ./includes/foot.jade
+  script(src="/js/app.test.js")

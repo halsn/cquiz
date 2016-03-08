@@ -14,7 +14,7 @@ var babel = require('babelify');
 var exec = require('child_process').exec;
 
 var opts = {
-  entries: './dev/js/main.js',
+  entries: './dev/js/test.js',
   debug: true,
   cache: {},
   packageCache: {},
@@ -28,6 +28,7 @@ var babelOpts = {
 };
 
 var b = browserify(opts).transform(babel.configure(babelOpts));
+var t = browserify(opts).transform(babel.configure(babelOpts));
 
 function bundle() {
   return b.bundle()
@@ -61,6 +62,25 @@ gulp.task('jade', function () {
 
 gulp.task('scripts', function () {
   bundle();
+});
+
+gulp.task('scriptTest', function () {
+  return t.bundle()
+    .on('error', err => console.log(err))
+    .pipe(source('test.js'))
+    .pipe(buffer())
+    .pipe(gulp.dest('./static/js'));
+});
+
+gulp.task('compressTest', function () {
+  return gulp.src([
+      './static/js/material.min.js',
+      './static/js/vue.min.js',
+      './static/js/test.js'
+    ])
+    .pipe(concat('app.test.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('./static/js'));
 });
 
 gulp.task('compressJS', function () {
