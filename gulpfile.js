@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var concat = require('gulp-concat');
 var gutil = require('gulp-util');
 var browserSync = require('browser-sync').create();
 var jade = require('gulp-jade');
@@ -63,10 +64,13 @@ gulp.task('scripts', function () {
 });
 
 gulp.task('compressJS', function () {
-  return b.bundle()
-    .on('error', err => console.log(err))
-    .pipe(source('bundle.js'))
-    .pipe(buffer())
+  return gulp.src([
+      './static/js/material.min.js',
+      './static/js/vue.min.js',
+      './static/js/xlsx.core.min.js',
+      './static/js/bundle.js'
+    ])
+    .pipe(concat('app.js'))
     .pipe(uglify())
     .pipe(gulp.dest('./static/js'));
 });

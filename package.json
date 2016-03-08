@@ -30,5 +30,6 @@
   },
   "keywords": ["node", "express"],
   "license": "MIT",
-  "devDependencies": {}
+  "devDependencies": {
+  }
 }

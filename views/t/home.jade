@@ -302,7 +302,7 @@ body
               .mdl-grid
                 .mdl-cell.mdl-cell--12-col(v-show="!s.isChecked")
                   h5 未批改题目
-                .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-for="(qidx, q) in s.ref_quizs", v-if="q.genre==='问答题'", v-show="!s.isChecked")
+                .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-for="(qidx, q) in s.ref_quizs", v-if="q.genre==='问答题' && !s.isChecked")
                   .mdl-card__supporting-text.width-calc-30
                     p 问题描述： {{ q.describe.content }}
                     p 参考答案：{{ q.answers }}
@@ -314,11 +314,11 @@ body
                 .mdl-cell.mdl-cell--12-col(v-show="s.isChecked")
                   h5 测试结果
                   p 题目总数：{{ s.ref_quizs.length }}
-                  p 正确数目：{{ s.ref_quizs | getRightNum}}
+                  p 正确数目：{{ s.ref_quizs | getRightNum }}
                   p 错误数目：{{ s.ref_quizs | getWrongNum }}
                   p 总分：{{ s.ref_quizs | getSum }}
-                  p 问答题得分：{{ s.ref_quizs | getAskScore}}
-                  p 其他题得分：{{ s.ref_quizs | getOtherScore}}
+                  p 问答题得分：{{ s.ref_quizs | getAskScore }}
+                  p 其他题得分：{{ s.ref_quizs | getOtherScore }}
                   p 总得分：{{ s.ref_quizs | getSumScore }}
             .mdl-card__actions.mdl-card--border(v-show="!s.isChecked")
               button.pull-right.mdl-button.mdl-js-button(@click="save($event, sidx)") 保存

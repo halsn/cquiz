@@ -163,7 +163,7 @@ function _put(req, res) {
             } else {
               q.isRight = q.answered.sort().join('') === q.answers.sort().join('');
               q.isChecked = true;
-              if (q.isRight) q.score = 10;
+              if (q.isRight) q.score = 5;
               else q.score = 0;
             }
             return q;
