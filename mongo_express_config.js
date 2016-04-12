@@ -80,8 +80,8 @@ module.exports = {
   useBasicAuth: process.env.ME_CONFIG_BASICAUTH_USERNAME !== '',
 
   basicAuth: {
-    username: process.env.ME_CONFIG_BASICAUTH_USERNAME || 'cquizmongo',
-    password: process.env.ME_CONFIG_BASICAUTH_PASSWORD || 'H5239'
+    username: process.env.ME_CONFIG_BASICAUTH_USERNAME || 'mongoadmin',
+    password: process.env.ME_CONFIG_BASICAUTH_PASSWORD || 'mongo'
   },
 
   options: {

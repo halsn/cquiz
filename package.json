@@ -4,7 +4,8 @@
   "description": "A sample Node.js app using Express 4",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "80": "VCAP_APP_PORT=80 node app.js"
   },
   "dependencies": {
     "bcryptjs": "^2.3.0",
