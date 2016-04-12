@@ -10,7 +10,15 @@ if (typeof process.env.MONGODB_PORT === 'string') {
 
 var authList = [];
 var mongo = {};
-if (!process.env.VCAP_SERVICES) {
+if (process.env.DAO) {
+  authList.push({
+    database: 'I5FwBvGcQ2eAyg1d',
+    username: 'uUBLVc86oHtmkjy7',
+    password: 'pX9LDQM0JGInmj6ea'
+  });
+  mongo.host = '10.10.72.139';
+  mongo.port = 27017;
+} else if (!process.env.VCAP_SERVICES) {
   authList.push({
     database: 'cquiz',
     username: '',
