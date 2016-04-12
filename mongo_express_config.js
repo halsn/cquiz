@@ -10,14 +10,14 @@ if (typeof process.env.MONGODB_PORT === 'string') {
 
 var authList = [];
 var mongo = {};
-if (process.env.DAO) {
+if (process.env.MONGODB_CONNECTION) {
   authList.push({
-    database: 'I5FwBvGcQ2eAyg1d',
-    username: 'uUBLVc86oHtmkjy7',
-    password: 'pX9LDQM0JGInmj6ea'
+    database: process.env.MONGODB_INSTANCE_NAME,
+    username: process.env.MONGODB_USERNAME,
+    password: process.env.MONGODB_PASSWORD
   });
-  mongo.host = '10.10.72.139';
-  mongo.port = 27017;
+  mongo.host = process.env.MONGODB_PORT_27017_TCP_ADDR;
+  mongo.port = process.env.MONGODB_PORT_27017_TCP_PORT;
 } else if (!process.env.VCAP_SERVICES) {
   authList.push({
     database: 'cquiz',
