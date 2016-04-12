@@ -36,7 +36,7 @@ if (process.env.DAO) {
 
 module.exports = {
   mongodb: {
-    server: mongo.host || 'localhost',
+    server: mongo.host || '0.0.0.0',
     port: mongo.port || 27017,
 
     //autoReconnect: automatically reconnect if connection is lost

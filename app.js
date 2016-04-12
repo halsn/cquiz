@@ -36,5 +36,5 @@ app.set('views', __dirname + '/views');
 
 app.use(router);
 app.listen(port, host, () => {
-  console.log(`Node app is running on http:\/\/127.0.0.1:${port}`);
+  console.log(`Node app is running on http:\/\/${host}:${port}`);
 });
