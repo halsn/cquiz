@@ -61,5 +61,7 @@ body
         p 学号未匹配，请联系授课教师
       .alert.alert-danger(style="margin:20px auto", v-if="lock")
         p 测试已失效
-    .tip#tip.hide
-  script(src="/js/app.test.js")
+    #tip.mdl-js-snackbar.mdl-snackbar
+      .mdl-snackbar__text
+      button.mdl-snackbar__action
+  script(src="/js/test.js")

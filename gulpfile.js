@@ -1,3 +1,4 @@
+var path = require('path');
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var gutil = require('gulp-util');
@@ -11,107 +12,82 @@ var buffer = require('vinyl-buffer');
 var uglify = require('gulp-uglify');
 var sass = require('gulp-sass');
 var babel = require('babelify');
-var exec = require('child_process').exec;
+var spawn = require('child_process').spawn;
 
-var opts = {
-  entries: './dev/js/main.js',
-  debug: true,
-  cache: {},
-  packageCache: {},
-  plugin: [watchify]
-};
+var jsEntries = ['./dev/js/index.js', './dev/js/t/home.js', './dev/js/test.js', './dev/js/login.js'];
+var sassEntries = ['./dev/sass/index.sass', './dev/sass/home.sass', './dev/sass/test.sass', './dev/sass/login.sass'];
 
-var optt = {
-  entries: './dev/js/test.js',
-  debug: true,
-  cache: {},
-  packageCache: {},
-  plugin: [watchify]
-};
-
-var babelOpts = {
-  ignore: ['./dev/js/vendor/*'],
-  compact: false,
-  presets: ['es2015']
-};
-
-var b = browserify(opts).transform(babel.configure(babelOpts));
-var t = browserify(optt).transform(babel.configure(babelOpts));
-
-function bundle() {
-  return b.bundle()
-    .on('error', err => console.log(err))
-    .pipe(source('bundle.js'))
-    .pipe(buffer())
-    .pipe(gulp.dest('./static/js'))
-    .on('end', browserSync.reload);
-}
-
-b.on('update', bundle);
-
-gulp.task('start', function () {
-  exec('npm start', (stdout, stderr) => {
-    console.log(stdout);
-    console.log(stderr);
-  });
+gulp.task('start', () => {
+  var nodemon = spawn('nodemon', ['--exec', 'npm start']);
+  nodemon.stdout.on('data', data => console.log(data.toString()));
+  nodemon.stderr.on('data', data => console.log(data.toString()));
 });
 
-gulp.task('sass', function () {
-  return gulp.src('./dev/sass/**/*.sass')
-    .pipe(sass())
+gulp.task('sass', () => {
+  return gulp.src(sassEntries)
+    .pipe(sass().on('error', gutil.log))
     .pipe(gulp.dest('./static/css'))
     .on('end', browserSync.reload);
 });
 
-gulp.task('jade', function () {
+gulp.task('jade', () => {
   return gulp.src('./views/**/*.jade')
     .on('end', browserSync.reload);
 });
 
-gulp.task('scripts', function () {
-  bundle();
+gulp.task('scripts', () => {
+  var babelOption = {
+    ignore: ['./dev/js/vendor/*'],
+    compact: false,
+    presets: ['es2015']
+  };
+  jsEntries.forEach(entry => {
+    var option = {
+      entries: entry,
+      debug: false,
+      cache: {},
+      packageCache: {},
+      plugin: [watchify]
+    };
+    var stream = browserify(option).transform(babel.configure(babelOption));
+    stream.on('update', bundle);
+    bundle();
+
+    function bundle() {
+      return stream.bundle()
+        .on('error', gutil.log)
+        .pipe(source(path.basename(entry)))
+        .pipe(buffer())
+        .pipe(gulp.dest('./static/js'))
+        .on('end', browserSync.reload);
+    }
+  });
 });
 
-gulp.task('scriptTest', function () {
-  return t.bundle()
-    .on('error', err => console.log(err))
-    .pipe(source('test.js'))
-    .pipe(buffer())
-    .pipe(gulp.dest('./static/js'));
-});
-
-gulp.task('compressTest', function () {
-  return gulp.src([
-      './static/js/material.min.js',
-      './static/js/vue.min.js',
-      './static/js/test.js'
-    ])
-    .pipe(concat('app.test.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest('./static/js'));
-});
-
-gulp.task('compressJS', function () {
-  return gulp.src([
-      './static/js/material.min.js',
-      './static/js/vue.min.js',
-      './static/js/xlsx.core.min.js',
-      './static/js/bundle.js'
-    ])
-    .pipe(concat('app.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest('./static/js'));
-});
-
-gulp.task('compressCSS', function () {
-  return gulp.src('./dev/sass/**/*.sass')
+gulp.task('compressCSS', () => {
+  return gulp.src(sassEntries)
     .pipe(sass({
       outputStyle: 'compressed'
     }))
     .pipe(gulp.dest('./static/css'));
 });
 
-gulp.task('default', ['start', 'jade', 'sass', 'scripts'], function () {
+gulp.task('compressJS', () => {
+  return gulp.src([
+      './static/js/index.js',
+      './static/js/home.js',
+      './static/js/test.js',
+      './static/js/login.js'
+    ])
+    .pipe(uglify())
+    .pipe(gulp.dest('./static/js'));
+});
+
+gulp.task('publish', ['compressCSS', 'compressJS'], (err) => {
+  console.log(err);
+});
+
+gulp.task('default', ['start', 'jade', 'sass', 'scripts'], () => {
   browserSync.init({
     proxy: 'localhost:5000'
   });

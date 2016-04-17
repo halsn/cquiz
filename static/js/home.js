@@ -1,181 +1,260 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-
-/* globals componentHandler Vue */
-var tip = require('./util').tip;
-var render = require('./util').render;
+/* globals Vue */
+//var Vue = require('../vendor/vue.min.js');
+var tip = require('../util').tip;
+var classView = require('./classview');
 Vue.use(require('vue-resource'));
+Vue.filter('validName', function (value) {
+  return value.slice(0, 48);
+});
 
-function range(s, e) {
-  return Array(e - s + 1).fill().map(function (e, i) {
-    return s + i;
-  });
-}
-
-new Vue({
-  el: '#testApp',
+var addClass = new Vue({
+  el: '#class-tab-2',
   data: {
-    no: '',
-    charMap: range(0, 25).map(function (e) {
-      return String.fromCharCode(e + 65);
-    }),
-    pass: false,
-    miss: false,
-    lock: false,
-    quizs: [],
-    show: [],
-    answered: [],
-    showAns: false,
-    disanswered: [],
-    icons: [],
-    min: 0,
-    sec: 0
+    courses: [],
+    className: '',
+    course: {}
   },
-  computed: {
-    finished: function finished() {
-      return this.answered.every(function (e) {
-        if (typeof e === 'string') return e.trim() !== '';else if ((typeof e === 'undefined' ? 'undefined' : _typeof(e)) === 'object') return e.length;else return e !== undefined;
-      });
-    },
-    disans: function disans() {
+  methods: {
+    addClass: function addClass(evt) {
       var _this = this;
 
-      if (!this.finished) return [];else {
-        return this.answered.map(function (a, idx) {
-          if (_this.quizs[idx].genre === '判断题') {
-            return ['错误', '正确'][a];
-          } else if (_this.quizs[idx].genre === '单选题') {
-            return _this.charMap[a];
-          } else if (_this.quizs[idx].genre === '多选题') {
-            return a.map(function (e) {
-              return _this.charMap[e];
-            });
-          } else return a;
-        }).map(function (e, x) {
-          return x + 1 + '.' + e.toString() + '  ';
-        });
-      }
-    },
-    sendans: function sendans() {
-      var _this2 = this;
+      if (!this.course || !this.className || this.className.length > 48) return evt.preventDefault();
+      var preAdd = {};
+      preAdd.ref_course = this.course._id;
+      preAdd.class_name = this.course.name + '-' + this.course.term + '-' + this.className;
+      this.$http.post('/api/t/class', preAdd).then(function (res) {
+        _this.className = '';
+        _this.course = {};
+        classView.get();
+        tip('添加成功', 'success');
+      }, function (err) {
+        return tip('添加失败', 'error');
+      });
+    }
+  }
+});
 
-      if (!this.finished) return [];else {
-        return this.answered.map(function (a, idx) {
-          if (_this2.quizs[idx].genre === '判断题') {
-            return [['错误', '正确'][a]];
-          } else if (_this2.quizs[idx].genre === '单选题') {
-            return [_this2.quizs[idx].selections[a]];
-          } else if (_this2.quizs[idx].genre === '多选题') {
-            return a.map(function (e) {
-              return _this2.quizs[idx].selections[e];
-            });
-          } else return [a.trim()];
-        });
-      }
+module.exports = addClass;
+
+},{"../util":11,"./classview":5,"vue-resource":25}],2:[function(require,module,exports){
+'use strict';
+
+/* globals Vue */
+//var Vue = require('../vendor/vue.min.js');
+var tip = require('../util').tip;
+var courseView = require('./courseview');
+Vue.use(require('vue-resource'));
+
+Vue.filter('validName', function (value) {
+  return value.slice(0, 48);
+});
+var addCourse = new Vue({
+  el: '#course-tab-2',
+  data: {
+    course: {
+      name: '',
+      duration: 32,
+      term: '',
+      chapters: [],
+      ref_qset: []
     }
   },
   methods: {
-    paste: function paste(evt) {
-      return evt.preventDefault();
-    },
-    pre: function pre(evt, qidx) {
-      if (qidx === 0) return evt.preventDefault();
-      this.show = this.show.map(function (e) {
-        return false;
-      });
-      this.show[qidx - 1] = true;
-    },
-    next: function next(evt, qidx) {
-      if (qidx === this.quizs.length - 1) return evt.preventDefault();
-      this.show = this.show.map(function (e) {
-        return false;
-      });
-      this.show[qidx + 1] = true;
-    },
-    tick: function tick() {
-      var _this3 = this;
+    add: function add(evt) {
+      var _this = this;
 
-      var ticker = setInterval(function () {
-        if (_this3.min === 0 && _this3.sec === 0) clearInterval(ticker);else if (_this3.sec === 0) {
-          _this3.min -= 1;
-          _this3.sec = 59;
-        } else _this3.sec -= 1;
-      }, 1000);
-    },
-    start: function start(evt) {
-      var _this4 = this;
+      if (!this.course.name) evt.preventDefault();else {
+        this.$http.post('/api/t/course', this.course).then(function (res) {
+          tip('添加成功', 'success');
+          _this.course.name = '';
+          _this.course.duration = 32;
+          courseView.get();
+        }, function (err) {
+          tip('添加失败', 'error');
+        });
+      }
+    }
+  }
+});
 
-      if (!/^\d{1,20}$/.test(this.no)) return evt.preventDefault();
-      var uuid = window.location.pathname.split('/')[4];
-      this.$http.get('/api/t/test/' + uuid, {
-        no: this.no
-      }).then(function (res) {
-        var data = res.data;
-        if (data.miss) {
-          _this4.miss = true;
-          setTimeout(function () {
-            _this4.miss = false;
-          }, 3000);
-        } else if (!data.showAns) {
-          _this4.pass = true;
-          _this4.quizs = res.data.quizs;
-          _this4.show = _this4.quizs.map(function (e) {
-            return false;
+module.exports = addCourse;
+
+},{"../util":11,"./courseview":6,"vue-resource":25}],3:[function(require,module,exports){
+'use strict';
+
+/* globals Vue XLSX */
+//var Vue = require('../vendor/vue.min.js');
+var courseView = require('./courseview');
+var classView = require('./classview');
+var tip = require('../util').tip;
+//var XLSX = require('xlsx-browserify-shim');
+Vue.use(require('vue-resource'));
+
+var addQuiz = new Vue({
+  el: '#course-tab-3',
+  data: {
+    courses: [],
+    course: {
+      _id: '',
+      chapter: ''
+    },
+    jsonData: []
+  },
+  computed: {
+    idx: function idx() {
+      for (var i = 0, l = this.courses.length; i < l; i++) {
+        if (this.courses[i]._id === this.course._id) return i;
+      }
+      return -1;
+    }
+  },
+  methods: {
+    save: function save(evt) {
+      var _this = this;
+
+      if (!this.course._id || !this.jsonData.length) return evt.preventDefault();
+      var quizs = [];
+      var qset = {};
+      this.jsonData.forEach(function (el) {
+        var q = {};
+        q.genre = el.类型;
+        q.describe = {};
+        q.describe.content = el.题目;
+        q.ref_point = el.知识点;
+        q.answers = [el.参考答案];
+        if (q.genre === '单选题' || q.genre === '多选题') {
+          var secs = el.选项.split(';');
+          q.selections = secs.map(function (el) {
+            return el.trim().slice(2);
           });
-          _this4.show[0] = true;
-          _this4.answered = Array(_this4.quizs.length).fill(undefined);
-          _this4.answered = _this4.answered.map(function (e, idx) {
-            if (_this4.quizs[idx].genre === '多选题') return [];else return undefined;
+          q.answers = el.参考答案.split('').map(function (el) {
+            return secs.filter(function (sec) {
+              return sec.indexOf(el) === 0;
+            }).join('').slice(2).trim();
           });
-          var expireDate = new Date(res.data.expire);
-          var nowDate = new Date(res.data.now);
-          var left = expireDate.getTime() - nowDate.getTime();
-          left = left < 0 ? 0 : left;
-          if (left === 0) _this4.lock = true;
-          var leftDate = new Date(left);
-          _this4.min = leftDate.getMinutes();
-          _this4.sec = leftDate.getSeconds();
-          _this4.tick();
-          render();
-        } else {
-          _this4.pass = true;
-          _this4.quizs = res.data.quizs;
-          _this4.show = _this4.quizs.map(function (e) {
-            return false;
-          });
-          _this4.show[0] = true;
-          _this4.lock = true;
-          _this4.showAns = true;
-          _this4.disanswered = _this4.quizs.map(function (q) {
-            if (q.genre === '单选题' || q.genre === '多选题') {
-              return q.answered.map(function (e) {
-                return _this4.charMap[q.selections.indexOf(e)];
-              }).sort();
-            } else return q.answered;
-          });
-          _this4.icons = _this4.quizs.map(function (q) {
-            return q.isRight;
-          });
-          render();
         }
+        quizs.push(q);
+      });
+      qset.quizs = quizs;
+      qset.ref_course = this.course._id;
+      qset.ref_chapter = this.course.chapter;
+      this.$http.post('/api/t/qset', qset).then(function (res) {
+        tip('录入成功', 'success');
+        _this.course = {};
+        _this.jsonData = [];
+        classView.get();
       }, function (err) {
-        if (err.data === '页面已过期') _this4.lock = true;else tip('网络故障', 'error');
+        console.log(err);
+        tip('录入失败', 'error');
       });
     },
-    send: function send(evt) {
-      var _this5 = this;
+    read: function read(evt, idx) {
+      var _this2 = this;
 
-      if (!this.finished) return evt.preventDefault();
-      var uuid = window.location.pathname.split('/')[4];
-      this.$http.put('/api/t/test/' + uuid, {
-        no: this.no,
-        answered: this.sendans
-      }).then(function (res) {
-        if (res.data.timeout) _this5.lock = true;else {
-          _this5.start();
-        }
+      if (!this.course._id || !this.course.chapter) return evt.preventDefault();
+      var course = this.courses.filter(function (course) {
+        return course._id === _this2.course._id;
+      })[0];
+      var chapter = course.chapters.filter(function (chap) {
+        return chap.title === _this2.course.chapter;
+      })[0] || {};
+      var tags = chapter.tags || [];
+      var file = evt.target.files[0];
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var data = e.target.result;
+        var workbook = XLSX.read(data, {
+          type: 'binary'
+        });
+        var first_sheet_name = workbook.SheetNames[0];
+        var first_sheet = workbook.Sheets[first_sheet_name];
+        addQuiz.jsonData = XLSX.utils.sheet_to_json(first_sheet).filter(function (el) {
+          if (tags.indexOf(el.知识点) === -1) return false;else if (el.类型 === '问答题') {
+            el.选项 = '';
+            return !!(el.题目 && el.参考答案);
+          } else if (el.类型 === '判断题') {
+            if (!el.参考答案) return false;else if (el.参考答案 === '正确' || el.参考答案 === '错误') return true;
+            return false;
+          } else if (el.类型 === '单选题' || el.类型 === '多选题') {
+            if (!el.选项) return false;
+            var selection = el.选项.split(';').map(function (s) {
+              return s.trim();
+            }).filter(function (el) {
+              return (/^[A-Z]\.[^\.]/.test(el) && el.match(/[A-Z]\./g).length === 1
+              );
+            });
+            if (selection.length < 2) return false;
+            el.选项 = selection.join(';');
+            var pre = !!(el.题目 && el.参考答案);
+            if (pre) return (/^[A-Z]+$/.test(el.参考答案) && el.参考答案.split('').length <= selection.length
+            );
+            return pre;
+          } else return false;
+        });
+      };
+      if (!file) return null;else reader.readAsBinaryString(file);
+    }
+  }
+});
+
+module.exports = addQuiz;
+
+},{"../util":11,"./classview":5,"./courseview":6,"vue-resource":25}],4:[function(require,module,exports){
+'use strict';
+
+/* globals Vue XLSX */
+//var Vue = require('../vendor/vue.min.js');
+var classView = require('./classview');
+var tip = require('../util').tip;
+//var XLSX = require('xlsx-browserify-shim');
+Vue.use(require('vue-resource'));
+
+var addStudents = new Vue({
+  el: '#class-tab-3',
+  data: {
+    classes: [],
+    Class: {},
+    jsonData: []
+  },
+  methods: {
+    read: function read(evt) {
+      if (!this.Class._id) return evt.preventDefault();
+      var file = evt.target.files[0];
+      var reader = new FileReader();
+      reader.onload = function (evt) {
+        var data = evt.target.result;
+        var workbook = XLSX.read(data, {
+          type: 'binary'
+        });
+        var first_sheet_name = workbook.SheetNames[0];
+        var first_sheet = workbook.Sheets[first_sheet_name];
+        addStudents.jsonData = XLSX.utils.sheet_to_json(first_sheet).filter(function (el) {
+          if (!el.姓名 || !el.学号 || !el.专业 || !el.班级) return false;
+          return true;
+        });
+      };
+      if (!file) return null;else reader.readAsBinaryString(file);
+    },
+    save: function save(evt) {
+      var _this = this;
+
+      if (!this.Class._id) return evt.preventDefault();
+      this.Class.ref_students = this.jsonData.map(function (el) {
+        return {
+          name: el.姓名,
+          no: el.学号,
+          spercialty: el.专业,
+          className: el.班级
+        };
+      });
+      this.$http.put('/api/t/class', this.Class).then(function (res) {
+        tip('录入成功', 'success');
+        _this.jsonData = [];
+        _this.Class = {};
+        classView.get();
       }, function (err) {
         return tip('网络故障', 'error');
       });
@@ -183,7 +262,698 @@ new Vue({
   }
 });
 
-},{"./util":2,"vue-resource":16}],2:[function(require,module,exports){
+module.exports = addStudents;
+
+},{"../util":11,"./classview":5,"vue-resource":25}],5:[function(require,module,exports){
+'use strict';
+
+/* globals MaterialButton Vue */
+//var Vue = require('../vendor/vue.min.js');
+var addStudents = require('./addstudents');
+var pubQuiz = require('./pubquiz');
+var testView = require('./testview');
+var tip = require('../util').tip;
+Vue.use(require('vue-resource'));
+
+var classView = new Vue({
+  el: '#class-tab-1',
+  data: {
+    classes: []
+  },
+  methods: {
+    toggleCard: function toggleCard(evt) {
+      var target = evt.target;
+      // target is different in chrome and firefox
+      if (target.nodeName === 'I') target = target.parentNode;
+      var card = target.parentNode.parentNode;
+      var bodys = card.querySelectorAll('.body');
+      var fullText = card.querySelector('.full-text');
+      if (fullText.innerText === 'fullscreen_exit') fullText.innerText = 'fullscreen';else fullText.innerText = 'fullscreen_exit';
+      [].forEach.call(bodys, function (el) {
+        if (!el.style.display || el.style.display === 'none') el.style.display = 'block';else el.style.display = 'none';
+      });
+    },
+    get: function get() {
+      var _this = this;
+
+      this.$http.get('/api/t/class').then(function (res) {
+        _this.classes = res.data;
+        addStudents.classes = _this.classes;
+        pubQuiz.classes = _this.classes;
+        pubQuiz.get();
+        testView.classes = _this.classes;
+        testView.get();
+      }, function (err) {
+        return tip('网络故障' + err.toString(), 'error');
+      });
+    },
+    del: function del(idx) {
+      var _this2 = this;
+
+      this.$http.delete('/api/t/class', this.classes[idx]).then(function (res) {
+        _this2.classes.splice(idx, 1);
+        addStudents.classes = _this2.classes;
+        pubQuiz.classes = _this2.classes;
+        pubQuiz.get();
+        testView.classes = _this2.classes;
+        testView.get();
+        tip('删除成功', 'success');
+      }, function (err) {
+        return tip('网络故障', 'error');
+      });
+    }
+  },
+  ready: function ready() {
+    this.get();
+  }
+});
+
+module.exports = classView;
+
+},{"../util":11,"./addstudents":4,"./pubquiz":8,"./testview":10,"vue-resource":25}],6:[function(require,module,exports){
+'use strict';
+
+/* globals MaterialButton Vue */
+//var Vue = require('../vendor/vue.min.js');
+var tip = require('../util').tip;
+var renderButton = require('../util').renderButton;
+var addQuiz = require('./addquiz');
+var quizView = require('./quizview');
+var addClass = require('./addclass');
+var classView = require('./classview');
+Vue.use(require('vue-resource'));
+
+Vue.filter('validChapter', function (value) {
+  if (!value) return '新篇章';
+  return value.slice(0, 28);
+});
+Vue.filter('validTag', function (value) {
+  if (!value) return '';
+  return value.slice(0, 16);
+});
+var courseView = new Vue({
+  el: '#course-tab-1',
+  data: {
+    cards: []
+  },
+  methods: {
+    toggleCard: function toggleCard(evt) {
+      var target = evt.target;
+      // target is different in chrome and firefox
+      if (target.nodeName === 'I') target = target.parentNode;
+      var card = target.parentNode.parentNode;
+      var bodys = card.querySelectorAll('.body');
+      var fullText = card.querySelector('.full-text');
+      if (fullText.innerText === 'fullscreen_exit') fullText.innerText = 'fullscreen';else fullText.innerText = 'fullscreen_exit';
+      [].forEach.call(bodys, function (el) {
+        if (!el.style.display || el.style.display === 'none') el.style.display = 'block';else el.style.display = 'none';
+      });
+    },
+    editChapter: function editChapter(evt) {
+      var t = evt.target;
+      var p = evt.target.parentNode;
+      var ctx = p.querySelector('.editable');
+      var input = p.querySelector('.editInput');
+      if (t === ctx) {
+        t.style.display = 'none';
+        input.style.display = 'inline';
+        window.setTimeout(function () {
+          p.querySelector('.editInput').focus();
+        }, 300);
+      } else {
+        t.style.display = 'none';
+        ctx.style.display = 'inline';
+      }
+    },
+    editTag: function editTag(evt, tagIdx, chapIdx, cardIdx) {
+      var p = evt.target.parentNode;
+      var t = evt.target;
+      var ctx = p.querySelector('.editable');
+      var input = p.querySelector('.editInput');
+      if (t === ctx) {
+        t.style.display = 'none';
+        input.style.display = 'inline-block';
+        window.setTimeout(function () {
+          p.querySelector('.editInput').focus();
+        }, 300);
+      } else {
+        t.style.display = 'none';
+        ctx.style.display = 'inline-block';
+        if (!this.cards[cardIdx].chapters[chapIdx].tags[tagIdx]) this.cards[cardIdx].chapters[chapIdx].tags.splice(tagIdx, 1);
+      }
+    },
+    addTag: function addTag(chapIdx, cardIdx) {
+      this.cards[cardIdx].chapters[chapIdx].tags.push('知识点');
+    },
+    addChapter: function addChapter(cardIdx) {
+      var chapter = {
+        title: '新篇章',
+        tags: []
+      };
+      this.cards[cardIdx].chapters.push(chapter);
+      renderButton('#course-tab-1');
+    },
+    removeChapter: function removeChapter(chapidx, cardIdx) {
+      this.cards[cardIdx].chapters.splice(chapidx, 1);
+    },
+    save: function save(cardIdx, evt) {
+      var _this = this;
+
+      var data = this.cards[cardIdx];
+      if (new Set(data.chapters.map(function (e) {
+        return e.title;
+      })).size !== data.chapters.length) {
+        tip('章节名不能重复', 'error');
+        return evt.preventDefault();
+      }
+      this.$http.put('/api/t/course', data).then(function (res) {
+        tip('保存成功', 'success');
+        addQuiz.courses = _this.cards;
+        quizView.courses = _this.cards;
+        addClass.courses = _this.cards;
+        classView.get();
+      }, function (error) {
+        return tip('保存失败', 'error');
+      });
+    },
+    del: function del(cardIdx) {
+      var _this2 = this;
+
+      var id = {};
+      id._id = this.cards[cardIdx]._id;
+      this.$http.delete('/api/t/course', id).then(function (res) {
+        tip('删除成功', 'success');
+        _this2.cards.splice(cardIdx, 1);
+        addQuiz.courses = _this2.cards;
+        quizView.courses = _this2.cards;
+        addClass.courses = _this2.cards;
+        addClass.courses = _this2.cards;
+        classView.get();
+      }, function (error) {
+        return tip('删除失败', 'error');
+      });
+    },
+    get: function get() {
+      var _this3 = this;
+
+      this.$http.get('/api/t/course').then(function (res) {
+        _this3.cards = res.data;
+        renderButton('#course-tab-1');
+        addQuiz.courses = _this3.cards;
+        quizView.courses = _this3.cards;
+        addClass.courses = _this3.cards;
+      }, function (error) {
+        return tip('网络故障', 'error');
+      });
+    }
+  },
+  ready: function ready() {
+    var _this4 = this;
+
+    this.$http.get('/api/t/course').then(function (res) {
+      _this4.cards = res.data;
+      renderButton('#course-tab-1');
+      addQuiz.courses = _this4.cards;
+      quizView.courses = _this4.cards;
+      addClass.courses = _this4.cards;
+    }, function (error) {
+      return tip('网络故障', 'error');
+    });
+  }
+});
+
+module.exports = courseView;
+
+},{"../util":11,"./addclass":1,"./addquiz":3,"./classview":5,"./quizview":9,"vue-resource":25}],7:[function(require,module,exports){
+'use strict';
+
+/* globals MaterialLayoutTab, MaterialLayout, MaterialTabs, MaterialTab, MaterialRipple */
+/* globals Vue */
+
+//var Vue = require('../vendor/vue.min.js');
+var renderTabs = require('../util').renderTabs;
+var courseView = require('./courseview');
+var addCourse = require('./addcourse');
+var classView = require('./classview');
+var collect = require('./testview');
+
+var layout = document.querySelector('.mdl-js-layout');
+var panels = document.querySelectorAll('.mdl-layout__tab-panel');
+
+var courseTabs = [{
+  url: '#course-tab-1',
+  title: '查看课程'
+}, {
+  url: '#course-tab-2',
+  title: '添加课程'
+}, {
+  url: '#course-tab-3',
+  title: '录入习题'
+}, {
+  url: '#course-tab-4',
+  title: '查看习题'
+}];
+var classTabs = [{
+  url: '#class-tab-1',
+  title: '查看班次'
+}, {
+  url: '#class-tab-2',
+  title: '添加班次'
+}, {
+  url: '#class-tab-3',
+  title: '录入学生'
+}, {
+  url: '#class-tab-4',
+  title: '发布测试'
+}, {
+  url: '#class-tab-5',
+  title: '查看测试'
+}];
+var myInfo = [{
+  url: '#info-tab-1',
+  title: '更新信息'
+}];
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    tabs: courseTabs
+  },
+  methods: {
+    setCourseTabs: function setCourseTabs(evt) {
+      this.tabs = courseTabs;
+      renderTabs(panels, layout);
+    },
+    setClassTabs: function setClassTabs(evt) {
+      this.tabs = classTabs;
+      renderTabs(panels, layout);
+    },
+    setInfoTabs: function setInfoTabs(evt) {
+      this.tabs = myInfo;
+      renderTabs(panels, layout);
+    }
+  },
+  ready: function ready() {
+    window.setTimeout(function () {
+      document.querySelectorAll('.mdl-layout__tab')[0].click();
+      /* 删除tab-bar-left-button */
+      var tabBarLeftBtn = document.querySelector('.mdl-layout__tab-bar-left-button');
+      var tabBarRightBtn = document.querySelector('.mdl-layout__tab-bar-right-button');
+      if (tabBarLeftBtn && tabBarRightBtn) {
+        var tabBarParent = tabBarLeftBtn.parentNode;
+        tabBarParent.removeChild(tabBarLeftBtn);
+        tabBarParent.removeChild(tabBarRightBtn);
+      }
+      var selects = document.querySelectorAll('select');
+      [].forEach.call(selects, function (el) {
+        return el.value = null;
+      });
+    }, 1000);
+  }
+});
+
+},{"../util":11,"./addcourse":2,"./classview":5,"./courseview":6,"./testview":10}],8:[function(require,module,exports){
+'use strict';
+
+/* globals Vue */
+//var Vue = require('../vendor/vue.min.js');
+var classView = require('./classview');
+var tip = require('../util').tip;
+var renderTable = require('../util').renderTable;
+var render = require('../util').render;
+var testView = require('./testview');
+Vue.use(require('vue-resource'));
+
+var pubQuiz = new Vue({
+  el: '#class-tab-4',
+  data: {
+    classes: [],
+    Class: {},
+    qsets: [],
+    chapterList: [],
+    duration: 10,
+    maxjudgeNum: 0,
+    maxsingleNum: 0,
+    maxmultiNum: 0,
+    maxaskNum: 0,
+    quizNum: 0,
+    judgeNum: 0,
+    singleNum: 0,
+    multiNum: 0,
+    askNum: 0
+  },
+  computed: {
+    studentNum: function studentNum() {
+      if (!Object.keys(this.Class).length) return 0;else return this.Class.ref_students.length;
+    },
+    expireNum: function expireNum() {
+      return this.judgeNum + this.singleNum + this.multiNum + this.askNum;
+    }
+  },
+  methods: {
+    getQuizNum: function getQuizNum(evt) {
+      var _this = this;
+
+      if (['INPUT', 'SPAN'].indexOf(evt.target.nodeName) === -1) return evt.preventDefault();
+      setTimeout(function () {
+        var table = document.querySelector('.pub-table');
+        var selected = table.querySelectorAll('.is-selected');
+        _this.quizNum = 0;
+        _this.chapterList = [];
+        [].forEach.call(selected, function (el) {
+          _this.quizNum += Number(el.childNodes[3].textContent || el.childNodes[3].innerText);
+          _this.chapterList.push(el.childNodes[2].textContent || el.childNodes[2].innerText);
+        });
+        var sets = _this.qsets.filter(function (qset) {
+          return _this.chapterList.indexOf(qset.ref_chapter) !== -1;
+        });
+        if (!sets.length) {
+          _this.maxjudgeNum = 0;
+          _this.maxsingleNum = 0;
+          _this.maxmultiNum = 0;
+          _this.maxaskNum = 0;
+        } else {
+          _this.maxjudgeNum = sets.map(function (s) {
+            return s.quizs;
+          }).reduce(function (p, a) {
+            return p.concat(a);
+          }).filter(function (q) {
+            return q.genre === '判断题';
+          }).length;
+          _this.maxsingleNum = sets.map(function (s) {
+            return s.quizs;
+          }).reduce(function (p, a) {
+            return p.concat(a);
+          }).filter(function (q) {
+            return q.genre === '单选题';
+          }).length;
+          _this.maxmultiNum = sets.map(function (s) {
+            return s.quizs;
+          }).reduce(function (p, a) {
+            return p.concat(a);
+          }).filter(function (q) {
+            return q.genre === '多选题';
+          }).length;
+          _this.maxaskNum = sets.map(function (s) {
+            return s.quizs;
+          }).reduce(function (p, a) {
+            return p.concat(a);
+          }).filter(function (q) {
+            return q.genre === '问答题';
+          }).length;
+        }
+      }, 100);
+    },
+    get: function get() {
+      var _this2 = this;
+
+      if (!this.Class._id) return;
+      var qset = {};
+      qset.ref_course = this.Class.ref_course;
+      this.$http.get('/api/t/qset', qset).then(function (res) {
+        _this2.qsets = res.data;
+        _this2.quizNum = 0;
+        renderTable(document.querySelector('.pub-table'));
+      }, function (err) {
+        return tip('网络故障', 'error');
+      });
+    },
+    pub: function pub(evt) {
+      var _this3 = this;
+
+      if (!Object.keys(this.Class).length || !this.quizNum || !this.expireNum || !this.studentNum || this.quizNum < this.expireNum) return evt.preventDefault();
+      if (this.judgeNum > this.maxjudgeNum || this.singleNum > this.maxsingleNum || this.multiNum > this.maxmultiNum || this.askNum > this.maxaskNum) return evt.preventDefault();
+      var data = {};
+      data.class_id = this.Class._id;
+      data.duration = this.duration;
+      data.chapterList = this.chapterList;
+      data.ref_students = this.Class.ref_students;
+      data.quizNum = this.quizNum;
+      data.expireNum = this.expireNum;
+      data.judgeNum = this.judgeNum;
+      data.singleNum = this.singleNum;
+      data.multiNum = this.multiNum;
+      data.askNum = this.askNum;
+      this.$http.post('/api/t/test', data).then(function (res) {
+        _this3.Class = {};
+        _this3.qsets = [];
+        _this3.duration = 10;
+        _this3.quizNum = 0;
+        _this3.expireNum = 0;
+        _this3.judgeNum = 0;
+        _this3.singleNum = 0;
+        _this3.multiNum = 0;
+        _this3.askNum = 0;
+        _this3.maxjudgeNum = 0;
+        _this3.maxsingleNum = 0;
+        _this3.maxmultiNum = 0;
+        _this3.maxaskNum = 0;
+        _this3.chapterList = [];
+        tip('发布成功', 'success');
+        testView.get();
+      }, function (err) {
+        return tip('网络故障', 'error');
+      });
+    }
+  }
+});
+
+module.exports = pubQuiz;
+
+},{"../util":11,"./classview":5,"./testview":10,"vue-resource":25}],9:[function(require,module,exports){
+'use strict';
+
+/* globals Vue */
+//var Vue = require('../vendor/vue.min.js');
+var courseView = require('./courseview');
+var pubQuiz = require('./pubquiz');
+var tip = require('../util').tip;
+Vue.use(require('vue-resource'));
+
+var quizView = new Vue({
+  el: '#course-tab-4',
+  data: {
+    courses: [],
+    course: {
+      _id: '',
+      chapter: ''
+    },
+    quizs: []
+  },
+  computed: {
+    idx: function idx() {
+      for (var i = 0, l = this.courses.length; i < l; i++) {
+        if (this.courses[i]._id === this.course._id) return i;
+      }
+      return -1;
+    }
+  },
+  methods: {
+    get: function get(evt) {
+      var _this = this;
+
+      if (!this.course._id || !this.course.chapter) return evt.preventDefault();
+      var qset = {};
+      qset.ref_course = this.course._id;
+      qset.ref_chapter = this.course.chapter;
+      this.$http.get('/api/t/qset', qset).then(function (res) {
+        if (!res.data) {
+          tip('未录入习题', 'message');
+          _this.quizs = [];
+        } else _this.quizs = res.data;
+      }, function (err) {
+        return tip('网络故障', 'error');
+      });
+    },
+    del: function del(evt) {
+      var _this2 = this;
+
+      if (!this.course._id || !this.course.chapter || !this.quizs.length) return evt.preventDefault();
+      var qset = {};
+      qset.ref_course = this.course._id;
+      qset.ref_chapter = this.course.chapter;
+      this.$http.delete('/api/t/qset', qset).then(function (res) {
+        tip('删除成功', 'success');
+        _this2.quizs = [];
+        pubQuiz.get();
+      }, function (err) {
+        return tip('网络故障', 'error');
+      });
+    }
+  }
+});
+
+module.exports = quizView;
+
+},{"../util":11,"./courseview":6,"./pubquiz":8,"vue-resource":25}],10:[function(require,module,exports){
+'use strict';
+
+/* globals Vue */
+//var Vue = require('../vendor/vue.min.js');
+var courseView = require('./courseview');
+var pubQuiz = require('./pubquiz');
+var tip = require('../util').tip;
+var render = require('../util').render;
+Vue.use(require('vue-resource'));
+
+Vue.filter('formatTime', function (value) {
+  if (!value) return '';
+  var date = new Date(value);
+  return date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日  ' + date.getHours() + '时:' + date.getMinutes() + '分';
+});
+
+Vue.filter('formatUnfinish', function (value) {
+  return value.map(function (v, idx) {
+    return idx + 1 + ' ' + v.name + '(' + v.no + ')';
+  }).join(',  ');
+});
+
+Vue.filter('validScore', function (value) {
+  return value > 10 ? 10 : value;
+});
+
+Vue.filter('getRightNum', function (quizs) {
+  return quizs.filter(function (q) {
+    return q.isRight;
+  }).length;
+});
+
+Vue.filter('getWrongNum', function (quizs) {
+  return quizs.filter(function (q) {
+    return !q.isRight;
+  }).length;
+});
+
+Vue.filter('getSum', function (quizs) {
+  var judgeNum = quizs.filter(function (q) {
+    return q.genre === '判断题';
+  }).length;
+  var singleNum = quizs.filter(function (q) {
+    return q.genre === '单选题';
+  }).length;
+  var multiNum = quizs.filter(function (q) {
+    return q.genre === '多选题';
+  }).length;
+  var askNum = quizs.filter(function (q) {
+    return q.genre === '问答题';
+  }).length;
+  return judgeNum * 5 + singleNum * 5 + multiNum * 10 + askNum * 10;
+});
+
+Vue.filter('getAskScore', function (quizs) {
+  return quizs.filter(function (q) {
+    return q.genre === '问答题';
+  }).map(function (x) {
+    return x.score;
+  }).reduce(function (p, a) {
+    return p + a;
+  }, 0);
+});
+
+Vue.filter('getOtherScore', function (quizs) {
+  return quizs.filter(function (q) {
+    return q.genre !== '问答题' && q.isRight;
+  }).map(function (x) {
+    return x.score;
+  }).reduce(function (p, a) {
+    return p + a;
+  }, 0);
+});
+
+Vue.filter('getSumScore', function (quizs) {
+  return quizs.map(function (x) {
+    return x.score;
+  }).reduce(function (p, a) {
+    return p + a;
+  });
+});
+
+var collect = new Vue({
+  el: '#class-tab-5',
+  data: {
+    showStatus: false,
+    finishedList: [],
+    unfinishList: [],
+    classes: [],
+    testList: [],
+    result: [],
+    classId: ''
+  },
+  computed: {
+    qrurl: function qrurl() {
+      if (!this.test || !this.testList.length) return '#';else return '/api/qr/?url=' + window.location.origin + '/api/t/test/' + this.test.uuid;
+    },
+    canGetStatus: function canGetStatus() {
+      return this.testList.length;
+    },
+    showAnalysis: function showAnalysis() {
+      return this.test.ref_students.every(function (s) {
+        return s.isChecked;
+      });
+    }
+  },
+  methods: {
+    save: function save(evt, sidx) {
+      this.finishedList[sidx].isChecked = true;
+      this.unfinishList.forEach(function (e) {
+        return e.isChecked = true;
+      });
+      var data = this.finishedList.concat(this.unfinishList);
+      this.$http.put('/api/t/test/' + this.test.uuid, {
+        data: data
+      }).then(function (res) {
+        tip('保存成功', 'success');
+      }, function (err) {
+        tip('网络故障', 'error');
+      });
+    },
+    share: function share(evt) {
+      if (!this.test || !this.testList.length) return evt.preventDefault();
+    },
+    analysis: function analysis(evt) {
+      if (!this.showAnalysis) {
+        tip('请完成先批改任务', 'message');
+      } else {
+        tip('待完成', 'message');
+      }
+    },
+    clearStatus: function clearStatus() {
+      this.showStatus = false;
+    },
+    getStatus: function getStatus(evt) {
+      if (!this.canGetStatus || !this.test) return evt.preventDefault();
+      if (new Date(this.test.expireAt) - Date.now() > 0) {
+        tip('测试未结束', 'message');
+      } else {
+        this.showStatus = true;
+        this.unfinishList = this.test.ref_students.filter(function (s) {
+          return !s.canGetAnswers;
+        });
+        this.finishedList = this.test.ref_students.filter(function (s) {
+          return s.canGetAnswers;
+        });
+        render();
+      }
+    },
+    get: function get() {
+      var _this = this;
+
+      if (!this.classId) return;
+      this.showStatus = false;
+      this.$http.get('/api/t/test/status', {
+        classId: this.classId
+      }).then(function (res) {
+        _this.testList = res.data;
+      }, function (err) {
+        tip('网络故障', 'error');
+      });
+    }
+  }
+});
+
+module.exports = collect;
+
+},{"../util":11,"./courseview":6,"./pubquiz":8,"vue-resource":25}],11:[function(require,module,exports){
 'use strict';
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -292,7 +1062,7 @@ module.exports.renderTextfield = renderTextfield;
 module.exports.render = render;
 module.exports.bindClose = bindClose;
 
-},{}],3:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /**
  * Before Interceptor.
  */
@@ -312,7 +1082,7 @@ module.exports = {
 
 };
 
-},{"../util":26}],4:[function(require,module,exports){
+},{"../util":35}],13:[function(require,module,exports){
 /**
  * Base client.
  */
@@ -379,7 +1149,7 @@ function parseHeaders(str) {
     return headers;
 }
 
-},{"../../promise":19,"../../util":26,"./xhr":7}],5:[function(require,module,exports){
+},{"../../promise":28,"../../util":35,"./xhr":16}],14:[function(require,module,exports){
 /**
  * JSONP client.
  */
@@ -429,7 +1199,7 @@ module.exports = function (request) {
     });
 };
 
-},{"../../promise":19,"../../util":26}],6:[function(require,module,exports){
+},{"../../promise":28,"../../util":35}],15:[function(require,module,exports){
 /**
  * XDomain client (Internet Explorer).
  */
@@ -468,7 +1238,7 @@ module.exports = function (request) {
     });
 };
 
-},{"../../promise":19,"../../util":26}],7:[function(require,module,exports){
+},{"../../promise":28,"../../util":35}],16:[function(require,module,exports){
 /**
  * XMLHttp client.
  */
@@ -520,7 +1290,7 @@ module.exports = function (request) {
     });
 };
 
-},{"../../promise":19,"../../util":26}],8:[function(require,module,exports){
+},{"../../promise":28,"../../util":35}],17:[function(require,module,exports){
 /**
  * CORS Interceptor.
  */
@@ -559,7 +1329,7 @@ function crossOrigin(request) {
     return (requestUrl.protocol !== originUrl.protocol || requestUrl.host !== originUrl.host);
 }
 
-},{"../util":26,"./client/xdr":6}],9:[function(require,module,exports){
+},{"../util":35,"./client/xdr":15}],18:[function(require,module,exports){
 /**
  * Header Interceptor.
  */
@@ -587,7 +1357,7 @@ module.exports = {
 
 };
 
-},{"../util":26}],10:[function(require,module,exports){
+},{"../util":35}],19:[function(require,module,exports){
 /**
  * Service for sending network requests.
  */
@@ -687,7 +1457,7 @@ Http.headers = {
 
 module.exports = _.http = Http;
 
-},{"../promise":19,"../util":26,"./before":3,"./client":4,"./cors":8,"./header":9,"./interceptor":11,"./jsonp":12,"./method":13,"./mime":14,"./timeout":15}],11:[function(require,module,exports){
+},{"../promise":28,"../util":35,"./before":12,"./client":13,"./cors":17,"./header":18,"./interceptor":20,"./jsonp":21,"./method":22,"./mime":23,"./timeout":24}],20:[function(require,module,exports){
 /**
  * Interceptor factory.
  */
@@ -734,7 +1504,7 @@ function when(value, fulfilled, rejected) {
     return promise.then(fulfilled, rejected);
 }
 
-},{"../promise":19,"../util":26}],12:[function(require,module,exports){
+},{"../promise":28,"../util":35}],21:[function(require,module,exports){
 /**
  * JSONP Interceptor.
  */
@@ -754,7 +1524,7 @@ module.exports = {
 
 };
 
-},{"./client/jsonp":5}],13:[function(require,module,exports){
+},{"./client/jsonp":14}],22:[function(require,module,exports){
 /**
  * HTTP method override Interceptor.
  */
@@ -773,7 +1543,7 @@ module.exports = {
 
 };
 
-},{}],14:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /**
  * Mime Interceptor.
  */
@@ -811,7 +1581,7 @@ module.exports = {
 
 };
 
-},{"../util":26}],15:[function(require,module,exports){
+},{"../util":35}],24:[function(require,module,exports){
 /**
  * Timeout Interceptor.
  */
@@ -843,7 +1613,7 @@ module.exports = function () {
     };
 };
 
-},{}],16:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /**
  * Install plugin.
  */
@@ -898,7 +1668,7 @@ if (window.Vue) {
 
 module.exports = install;
 
-},{"./http":10,"./promise":19,"./resource":20,"./url":21,"./util":26}],17:[function(require,module,exports){
+},{"./http":19,"./promise":28,"./resource":29,"./url":30,"./util":35}],26:[function(require,module,exports){
 /**
  * Promises/A+ polyfill v1.1.4 (https://github.com/bramstein/promis)
  */
@@ -1079,7 +1849,7 @@ p.catch = function (onRejected) {
 
 module.exports = Promise;
 
-},{"../util":26}],18:[function(require,module,exports){
+},{"../util":35}],27:[function(require,module,exports){
 /**
  * URL Template v2.0.6 (https://github.com/bramstein/url-template)
  */
@@ -1231,7 +2001,7 @@ exports.encodeReserved = function (str) {
     }).join('');
 };
 
-},{}],19:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /**
  * Promise adapter.
  */
@@ -1342,7 +2112,7 @@ p.always = function (callback) {
 
 module.exports = Promise;
 
-},{"./lib/promise":17,"./util":26}],20:[function(require,module,exports){
+},{"./lib/promise":26,"./util":35}],29:[function(require,module,exports){
 /**
  * Service for interacting with RESTful services.
  */
@@ -1454,7 +2224,7 @@ Resource.actions = {
 
 module.exports = _.resource = Resource;
 
-},{"./util":26}],21:[function(require,module,exports){
+},{"./util":35}],30:[function(require,module,exports){
 /**
  * Service for URL templating.
  */
@@ -1586,7 +2356,7 @@ function serialize(params, obj, scope) {
 
 module.exports = _.url = Url;
 
-},{"../util":26,"./legacy":22,"./query":23,"./root":24,"./template":25}],22:[function(require,module,exports){
+},{"../util":35,"./legacy":31,"./query":32,"./root":33,"./template":34}],31:[function(require,module,exports){
 /**
  * Legacy Transform.
  */
@@ -1634,7 +2404,7 @@ function encodeUriQuery(value, spaces) {
         replace(/%20/g, (spaces ? '%20' : '+'));
 }
 
-},{"../util":26}],23:[function(require,module,exports){
+},{"../util":35}],32:[function(require,module,exports){
 /**
  * Query Parameter Transform.
  */
@@ -1660,7 +2430,7 @@ module.exports = function (options, next) {
     return url;
 };
 
-},{"../util":26}],24:[function(require,module,exports){
+},{"../util":35}],33:[function(require,module,exports){
 /**
  * Root Prefix Transform.
  */
@@ -1678,7 +2448,7 @@ module.exports = function (options, next) {
     return url;
 };
 
-},{"../util":26}],25:[function(require,module,exports){
+},{"../util":35}],34:[function(require,module,exports){
 /**
  * URL Template (RFC 6570) Transform.
  */
@@ -1696,7 +2466,7 @@ module.exports = function (options) {
     return url;
 };
 
-},{"../lib/url-template":18}],26:[function(require,module,exports){
+},{"../lib/url-template":27}],35:[function(require,module,exports){
 /**
  * Utility functions.
  */
@@ -1820,4 +2590,4 @@ function merge(target, source, deep) {
     }
 }
 
-},{}]},{},[1]);
+},{}]},{},[7]);

@@ -2,7 +2,6 @@
 var Teacher = require('../../lib/teacher');
 
 module.exports.get = function (req, res) {
-  res.locals.err = '';
   res.render('t/login');
 };
 
@@ -13,7 +12,7 @@ module.exports.post = function (req, res) {
     if (err === -1) {
       res.render('5xx');
     } else if (err) {
-      res.locals.err = err;
+      res.locals.err = err.toString();
       res.render('t/login');
     } else {
       req.session.user = user;

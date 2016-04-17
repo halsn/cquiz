@@ -4,9 +4,6 @@ var forget = require('./forget');
 var tLogin = require('./teacher/login');
 var tSignup = require('./teacher/signup');
 var tHome = require('./teacher/home');
-var sLogin = require('./student/login');
-var sSignup = require('./student/signup');
-var sHome = require('./student/home');
 var tCourse = require('./api/t/_course');
 var tTeacher = require('./api/t/_teacher');
 var tQset = require('./api/t/_qset');
@@ -29,20 +26,14 @@ router
 router
   .get('/t/login', tLogin.get)
   .post('/t/login', tLogin.post);
+
 router
   .get('/t/signup', tSignup.get)
   .post('/t/signup', tSignup.post);
+
 router
   .get('/t/home', tHome.get);
 
-router
-  .get('/s/login', sLogin.get)
-  .post('/s/login', sLogin.post);
-router
-  .get('/s/signup', sSignup.get)
-  .post('/s/signup', sSignup.post);
-router
-  .get('/s/home', sHome.get);
 router
   .get('/api/t/course', tCourse.get)
   .post('/api/t/course', tCourse.post)

@@ -6,12 +6,6 @@ body
     header.mdl-layout__header
       .mdl-layout__header-row
         span.mdl-layout__title Home
-        .mdl-layout-spacer
-        button#hdrbtn.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--icon
-          i.material-icons more_vert
-        ul.mdl-menu.mdl-menu--bottom-right.mdl-js-menu.mdl-js-ripple-effect(for="hdrbtn")
-          li
-            a.align-center.mdl-menu__item(href="/logout") 退出登陆
       .mdl-layout__tab-bar.mdl-js-ripple-effect
         a.mdl-layout__tab(:href="tab.url", v-for="tab in tabs") {{tab.title}}
     .border-none.mdl-layout__drawer.mdl-color--blue-grey-900.mdl-color-text--blue-grey-50
@@ -22,6 +16,7 @@ body
         a.align-center.mdl-navigation__link(href="#", @click="setCourseTabs") 课程管理
         a.align-center.mdl-navigation__link(href="#", @click="setClassTabs") 授课班次
         a.align-center.mdl-navigation__link(href="#", @click="setInfoTabs") 个人信息
+        a.align-center.mdl-navigation__link(href="/logout") 退出登陆
     main.mdl-layout__content.mdl-color--grey-100
       section.mdl-layout__tab-panel#course-tab-1
         .mdl-grid
@@ -324,5 +319,7 @@ body
               button.pull-right.mdl-button.mdl-js-button(@click="save($event, sidx)") 保存
       section.mdl-layout__tab-panel#info-tab-1 todo
       section.mdl-layout__tab-panel#info-tab-2 todo
-  .tip#tip.hide 
-  include ../includes/foot.jade
+  #tip.mdl-js-snackbar.mdl-snackbar
+    .mdl-snackbar__text
+    button.mdl-snackbar__action
+  script(src="/js/home.js")

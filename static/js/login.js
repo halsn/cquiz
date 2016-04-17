@@ -1,187 +1,58 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-
-/* globals componentHandler Vue */
-var tip = require('./util').tip;
-var render = require('./util').render;
+/* global Vue */
 Vue.use(require('vue-resource'));
-
-function range(s, e) {
-  return Array(e - s + 1).fill().map(function (e, i) {
-    return s + i;
-  });
-}
-
-new Vue({
-  el: '#testApp',
+var tip = require('./util').tip;
+var bindClose = require('./util').bindClose;
+var app = new Vue({
+  el: '#app',
   data: {
-    no: '',
-    charMap: range(0, 25).map(function (e) {
-      return String.fromCharCode(e + 65);
-    }),
-    pass: false,
-    miss: false,
-    lock: false,
-    quizs: [],
-    show: [],
-    answered: [],
-    showAns: false,
-    disanswered: [],
-    icons: [],
-    min: 0,
-    sec: 0
+    loginUserName: '',
+    loginPass: '',
+    signUserName: '',
+    signPass: '',
+    signCkPass: ''
   },
-  computed: {
-    finished: function finished() {
-      return this.answered.every(function (e) {
-        if (typeof e === 'string') return e.trim() !== '';else if ((typeof e === 'undefined' ? 'undefined' : _typeof(e)) === 'object') return e.length;else return e !== undefined;
-      });
-    },
-    disans: function disans() {
-      var _this = this;
-
-      if (!this.finished) return [];else {
-        return this.answered.map(function (a, idx) {
-          if (_this.quizs[idx].genre === '判断题') {
-            return ['错误', '正确'][a];
-          } else if (_this.quizs[idx].genre === '单选题') {
-            return _this.charMap[a];
-          } else if (_this.quizs[idx].genre === '多选题') {
-            return a.map(function (e) {
-              return _this.charMap[e];
-            });
-          } else return a;
-        }).map(function (e, x) {
-          return x + 1 + '.' + e.toString() + '  ';
-        });
-      }
-    },
-    sendans: function sendans() {
-      var _this2 = this;
-
-      if (!this.finished) return [];else {
-        return this.answered.map(function (a, idx) {
-          if (_this2.quizs[idx].genre === '判断题') {
-            return [['错误', '正确'][a]];
-          } else if (_this2.quizs[idx].genre === '单选题') {
-            return [_this2.quizs[idx].selections[a]];
-          } else if (_this2.quizs[idx].genre === '多选题') {
-            return a.map(function (e) {
-              return _this2.quizs[idx].selections[e];
-            });
-          } else return [a.trim()];
-        });
-      }
-    }
-  },
+  computed: {},
   methods: {
-    paste: function paste(evt) {
-      return evt.preventDefault();
-    },
-    pre: function pre(evt, qidx) {
-      if (qidx === 0) return evt.preventDefault();
-      this.show = this.show.map(function (e) {
-        return false;
-      });
-      this.show[qidx - 1] = true;
-    },
-    next: function next(evt, qidx) {
-      if (qidx === this.quizs.length - 1) return evt.preventDefault();
-      this.show = this.show.map(function (e) {
-        return false;
-      });
-      this.show[qidx + 1] = true;
-    },
-    tick: function tick() {
-      var _this3 = this;
-
-      var ticker = setInterval(function () {
-        if (_this3.min === 0 && _this3.sec === 0) clearInterval(ticker);else if (_this3.sec === 0) {
-          _this3.min -= 1;
-          _this3.sec = 59;
-        } else _this3.sec -= 1;
-      }, 1000);
-    },
-    start: function start(evt) {
-      var _this4 = this;
-
-      if (!/^\d{1,20}$/.test(this.no)) return evt.preventDefault();
-      var uuid = window.location.pathname.split('/')[4];
-      this.$http.get('/api/t/test/' + uuid, {
-        no: this.no
-      }).then(function (res) {
-        var data = res.data;
-        if (data.miss) {
-          _this4.miss = true;
-          setTimeout(function () {
-            _this4.miss = false;
-          }, 3000);
-        } else if (!data.showAns) {
-          _this4.pass = true;
-          _this4.quizs = res.data.quizs;
-          _this4.show = _this4.quizs.map(function (e) {
-            return false;
-          });
-          _this4.show[0] = true;
-          _this4.answered = Array(_this4.quizs.length).fill(undefined);
-          _this4.answered = _this4.answered.map(function (e, idx) {
-            if (_this4.quizs[idx].genre === '多选题') return [];else return undefined;
-          });
-          var expireDate = new Date(res.data.expire);
-          var nowDate = new Date(res.data.now);
-          var left = expireDate.getTime() - nowDate.getTime();
-          left = left < 0 ? 0 : left;
-          if (left === 0) _this4.lock = true;
-          var leftDate = new Date(left);
-          _this4.min = leftDate.getMinutes();
-          _this4.sec = leftDate.getSeconds();
-          _this4.tick();
-          render();
-        } else {
-          _this4.pass = true;
-          _this4.quizs = res.data.quizs;
-          _this4.show = _this4.quizs.map(function (e) {
-            return false;
-          });
-          _this4.show[0] = true;
-          _this4.lock = true;
-          _this4.showAns = true;
-          _this4.disanswered = _this4.quizs.map(function (q) {
-            if (q.genre === '单选题' || q.genre === '多选题') {
-              return q.answered.map(function (e) {
-                return _this4.charMap[q.selections.indexOf(e)];
-              }).sort();
-            } else return q.answered;
-          });
-          _this4.icons = _this4.quizs.map(function (q) {
-            return q.isRight;
-          });
-          render();
-        }
-      }, function (err) {
-        if (err.data === '页面已过期') _this4.lock = true;else tip('网络故障', 'error');
-      });
-    },
-    send: function send(evt) {
-      var _this5 = this;
-
-      if (!this.finished) return evt.preventDefault();
-      var uuid = window.location.pathname.split('/')[4];
-      this.$http.put('/api/t/test/' + uuid, {
-        no: this.no,
-        answered: this.sendans
-      }).then(function (res) {
-        if (res.data.timeout) _this5.lock = true;else {
-          _this5.start();
-        }
-      }, function (err) {
-        return tip('网络故障', 'error');
-      });
+    signup: function signup(evt) {
+      if (!this.signUserName || !this.signPass || !this.signCkPass || this.signPass.length < 6) return evt.preventDefault();
+      var form = document.querySelector('#signup');
+      if (!form[0].checkValidity()) {
+        tip('请输入合法的邮箱地址');
+        return evt.preventDefault();
+      } else if (this.signPass !== this.signCkPass) {
+        tip('两次输入密码不一致');
+        return evt.preventDefault();
+      } else {
+        evt.preventDefault();
+        this.$http.post('/t/signup', {
+          useremail: this.signUserName,
+          userpass: this.signPass,
+          userckps: this.signCkPass
+        }).then(function (res) {
+          tip('注册成功', 'success');
+          document.querySelector('.close').click();
+        }, function (err) {
+          console.log(err);
+          tip(err.data, 'error');
+        });
+      }
     }
   }
 });
+
+var toggle = document.querySelector('.toggle');
+var container = document.querySelector('.container');
+var close = document.querySelector('.close');
+toggle.addEventListener('click', function (evt) {
+  container.classList.add('active');
+});
+close.addEventListener('click', function (evt) {
+  container.classList.remove('active');
+});
+bindClose();
 
 },{"./util":2,"vue-resource":16}],2:[function(require,module,exports){
 'use strict';

@@ -1,14 +1,36 @@
 include ./includes/head.jade
-  link(href="css/index.css", rel="stylesheet")
+  link(href="/css/index.css", rel="stylesheet")
   title 过程化考核
 body
-  .mdl-layout.mdl-js-layout.mdl-layout--fixed-header
-    header.mdl-layout__header.mdl-layout__header--scroll
+  mixin text-block(title, content)
+    .text-block
+      h3.align-center= title
+      p.align-center= content
+  #app.mdl-layout.mdl-js-layout.mdl-layout--fixed-header
+    header.mdl-layout__header.mdl-layout__header--scroll.mdl-shadow--2dp
       .mdl-layout__header-row
-        span.mdl-layout__title 过程化考核
+        span.mdl-layout__title ProcTest
         .mdl-layout-spacer
         nav.mdl-navigation
-          a.mdl-navigation__link(href="/t/login") 登陆
-          a.mdl-navigation__link(href="/t/signup") 注册
+          a.hover.mdl-navigation__link(href="/t/login") 登陆
     main.mdl-layout__content
-include ./includes/foot.jade
+      #mgrid.mdl-grid
+        .mdl-cell.mdl-cell--12-col.just-center.align-center
+          h1.mdl-color-text--grey-100
+            便利的在线测试系统
+            br
+            实时掌握学生学习进度
+        .mdl-cell.mdl-cell--4-col.mdl-cell--8-col-tablet
+          +text-block('习题库', '可从Excel文件一键式导入习题，包括选择题，判断题，问答题')
+        .mdl-cell.mdl-cell--4-col.mdl-cell--8-col-tablet
+          +text-block('跨平台', '无论是PC，平板，还是手机，只要登陆网站，便可随时随地发布测试')
+        .mdl-cell.mdl-cell--4-col.mdl-cell--8-col-tablet
+          +text-block('评测分析', '以图表方式展示学生测试结果，同时给出科学的分析')
+      footer.mdl-mini-footer.footer
+        p
+          span.material-icons email
+          span 492264408@qq.com
+    #tip.mdl-js-snackbar.mdl-snackbar
+      .mdl-snackbar__text
+      button.mdl-snackbar__action
+  script(src="/js/index.js")

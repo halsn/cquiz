@@ -5,7 +5,7 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var mongoExpress = require('mongo-express/middleware');
-var mongoExpressConfig = require('./mongo_express_config');
+var mongoExpressConfig = require('./lib/mongo_express_config');
 var compression = require('compression');
 var app = express();
 
