@@ -1,1 +1,36 @@
-{"name":"cquiz","version":"0.0.0","description":"A sample Node.js app using Express 4","main":"app.js","scripts":{"80":"VCAP_APP_PORT=80 node app.js","start":"node app.js"},"dependencies":{"bcryptjs":"^2.3.0","body-parser":"^1.14.1","cookie-parser":"^1.4.0","express":"^4.13.3","express-session":"^1.11.3","mongodb":"^2.0.43","mongoose":"^4.1.9","jade":"^1.11.0","mongo-express":"^0.28.4","compression":"^1.6.1","node-uuid":"^1.4.7","qr-image":"^3.1.0"},"engines":{"node":"4.2.4","npm":"2.14.12"},"repository":{"type":"git","url":"https://coding.net/u/hosn/p/cquiz/git"},"keywords":["node","express"],"license":"MIT","devDependencies":{"gulp-plumber":"^1.1.0"}}
+{
+  "name": "cquiz",
+  "version": "0.0.0",
+  "description": "A sample Node.js app using Express 4",
+  "main": "app.js",
+  "scripts": {
+    "80": "VCAP_APP_PORT=80 node app.js",
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.3.0",
+    "body-parser": "^1.14.1",
+    "cookie-parser": "^1.4.0",
+    "express": "^4.13.3",
+    "express-session": "^1.11.3",
+    "mongodb": "^2.0.43",
+    "mongoose": "^4.1.9",
+    "jade": "^1.11.0",
+    "mongo-express": "^0.28.4",
+    "compression": "^1.6.1",
+    "node-uuid": "^1.4.7",
+    "qr-image": "^3.1.0"
+  },
+  "engines": {
+    "node": "4.2.4",
+    "npm": "2.14.12"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://coding.net/u/hosn/p/cquiz/git"
+  },
+  "keywords": ["node", "express"],
+  "license": "MIT",
+  "devDependencies": {
+  }
+}
