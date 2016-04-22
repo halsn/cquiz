@@ -3,7 +3,7 @@ var Teacher = require('../../lib/teacher');
 
 module.exports.get = function (req, res) {
   res.locals.err = '';
-  res.render('t/login');
+  res.render('t/signup');
 };
 
 module.exports.post = function (req, res) {
@@ -11,15 +11,18 @@ module.exports.post = function (req, res) {
     pass = req.body.userpass,
     ckps = req.body.userckps;
   if (pass !== ckps) {
-    return res.status(500).end('两次输入密码不一致');
+    res.locals.err = '两次输入密码不一致';
+    return res.render('t/signup');
   }
   Teacher.add(email, pass, err => {
     if (err === -1) {
-      return res.status(500).end('系统内部错误');
+      res.render('5xx');
     } else if (err) {
-      return res.status(500).end(err.toString());
+      res.locals.err = err.toString();
+      res.render('t/signup');
     } else {
-      return res.status(200).end('注册成功');
+      res.status(200);
+      res.redirect('login');
     }
   });
 };

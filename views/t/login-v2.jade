@@ -1,0 +1,47 @@
+include ../includes/head.jade
+  link(href="/css/login.css", rel="stylesheet")
+  title 登陆
+body
+  .mdl-layout.mdl-js-layout.mdl-layout--fixed-header
+    header.mdl-layout__header.mdl-layout__header--scroll
+      .mdl-layout__header-row
+        a.mdl-button.mdl-js-button.mdl-button--icon.back-button(href="/")
+          i.material-icons arrow_back
+    main#app.mdl-layout__content.container
+      .card
+      .card
+        h2.mdl-card__title-text.title 登陆
+        form(method='post', action='/t/login')
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.input-container
+            input.mdl-textfield__input(type="email", name="useremail", v-model='loginUserName', required)
+            label.mdl-textfield__label 邮箱
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.input-container
+            input.mdl-textfield__input(type="password", name="userpass", v-model='loginPass', required)
+            label.mdl-textfield__label 密码
+          button.full-width.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect.button-container(type="submit") 登陆
+          a(href='/forget') 忘记密码？
+      .card.alt
+        .toggle.just-center
+          i.material-icons add
+        h2.mdl-card__title-text.title 注册
+          .close
+        form#signup
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.input-container
+            input.mdl-textfield__input(type="email", name="useremail", v-model='signUserName', required)
+            label.mdl-textfield__label 邮箱
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.input-container
+            input.mdl-textfield__input(type="password", name="userpass", pattern='[0-9,A-Z,a-z,_]{6,30}', v-model='signPass', required)
+            label.mdl-textfield__label 密码
+            span.mdl-textfield__error(style='color: white;') 支持数字，字母，下划线，至少6个字符
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.input-container
+            input.mdl-textfield__input(type="password", name="userckps", pattern='[0-9,A-Z,a-z,_]{6,}' v-model='signCkPass', required)
+            label.mdl-textfield__label 重复密码
+          button.full-width.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect.button-container(type="submit", @click="signup($event)") NEXT
+      if err
+        .alert.alert-danger  
+          button.closebtn &times;
+          p #{err}
+  #tip.mdl-js-snackbar.mdl-snackbar
+    .mdl-snackbar__text
+    button.mdl-snackbar__action
+  script(src='/js/login.js')

@@ -14,8 +14,8 @@ var sass = require('gulp-sass');
 var babel = require('babelify');
 var spawn = require('child_process').spawn;
 
-var jsEntries = ['./dev/js/index.js', './dev/js/t/home.js', './dev/js/test.js', './dev/js/login.js'];
-var sassEntries = ['./dev/sass/index.sass', './dev/sass/home.sass', './dev/sass/test.sass', './dev/sass/login.sass'];
+var jsEntries = ['./dev/js/index.js', './dev/js/t/home.js', './dev/js/test.js', './dev/js/login.js', './dev/js/signup.js'];
+var sassEntries = ['./dev/sass/index.sass', './dev/sass/home.sass', './dev/sass/test.sass', './dev/sass/login.sass', './dev/sass/signup.sass'];
 
 gulp.task('start', () => {
   var nodemon = spawn('nodemon', ['--exec', 'npm start']);
@@ -73,12 +73,7 @@ gulp.task('compressCSS', () => {
 });
 
 gulp.task('compressJS', () => {
-  return gulp.src([
-      './static/js/index.js',
-      './static/js/home.js',
-      './static/js/test.js',
-      './static/js/login.js'
-    ])
+  return gulp.src(['./static/js/*.js'])
     .pipe(uglify())
     .pipe(gulp.dest('./static/js'));
 });

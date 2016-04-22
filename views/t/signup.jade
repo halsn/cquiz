@@ -1,6 +1,6 @@
 include ../includes/head.jade
-  link(href="/css/login.css", rel="stylesheet")
-  title 登陆
+  link(href="/css/signup.css", rel="stylesheet")
+  title 注册
 body
   #app.mdl-layout.mdl-js-layout.mdl-layout--fixed-header.mdl-color--grey-200.item-center
     header.mdl-layout__header.mdl-layout__header--scroll
@@ -10,24 +10,24 @@ body
     main.mdl-layout__content.content
       .mdl-card.mdl-shadow--6dp
         .mdl-card__title.mdl-color--primary.mdl-color-text--white
-          h2.mdl-card__title-text 登陆
+          h2.mdl-card__title-text 注册
         .mdl-card__supporting-text
           form(role="form", method="post")
             .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
               input.mdl-textfield__input(type="email", v-model="email", name="useremail")
               label.mdl-textfield__label 邮箱
             .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
-              input.mdl-textfield__input(type="password", v-model="pass", name="userpass")
+              input.mdl-textfield__input(type="password", pattern="[0-9,A-Z,a-z,_]{6,30}", v-model="pass", name="userpass")
               label.mdl-textfield__label 密码
-            label.mdl-checkbox.mdl-js-checkbox.mdl-js-ripple-effect
-              input.mdl-checkbox__input(type="checkbox")
-              span.mdl-checkbox__label 记住密码
-            button#login-btn-submit.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(type="submit", @click="submit($event)") 登陆
+              span.mdl-textfield__error 支持数字,字母,下划线,至少6个字符
+            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+              input.mdl-textfield__input(type="password", pattern="[0-9,A-Z,a-z]{6,}", v-model="ckps", name="userckps")
+              label.mdl-textfield__label 确认密码
+            button.full-width.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(type="submit", @click="submit($event)") 注册
         .mdl-card__actions.mdl-card--border
-          a.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored(href="/forget") 忘记密码
-          a.pull-right.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored(href="/t/signup") 注册
+          a.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored.pull-right(href="/t/login") 登陆
       if err
         .alert.alert-danger
           button.closebtn &times;
           p #{err}
-  script(src="/js/login.js")
+  script(src='/js/signup.js')
