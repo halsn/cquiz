@@ -33,7 +33,7 @@ body
                   .mdl-card__title.mdl-card--border
                     span#title.editable(@click="editChapter($event)")
                       {{ chapter.title | validChapter }}
-                      .mdl-tooltip(for='title') 点击修改<br>修改后需重新录入习题
+                      .mdl-tooltip.mdl-tooltip--right(for='title') 点击修改<br>修改后需重新录入习题
                     input.editInput.hide(type="text", @blur="editChapter($event)", v-model="chapter.title | validChapter")
                     button#removechap.mdl-button.mdl-js-button.mdl-button--icon(@click="removeChapter(chapIdx, cardIdx)")
                       i.material-icons remove
