@@ -33,18 +33,20 @@ body
                   .mdl-card__title.mdl-card--border
                     span#title.editable(@click="editChapter($event)")
                       {{ chapter.title | validChapter }}
-                      .mdl-tooltip.mdl-tooltip--right(for='title') 点击修改<br>修改后需重新录入习题
+                      .mdl-tooltip.mdl-tooltip--right(for='title') 点击修改
                     input.editInput.hide(type="text", @blur="editChapter($event)", v-model="chapter.title | validChapter")
                     button#removechap.mdl-button.mdl-js-button.mdl-button--icon(@click="removeChapter(chapIdx, cardIdx)")
                       i.material-icons remove
                       .mdl-tooltip(for='removechap') 移除章节
                   .mdl-card__supporting-text
+                    p 题目总数 {{ chapter.totalNum }}
+                    p 单选题 {{ chapter.singleNum }}
+                    p 多选题 {{ chapter.multiNum }}
+                    p 判断题 {{ chapter.judgeNum }}
+                    p 问答题 {{ chapter.askNum }}
+                    p 知识点列表
                     .tag.inline(v-for="(tagIdx, tag) in chapter.tags", track-by="$index")
-                      span.editable.label-info(@click="editTag($event, tagIdx, chapIdx, cardIdx)", v-text="tag | validTag")
-                      input.label-info.editInput.hide(type="text", @blur="editTag($event, tagIdx, chapIdx, cardIdx)", v-model="tag | validTag")
-                    button#add.mdl-button.mdl-js-button.mdl-button--icon(@click="addTag(chapIdx, cardIdx)")
-                      i.material-icons add
-                      .mdl-tooltip.mdl-tooltip--top(for='add') 点击知识点可修改<br>删除全部字符可移除
+                      span.label-info(v-text='tag')
                 .mdl-cell.mdl-cell--4-col.mdl-card.add-chapter
                   button.mdl-button.mdl-js-button.mdl-button--fab(@click="addChapter(cardIdx)")
                     i.material-icons note_add
@@ -323,8 +325,7 @@ body
                   p 总得分：{{ s.ref_quizs | getSumScore }}
             .mdl-card__actions.mdl-card--border(v-show="!s.isChecked")
               button.pull-right.mdl-button.mdl-js-button(@click="save($event, sidx)") 保存
-      section.mdl-layout__tab-panel#info-tab-1 todo
-      section.mdl-layout__tab-panel#info-tab-2 todo
+      section.mdl-layout__tab-panel#info-tab-1.content todo
   #tip.mdl-js-snackbar.mdl-snackbar
     .mdl-snackbar__text
     button.mdl-snackbar__action
