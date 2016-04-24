@@ -257,7 +257,8 @@ body
                 span(v-text="askNum")
               .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
                 .mdl-card__supporting-text.width-calc-30
-                  table.mdl-data-table.mdl-js-data-table.mdl-data-table--selectable.pub-table(@click="getQuizNum($event)")
+                  p 选择章节（可多选）
+                  table.mdl-data-table.mdl-js-data-table.mdl-data-table--selectable.pub-table(@click="getPoint($event)")
                     thead
                       tr
                         th 序号
@@ -268,6 +269,19 @@ body
                         td(v-text="idx + 1")
                         td(v-text="qset.ref_chapter")
                         td(v-text="qset.quizs.length")
+                  br
+                  p 选择知识点（可多选）
+                  table.mdl-data-table.mdl-js-data-table.mdl-data-table--selectable.pub-table.point-table(@click="getNum($event)")
+                    thead
+                      tr
+                        th 序号
+                        th 知识点
+                        th 习题数
+                    tbody
+                      tr(v-for="(pidx, point) in points")
+                        td(v-text='pidx + 1')
+                        td(v-text='point.title')
+                        td(v-text='point.totalNum')
                   h5 题目总数：{{ quizNum }}
                   h5 需完成数：{{ expireNum }}
             .mdl-card__actions.mdl-card--border

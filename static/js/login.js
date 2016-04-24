@@ -44,6 +44,23 @@ function renderTabs(panels, layout) {
   }, 100);
 }
 
+function renderPointTable(table) {
+  var th_first = table.querySelector('th');
+  th_first.parentNode.removeChild(th_first);
+  setTimeout(function () {
+    new MaterialDataTable(table);
+    componentHandler.upgradeAllRegistered();
+    var ths = table.querySelectorAll('th:nth-child(2)');
+    var tds = table.querySelectorAll('td:nth-child(2)');
+    [].concat(_toConsumableArray(ths)).forEach(function (th) {
+      if (th.childElementCount !== 0) th.innerHTML = '序号';
+    });
+    [].concat(_toConsumableArray(tds)).forEach(function (td) {
+      if (td.childElementCount !== 0) td.parentNode.removeChild(td);
+    });
+  });
+}
+
 function renderTable(table) {
   var th_first = table.querySelector('th');
   th_first.parentNode.removeChild(th_first);
@@ -125,6 +142,7 @@ function bindClose() {
 module.exports.renderTabs = renderTabs;
 module.exports.tip = tip;
 module.exports.renderTable = renderTable;
+module.exports.renderPointTable = renderPointTable;
 module.exports.renderButton = renderButton;
 module.exports.renderRipple = renderRipple;
 module.exports.renderRadio = renderRadio;

@@ -58,7 +58,9 @@ function _get(req, res) {
                 .exec((err, qsets) => {
                   if (err) return res.status(500).end();
                   var si = test.ref_students.map(s => s.no).indexOf(no);
-                  var quizs = qsets.map(s => s.quizs).reduce((pre, acc) => pre.concat(acc)).sort(() => 0.5 - Math.random());
+                  var quizs = qsets.map(s => s.quizs).reduce((pre, acc) => pre.concat(acc));
+                  quizs = quizs.filter(q => test.ref_points.indexOf(q.ref_point) !== -1);
+                  quizs = quizs.sort(() => 0.5 - Math.random());
                   var judgeQuizs = quizs.filter(q => q.genre === '判断题').slice(0, test.judgeNum);
                   var singleQuizs = quizs.filter(q => q.genre === '单选题').slice(0, test.singleNum);
                   var multiQuizs = quizs.filter(q => q.genre === '多选题').slice(0, test.multiNum);
@@ -108,6 +110,7 @@ function _post(req, res) {
         .where('ref_course').equals(Class.ref_course)
         .where('ref_chapter').in(data.chapterList)
         .exec((err, qsets) => {
+          preAdd.ref_points = data.pointList;
           preAdd.ref_qsets = qsets.map(q => q._id);
           if (!preAdd.ref_qsets.length) return res.status(500).end();
           preAdd.ref_students = data.ref_students;

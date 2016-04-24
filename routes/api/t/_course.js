@@ -11,7 +11,57 @@ function _get(req, res) {
     })
     .exec((err, docs) => {
       if (err) return res.status('500').end('内部错误');
-      res.json(docs).end();
+      // WTF _doc ???
+      var docIds = docs.map(d => d._id);
+      getInfo(docIds)
+        .then(info => {
+          docs = docs.map(d => {
+            d._doc.chapters.forEach(c => {
+              if (info[d._id][c.title]) {
+                c._doc.totalNum = info[d._id][c.title].totalNum;
+                c._doc.singleNum = info[d._id][c.title].singleNum;
+                c._doc.multiNum = info[d._id][c.title].multiNum;
+                c._doc.judgeNum = info[d._id][c.title].judgeNum;
+                c._doc.askNum = info[d._id][c.title].askNum;
+              } else {
+                c._doc.totalNum = 0;
+                c._doc.singleNum = 0;
+                c._doc.multiNum = 0;
+                c._doc.judgeNum = 0;
+                c._doc.askNum = 0;
+              }
+            });
+            return d;
+          });
+          return res.json(docs).end();
+        })
+        .catch(err => {
+          console.log(err);
+          return res.status(500).end('内部错误');
+        });
+
+      function getInfo(ids) {
+        return new Promise((resolve, reject) => {
+          Qset.find()
+            .where('ref_course').in(ids)
+            .exec((err, sets) => {
+              if (err) return reject(err);
+              else {
+                var res = {};
+                sets.forEach(set => {
+                  if (!res[set.ref_course]) res[set.ref_course] = {};
+                  if (!res[set.ref_course][set.ref_chapter]) res[set.ref_course][set.ref_chapter] = {};
+                  res[set.ref_course][set.ref_chapter].totalNum = set.quizs.length;
+                  res[set.ref_course][set.ref_chapter].singleNum = set.quizs.filter(q => q.genre === '单选题').length;
+                  res[set.ref_course][set.ref_chapter].multiNum = set.quizs.filter(q => q.genre === '多选题').length;
+                  res[set.ref_course][set.ref_chapter].judgeNum = set.quizs.filter(q => q.genre === '判断题').length;
+                  res[set.ref_course][set.ref_chapter].askNum = set.quizs.filter(q => q.genre === '问答题').length;
+                });
+                return resolve(res);
+              }
+            });
+        });
+      }
     });
 }
 

@@ -566,6 +566,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 var classView = require('./classview');
 var tip = require('../util').tip;
 var renderTable = require('../util').renderTable;
+var renderPointTable = require('../util').renderPointTable;
 var render = require('../util').render;
 var testView = require('./testview');
 Vue.use(require('vue-resource'));
@@ -576,6 +577,8 @@ var pubQuiz = new Vue({
     classes: [],
     Class: {},
     qsets: [],
+    points: [],
+    pointList: [],
     chapterList: [],
     duration: 10,
     maxjudgeNum: 0,
@@ -597,19 +600,71 @@ var pubQuiz = new Vue({
     }
   },
   methods: {
-    getQuizNum: function getQuizNum(evt) {
+    getNum: function getNum(evt) {
       var _this = this;
+
+      if (['INPUT', 'SPAN'].indexOf(evt.target.nodeName) === -1) return evt.preventDefault();
+      setTimeout(function () {
+        var table = document.querySelector('.point-table');
+        var selected = table.querySelectorAll('.is-selected');
+        _this.quizNum = 0;
+        _this.judgeNum = 0;
+        _this.singleNum = 0;
+        _this.multiNum = 0;
+        _this.askNum = 0;
+        _this.pointList = [];
+        var uppers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-upper');
+        var lowers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-lower');
+        [].concat(_toConsumableArray(uppers)).forEach(function (up, idx) {
+          if (idx > 0) up.style.flex = '1';
+        });
+        [].concat(_toConsumableArray(lowers)).forEach(function (lo, idx) {
+          if (idx > 0) lo.style.flex = '0';
+        });
+        [].concat(_toConsumableArray(selected)).forEach(function (el) {
+          _this.quizNum += Number(el.childNodes[3].textContent || el.childNodes[3].innerText);
+          _this.pointList.push(el.childNodes[2].textContent || el.childNodes[2].innerText);
+        });
+        var sets = _this.qsets.filter(function (qset) {
+          return _this.chapterList.indexOf(qset.ref_chapter) !== -1;
+        });
+        var quizs = [];
+        sets.forEach(function (set) {
+          var _quizs;
+
+          (_quizs = quizs).splice.apply(_quizs, [quizs.length, 0].concat(_toConsumableArray(set.quizs)));
+        });
+        quizs = quizs.filter(function (q) {
+          return _this.pointList.indexOf(q.ref_point) !== -1;
+        });
+        _this.maxjudgeNum = quizs.filter(function (q) {
+          return q.genre === '判断题';
+        }).length;
+        _this.maxsingleNum = quizs.filter(function (q) {
+          return q.genre === '单选题';
+        }).length;
+        _this.maxmultiNum = quizs.filter(function (q) {
+          return q.genre === '多选题';
+        }).length;
+        _this.maxaskNum = quizs.filter(function (q) {
+          return q.genre === '问答题';
+        }).length;
+      }, 100);
+    },
+    getPoint: function getPoint(evt) {
+      var _this2 = this;
 
       if (['INPUT', 'SPAN'].indexOf(evt.target.nodeName) === -1) return evt.preventDefault();
       setTimeout(function () {
         var table = document.querySelector('.pub-table');
         var selected = table.querySelectorAll('.is-selected');
-        _this.quizNum = 0;
-        _this.chapterList = [];
-        _this.judgeNum = 0;
-        _this.singleNum = 0;
-        _this.multiNum = 0;
-        _this.askNum = 0;
+        _this2.quizNum = 0;
+        _this2.singleNum = 0;
+        _this2.multiNum = 0;
+        _this2.askNum = 0;
+        _this2.judgeNum = 0;
+        _this2.chapterList = [];
+        _this2.pointList = [];
         var uppers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-upper');
         var lowers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-lower');
         [].concat(_toConsumableArray(uppers)).forEach(function (up, idx) {
@@ -619,65 +674,53 @@ var pubQuiz = new Vue({
           if (idx > 0) lo.style.flex = '0';
         });
         [].forEach.call(selected, function (el) {
-          _this.quizNum += Number(el.childNodes[3].textContent || el.childNodes[3].innerText);
-          _this.chapterList.push(el.childNodes[2].textContent || el.childNodes[2].innerText);
+          _this2.chapterList.push(el.childNodes[2].textContent || el.childNodes[2].innerText);
         });
-        var sets = _this.qsets.filter(function (qset) {
-          return _this.chapterList.indexOf(qset.ref_chapter) !== -1;
+        var sets = _this2.qsets.filter(function (qset) {
+          return _this2.chapterList.indexOf(qset.ref_chapter) !== -1;
         });
-        if (!sets.length) {
-          _this.maxjudgeNum = 0;
-          _this.maxsingleNum = 0;
-          _this.maxmultiNum = 0;
-          _this.maxaskNum = 0;
-        } else {
-          _this.maxjudgeNum = sets.map(function (s) {
-            return s.quizs;
-          }).reduce(function (p, a) {
-            return p.concat(a);
-          }).filter(function (q) {
-            return q.genre === '判断题';
-          }).length;
-          _this.maxsingleNum = sets.map(function (s) {
-            return s.quizs;
-          }).reduce(function (p, a) {
-            return p.concat(a);
-          }).filter(function (q) {
-            return q.genre === '单选题';
-          }).length;
-          _this.maxmultiNum = sets.map(function (s) {
-            return s.quizs;
-          }).reduce(function (p, a) {
-            return p.concat(a);
-          }).filter(function (q) {
-            return q.genre === '多选题';
-          }).length;
-          _this.maxaskNum = sets.map(function (s) {
-            return s.quizs;
-          }).reduce(function (p, a) {
-            return p.concat(a);
-          }).filter(function (q) {
-            return q.genre === '问答题';
-          }).length;
+        if (!sets.length) _this2.points = [];else {
+          var prePoints = [];
+          var quizs = [];
+          sets.forEach(function (set) {
+            var _prePoints;
+
+            var titles = set.quizs.map(function (q) {
+              return q.ref_point;
+            });
+            (_prePoints = prePoints).splice.apply(_prePoints, [prePoints.length, 0].concat(_toConsumableArray(titles)));
+            quizs.splice.apply(quizs, [quizs.length, 0].concat(_toConsumableArray(titles)));
+          });
+          prePoints = [].concat(_toConsumableArray(new Set(prePoints))).map(function (q) {
+            var num = quizs.filter(function (e) {
+              return e === q;
+            }).length;
+            return {
+              title: q,
+              totalNum: num
+            };
+          });
+          _this2.points = prePoints;
         }
+        renderPointTable(document.querySelector('.point-table'));
       }, 100);
     },
     get: function get() {
-      var _this2 = this;
+      var _this3 = this;
 
       if (!this.Class._id) return;
       var qset = {};
       qset.ref_course = this.Class.ref_course;
       this.$http.get('/api/t/qset', qset).then(function (res) {
-        _this2.qsets = res.data;
-        _this2.quizNum = 0;
+        _this3.qsets = res.data;
+        _this3.quizNum = 0;
         renderTable(document.querySelector('.pub-table'));
       }, function (err) {
         return tip('网络故障', 'error');
       });
     },
     pub: function pub(evt) {
-      var _this3 = this;
+      var _this4 = this;
 
       if (!Object.keys(this.Class).length || !this.quizNum || !this.expireNum || !this.studentNum || this.quizNum < this.expireNum) return evt.preventDefault();
       if (this.judgeNum > this.maxjudgeNum || this.singleNum > this.maxsingleNum || this.multiNum > this.maxmultiNum || this.askNum > this.maxaskNum) return evt.preventDefault();
@@ -685,6 +728,7 @@ var pubQuiz = new Vue({
       data.class_id = this.Class._id;
       data.duration = this.duration;
       data.chapterList = this.chapterList;
+      data.pointList = this.pointList;
       data.ref_students = this.Class.ref_students;
       data.quizNum = this.quizNum;
       data.expireNum = this.expireNum;
@@ -693,20 +737,22 @@ var pubQuiz = new Vue({
       data.multiNum = this.multiNum;
       data.askNum = this.askNum;
       this.$http.post('/api/t/test', data).then(function (res) {
-        _this3.Class = {};
-        _this3.qsets = [];
-        _this3.duration = 10;
-        _this3.quizNum = 0;
-        _this3.expireNum = 0;
-        _this3.judgeNum = 0;
-        _this3.singleNum = 0;
-        _this3.multiNum = 0;
-        _this3.askNum = 0;
-        _this3.maxjudgeNum = 0;
-        _this3.maxsingleNum = 0;
-        _this3.maxmultiNum = 0;
-        _this3.maxaskNum = 0;
-        _this3.chapterList = [];
+        _this4.Class = {};
+        _this4.qsets = [];
+        _this4.duration = 10;
+        _this4.quizNum = 0;
+        _this4.expireNum = 0;
+        _this4.judgeNum = 0;
+        _this4.singleNum = 0;
+        _this4.multiNum = 0;
+        _this4.askNum = 0;
+        _this4.maxjudgeNum = 0;
+        _this4.maxsingleNum = 0;
+        _this4.maxmultiNum = 0;
+        _this4.maxaskNum = 0;
+        _this4.chapterList = [];
+        _this4.pointList = [];
+        _this4.points = [];
         tip('发布成功', 'success');
         var uppers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-upper');
         var lowers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-lower');
@@ -980,6 +1026,23 @@ function renderTabs(panels, layout) {
   }, 100);
 }
 
+function renderPointTable(table) {
+  var th_first = table.querySelector('th');
+  th_first.parentNode.removeChild(th_first);
+  setTimeout(function () {
+    new MaterialDataTable(table);
+    componentHandler.upgradeAllRegistered();
+    var ths = table.querySelectorAll('th:nth-child(2)');
+    var tds = table.querySelectorAll('td:nth-child(2)');
+    [].concat(_toConsumableArray(ths)).forEach(function (th) {
+      if (th.childElementCount !== 0) th.innerHTML = '序号';
+    });
+    [].concat(_toConsumableArray(tds)).forEach(function (td) {
+      if (td.childElementCount !== 0) td.parentNode.removeChild(td);
+    });
+  });
+}
+
 function renderTable(table) {
   var th_first = table.querySelector('th');
   th_first.parentNode.removeChild(th_first);
@@ -1061,6 +1124,7 @@ function bindClose() {
 module.exports.renderTabs = renderTabs;
 module.exports.tip = tip;
 module.exports.renderTable = renderTable;
+module.exports.renderPointTable = renderPointTable;
 module.exports.renderButton = renderButton;
 module.exports.renderRipple = renderRipple;
 module.exports.renderRadio = renderRadio;
