@@ -16,6 +16,7 @@ body
         a.align-center.mdl-navigation__link(href="#", @click="setCourseTabs") 课程管理
         a.align-center.mdl-navigation__link(href="#", @click="setClassTabs") 授课班次
         a.align-center.mdl-navigation__link(href="#", @click="setInfoTabs") 个人信息
+        .spacer
         a.align-center.mdl-navigation__link(href="/logout") 退出登陆
     main.mdl-layout__content.mdl-color--grey-100
       section.mdl-layout__tab-panel#course-tab-1
@@ -33,7 +34,7 @@ body
                   .mdl-card__title.mdl-card--border
                     span#title.editable(@click="editChapter($event)")
                       {{ chapter.title | validChapter }}
-                      .mdl-tooltip.mdl-tooltip--right(for='title') 点击修改
+                      .mdl-tooltip(for='title') 点击修改
                     input.editInput.hide(type="text", @blur="editChapter($event)", v-model="chapter.title | validChapter")
                     button#removechap.mdl-button.mdl-js-button.mdl-button--icon(@click="removeChapter(chapIdx, cardIdx)")
                       i.material-icons remove
@@ -122,11 +123,11 @@ body
             .mdl-card__supporting-text.width-calc-30
               .select
                 label 课程：
-                select(v-model="course._id")
+                select(v-model="course._id", @click="clear")
                   option(v-for="course in courses", v-text="course.name+'-'+course.term", :value="course._id")
               .select
                 label 章节：
-                select(v-model="course.chapter")
+                select(v-model="course.chapter", @click="clear")
                   option(v-for="(index, chapter) in courses[idx].chapters", v-text="chapter.title", :value="chapter.title", track-by="$index")
               .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
                 .mdl-card__supporting-text.width-calc-30
@@ -304,9 +305,9 @@ body
               a#share.pull-right.mdl-button.mdl-js-button.mdl-button--icon(:href="qrurl", target="blank", @click="share($event)")
                 i.material-icons share
               .mdl-tooltip.mdl-tooltip--left(for='share') 链接二维码
-              button#assessment.pull-right.mdl-button.mdl-js-button.mdl-button--icon(@click="analysis($event)")
+              //button#assessment.pull-right.mdl-button.mdl-js-button.mdl-button--icon(@click="analysis($event)")
                 i.material-icons assessment
-              .mdl-tooltip.mdl-tooltip--top(for='assessment') 测试结果分析
+              //.mdl-tooltip.mdl-tooltip--top(for='assessment') 测试结果分析
           .mdl-cell.mdl-cell--12-col(v-show="showStatus")
             h5 未完成同学名单
             p {{ unfinishList | formatUnfinish }}
@@ -330,16 +331,30 @@ body
                       span(v-text="q.score")
                 .mdl-cell.mdl-cell--12-col(v-show="s.isChecked")
                   h5 测试结果
-                  p 题目总数：{{ s.ref_quizs.length }}
-                  p 正确数目：{{ s.ref_quizs | getRightNum }}
-                  p 错误数目：{{ s.ref_quizs | getWrongNum }}
-                  p 总分：{{ s.ref_quizs | getSum }}
-                  p 问答题得分：{{ s.ref_quizs | getAskScore }}
-                  p 其他题得分：{{ s.ref_quizs | getOtherScore }}
-                  p 总得分：{{ s.ref_quizs | getSumScore }}
+                  //p 题目总数：{{ s.ref_quizs.length }}
+                  //p 正确数目：{{ s.ref_quizs | getRightNum }}
+                  //p 错误数目：{{ s.ref_quizs | getWrongNum }}
+                  //p 总分：{{ s.ref_quizs | getSum }}
+                  //p 问答题得分：{{ s.ref_quizs | getAskScore }}
+                  //p 其他题得分：{{ s.ref_quizs | getOtherScore }}
+                  p 总得分（百分制）：{{ s.ref_quizs | getSumScore }}
             .mdl-card__actions.mdl-card--border(v-show="!s.isChecked")
               button.pull-right.mdl-button.mdl-js-button(@click="save($event, sidx)") 保存
-      section.mdl-layout__tab-panel#info-tab-1.content todo
+      section.mdl-layout__tab-panel#info-tab-1.content
+        .mdl-grid
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+            .mdl-card__supporting-text.width-calc-30
+              .mdl-textfield.input
+                label 原密码：
+                input.mdl-textfield__input(type="password", v-model='originPass')
+              .mdl-textfield.input
+                label 新密码：
+                input.mdl-textfield__input(type="password", v-model='newPass')
+              .mdl-textfield.input
+                label 确认密码：
+                input.mdl-textfield__input(type="password", v-model='cknPass')
+            .mdl-card__actions.mdl-card--border
+              button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click='save($event)') 保存
   #tip.mdl-js-snackbar.mdl-snackbar
     .mdl-snackbar__text
     button.mdl-snackbar__action

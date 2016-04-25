@@ -107,7 +107,10 @@ new Vue({
     start: function start(evt) {
       var _this4 = this;
 
-      if (!/^\d{1,20}$/.test(this.no)) return evt.preventDefault();
+      if (!/^\d{1,20}$/.test(this.no)) {
+        tip('学号为1至20位数字', 'message');
+        return evt.preventDefault();
+      }
       var uuid = window.location.pathname.split('/')[4];
       this.$http.get('/api/t/test/' + uuid, {
         no: this.no

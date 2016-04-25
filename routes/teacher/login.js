@@ -15,7 +15,11 @@ module.exports.post = function (req, res) {
       res.locals.err = err.toString();
       res.render('t/login');
     } else {
-      req.session.user = user;
+      req.session.user = {
+        email: user.email,
+        name: user.name,
+        _id: user._id
+      };
       res.redirect('home');
     }
   });

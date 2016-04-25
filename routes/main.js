@@ -59,6 +59,9 @@ router
   .delete('/api/t/test/:uuid', tTest.del);
 
 router
+  .put('/api/t', tTeacher.put);
+
+router
   .get('/api/qr', qr.get);
 
 router.get('*', (req, res) => {

@@ -41,7 +41,7 @@ var addClass = new Vue({
 
 module.exports = addClass;
 
-},{"../util":11,"./classview":5,"vue-resource":25}],2:[function(require,module,exports){
+},{"../util":12,"./classview":5,"vue-resource":26}],2:[function(require,module,exports){
 'use strict';
 
 /* globals Vue */
@@ -85,7 +85,7 @@ var addCourse = new Vue({
 
 module.exports = addCourse;
 
-},{"../util":11,"./courseview":6,"vue-resource":25}],3:[function(require,module,exports){
+},{"../util":12,"./courseview":6,"vue-resource":26}],3:[function(require,module,exports){
 'use strict';
 
 /* globals Vue XLSX */
@@ -207,7 +207,7 @@ var addQuiz = new Vue({
 
 module.exports = addQuiz;
 
-},{"../util":11,"./classview":5,"./courseview":6,"vue-resource":25}],4:[function(require,module,exports){
+},{"../util":12,"./classview":5,"./courseview":6,"vue-resource":26}],4:[function(require,module,exports){
 'use strict';
 
 /* globals Vue XLSX */
@@ -267,7 +267,7 @@ var addStudents = new Vue({
 
 module.exports = addStudents;
 
-},{"../util":11,"vue-resource":25}],5:[function(require,module,exports){
+},{"../util":12,"vue-resource":26}],5:[function(require,module,exports){
 'use strict';
 
 /* globals MaterialButton Vue */
@@ -333,7 +333,7 @@ var classView = new Vue({
 
 module.exports = classView;
 
-},{"../util":11,"./addstudents":4,"./pubquiz":8,"./testview":10,"vue-resource":25}],6:[function(require,module,exports){
+},{"../util":12,"./addstudents":4,"./pubquiz":8,"./testview":10,"vue-resource":26}],6:[function(require,module,exports){
 'use strict';
 
 /* globals MaterialButton Vue */
@@ -470,7 +470,7 @@ window.courseView = courseView;
 
 module.exports = courseView;
 
-},{"../util":11,"./addclass":1,"./addquiz":3,"./classview":5,"./quizview":9,"vue-resource":25}],7:[function(require,module,exports){
+},{"../util":12,"./addclass":1,"./addquiz":3,"./classview":5,"./quizview":9,"vue-resource":26}],7:[function(require,module,exports){
 'use strict';
 
 /* globals MaterialLayoutTab, MaterialLayout, MaterialTabs, MaterialTab, MaterialRipple */
@@ -480,6 +480,7 @@ var courseView = require('./courseview');
 var addCourse = require('./addcourse');
 var classView = require('./classview');
 var collect = require('./testview');
+var info = require('./updateinfo');
 
 var layout = document.querySelector('.mdl-js-layout');
 var panels = document.querySelectorAll('.mdl-layout__tab-panel');
@@ -556,7 +557,7 @@ var app = new Vue({
   }
 });
 
-},{"../util":11,"./addcourse":2,"./classview":5,"./courseview":6,"./testview":10}],8:[function(require,module,exports){
+},{"../util":12,"./addcourse":2,"./classview":5,"./courseview":6,"./testview":10,"./updateinfo":11}],8:[function(require,module,exports){
 'use strict';
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -663,6 +664,10 @@ var pubQuiz = new Vue({
         _this2.multiNum = 0;
         _this2.askNum = 0;
         _this2.judgeNum = 0;
+        _this2.maxsingleNum = 0;
+        _this2.maxmultiNum = 0;
+        _this2.maxjudgeNum = 0;
+        _this2.maxaskNum = 0;
         _this2.chapterList = [];
         _this2.pointList = [];
         var uppers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-upper');
@@ -772,7 +777,7 @@ var pubQuiz = new Vue({
 
 module.exports = pubQuiz;
 
-},{"../util":11,"./classview":5,"./testview":10,"vue-resource":25}],9:[function(require,module,exports){
+},{"../util":12,"./classview":5,"./testview":10,"vue-resource":26}],9:[function(require,module,exports){
 'use strict';
 
 /* globals Vue */
@@ -801,6 +806,9 @@ var quizView = new Vue({
     }
   },
   methods: {
+    clear: function clear() {
+      this.quizs = [];
+    },
     get: function get(evt) {
       var _this = this;
 
@@ -808,6 +816,7 @@ var quizView = new Vue({
       var qset = {};
       qset.ref_course = this.course._id;
       qset.ref_chapter = this.course.chapter;
+      console.log(qset);
       this.$http.get('/api/t/qset', qset).then(function (res) {
         if (!res.data) {
           tip('未录入习题', 'message');
@@ -838,7 +847,7 @@ var quizView = new Vue({
 
 module.exports = quizView;
 
-},{"../util":11,"./courseview":6,"./pubquiz":8,"vue-resource":25}],10:[function(require,module,exports){
+},{"../util":12,"./courseview":6,"./pubquiz":8,"vue-resource":26}],10:[function(require,module,exports){
 'use strict';
 
 /* globals Vue */
@@ -914,11 +923,25 @@ Vue.filter('getOtherScore', function (quizs) {
 });
 
 Vue.filter('getSumScore', function (quizs) {
-  return quizs.map(function (x) {
+  var judgeNum = quizs.filter(function (q) {
+    return q.genre === '判断题';
+  }).length;
+  var singleNum = quizs.filter(function (q) {
+    return q.genre === '单选题';
+  }).length;
+  var multiNum = quizs.filter(function (q) {
+    return q.genre === '多选题';
+  }).length;
+  var askNum = quizs.filter(function (q) {
+    return q.genre === '问答题';
+  }).length;
+  var total = judgeNum * 5 + singleNum * 5 + multiNum * 10 + askNum * 10;
+  var sum = quizs.map(function (x) {
     return x.score;
   }).reduce(function (p, a) {
     return p + a;
   });
+  return Math.round(sum / total * 100);
 });
 
 var collect = new Vue({
@@ -1006,7 +1029,52 @@ var collect = new Vue({
 
 module.exports = collect;
 
-},{"../util":11,"./courseview":6,"./pubquiz":8,"vue-resource":25}],11:[function(require,module,exports){
+},{"../util":12,"./courseview":6,"./pubquiz":8,"vue-resource":26}],11:[function(require,module,exports){
+/* globals Vue */
+'use strict';
+
+var tip = require('../util').tip;
+Vue.use(require('vue-resource'));
+
+var info = new Vue({
+  el: '#info-tab-1',
+  data: {
+    originPass: '',
+    newPass: '',
+    cknPass: ''
+  },
+  computed: {},
+  methods: {
+    save: function save(evt) {
+      var _this = this;
+
+      if (!/^[0-9A-Za-z\_]{6,30}$/.test(this.newPass)) {
+        tip('新密码由数字，字母，下划线组成，至少6个字符', 'message');
+        return evt.preventDefault();
+      }
+      if (this.newPass !== this.cknPass) {
+        tip('确认密码与新密码不一致', 'message');
+        return evt.preventDefault();
+      }
+      var data = {};
+      data.originPass = this.originPass;
+      data.newPass = this.newPass;
+      data.cknPass = this.cknPass;
+      this.$http.put('/api/t', data).then(function (res) {
+        tip('修改成功', 'success');
+        _this.originPass = '';
+        _this.newPass = '';
+        _this.cknPass = '';
+      }, function (err) {
+        tip(err.data, 'error');
+      });
+    }
+  }
+});
+
+module.exports = info;
+
+},{"../util":12,"vue-resource":26}],12:[function(require,module,exports){
 'use strict';
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -1133,7 +1201,7 @@ module.exports.renderTextfield = renderTextfield;
 module.exports.render = render;
 module.exports.bindClose = bindClose;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /**
  * Before Interceptor.
  */
@@ -1153,7 +1221,7 @@ module.exports = {
 
 };
 
-},{"../util":35}],13:[function(require,module,exports){
+},{"../util":36}],14:[function(require,module,exports){
 /**
  * Base client.
  */
@@ -1220,7 +1288,7 @@ function parseHeaders(str) {
     return headers;
 }
 
-},{"../../promise":28,"../../util":35,"./xhr":16}],14:[function(require,module,exports){
+},{"../../promise":29,"../../util":36,"./xhr":17}],15:[function(require,module,exports){
 /**
  * JSONP client.
  */
@@ -1270,7 +1338,7 @@ module.exports = function (request) {
     });
 };
 
-},{"../../promise":28,"../../util":35}],15:[function(require,module,exports){
+},{"../../promise":29,"../../util":36}],16:[function(require,module,exports){
 /**
  * XDomain client (Internet Explorer).
  */
@@ -1309,7 +1377,7 @@ module.exports = function (request) {
     });
 };
 
-},{"../../promise":28,"../../util":35}],16:[function(require,module,exports){
+},{"../../promise":29,"../../util":36}],17:[function(require,module,exports){
 /**
  * XMLHttp client.
  */
@@ -1361,7 +1429,7 @@ module.exports = function (request) {
     });
 };
 
-},{"../../promise":28,"../../util":35}],17:[function(require,module,exports){
+},{"../../promise":29,"../../util":36}],18:[function(require,module,exports){
 /**
  * CORS Interceptor.
  */
@@ -1400,7 +1468,7 @@ function crossOrigin(request) {
     return (requestUrl.protocol !== originUrl.protocol || requestUrl.host !== originUrl.host);
 }
 
-},{"../util":35,"./client/xdr":15}],18:[function(require,module,exports){
+},{"../util":36,"./client/xdr":16}],19:[function(require,module,exports){
 /**
  * Header Interceptor.
  */
@@ -1428,7 +1496,7 @@ module.exports = {
 
 };
 
-},{"../util":35}],19:[function(require,module,exports){
+},{"../util":36}],20:[function(require,module,exports){
 /**
  * Service for sending network requests.
  */
@@ -1528,7 +1596,7 @@ Http.headers = {
 
 module.exports = _.http = Http;
 
-},{"../promise":28,"../util":35,"./before":12,"./client":13,"./cors":17,"./header":18,"./interceptor":20,"./jsonp":21,"./method":22,"./mime":23,"./timeout":24}],20:[function(require,module,exports){
+},{"../promise":29,"../util":36,"./before":13,"./client":14,"./cors":18,"./header":19,"./interceptor":21,"./jsonp":22,"./method":23,"./mime":24,"./timeout":25}],21:[function(require,module,exports){
 /**
  * Interceptor factory.
  */
@@ -1575,7 +1643,7 @@ function when(value, fulfilled, rejected) {
     return promise.then(fulfilled, rejected);
 }
 
-},{"../promise":28,"../util":35}],21:[function(require,module,exports){
+},{"../promise":29,"../util":36}],22:[function(require,module,exports){
 /**
  * JSONP Interceptor.
  */
@@ -1595,7 +1663,7 @@ module.exports = {
 
 };
 
-},{"./client/jsonp":14}],22:[function(require,module,exports){
+},{"./client/jsonp":15}],23:[function(require,module,exports){
 /**
  * HTTP method override Interceptor.
  */
@@ -1614,7 +1682,7 @@ module.exports = {
 
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /**
  * Mime Interceptor.
  */
@@ -1652,7 +1720,7 @@ module.exports = {
 
 };
 
-},{"../util":35}],24:[function(require,module,exports){
+},{"../util":36}],25:[function(require,module,exports){
 /**
  * Timeout Interceptor.
  */
@@ -1684,7 +1752,7 @@ module.exports = function () {
     };
 };
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /**
  * Install plugin.
  */
@@ -1739,7 +1807,7 @@ if (window.Vue) {
 
 module.exports = install;
 
-},{"./http":19,"./promise":28,"./resource":29,"./url":30,"./util":35}],26:[function(require,module,exports){
+},{"./http":20,"./promise":29,"./resource":30,"./url":31,"./util":36}],27:[function(require,module,exports){
 /**
  * Promises/A+ polyfill v1.1.4 (https://github.com/bramstein/promis)
  */
@@ -1920,7 +1988,7 @@ p.catch = function (onRejected) {
 
 module.exports = Promise;
 
-},{"../util":35}],27:[function(require,module,exports){
+},{"../util":36}],28:[function(require,module,exports){
 /**
  * URL Template v2.0.6 (https://github.com/bramstein/url-template)
  */
@@ -2072,7 +2140,7 @@ exports.encodeReserved = function (str) {
     }).join('');
 };
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /**
  * Promise adapter.
  */
@@ -2183,7 +2251,7 @@ p.always = function (callback) {
 
 module.exports = Promise;
 
-},{"./lib/promise":26,"./util":35}],29:[function(require,module,exports){
+},{"./lib/promise":27,"./util":36}],30:[function(require,module,exports){
 /**
  * Service for interacting with RESTful services.
  */
@@ -2295,7 +2363,7 @@ Resource.actions = {
 
 module.exports = _.resource = Resource;
 
-},{"./util":35}],30:[function(require,module,exports){
+},{"./util":36}],31:[function(require,module,exports){
 /**
  * Service for URL templating.
  */
@@ -2427,7 +2495,7 @@ function serialize(params, obj, scope) {
 
 module.exports = _.url = Url;
 
-},{"../util":35,"./legacy":31,"./query":32,"./root":33,"./template":34}],31:[function(require,module,exports){
+},{"../util":36,"./legacy":32,"./query":33,"./root":34,"./template":35}],32:[function(require,module,exports){
 /**
  * Legacy Transform.
  */
@@ -2475,7 +2543,7 @@ function encodeUriQuery(value, spaces) {
         replace(/%20/g, (spaces ? '%20' : '+'));
 }
 
-},{"../util":35}],32:[function(require,module,exports){
+},{"../util":36}],33:[function(require,module,exports){
 /**
  * Query Parameter Transform.
  */
@@ -2501,7 +2569,7 @@ module.exports = function (options, next) {
     return url;
 };
 
-},{"../util":35}],33:[function(require,module,exports){
+},{"../util":36}],34:[function(require,module,exports){
 /**
  * Root Prefix Transform.
  */
@@ -2519,7 +2587,7 @@ module.exports = function (options, next) {
     return url;
 };
 
-},{"../util":35}],34:[function(require,module,exports){
+},{"../util":36}],35:[function(require,module,exports){
 /**
  * URL Template (RFC 6570) Transform.
  */
@@ -2537,7 +2605,7 @@ module.exports = function (options) {
     return url;
 };
 
-},{"../lib/url-template":27}],35:[function(require,module,exports){
+},{"../lib/url-template":28}],36:[function(require,module,exports){
 /**
  * Utility functions.
  */

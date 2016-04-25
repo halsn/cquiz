@@ -14,7 +14,6 @@ function _get(req, res) {
 function _post(req, res) {
   if (!req.session.user) return res.end('no auth');
   var preAdd = req.body;
-  console.log(preAdd);
   preAdd.ref_teacher = req.session.user._id;
   new Class(preAdd).save(err => {
     if (err) res.status(500).end();

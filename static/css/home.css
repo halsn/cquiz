@@ -6670,3 +6670,11 @@ body {
 
 .add-chapter {
   min-height: 129px !important; }
+
+.home-drawer-nav {
+  height: calc(100% - 150px);
+  overflow: auto; }
+
+.spacer {
+  min-height: 0;
+  height: calc(100% - 224px); }
