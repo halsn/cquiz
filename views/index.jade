@@ -1,6 +1,6 @@
 include ./includes/head.jade
   link(href="/css/index.css", rel="stylesheet")
-  title 过程化考核
+  title ProcTest
 body
   mixin text-block(title, content)
     .text-block
@@ -9,7 +9,7 @@ body
   #app.mdl-layout.mdl-js-layout.mdl-layout--fixed-header
     header.mdl-layout__header.mdl-layout__header--scroll.mdl-shadow--2dp
       .mdl-layout__header-row
-        span.mdl-layout__title ProcTest
+        span.mdl-layout__title 过程化考核
         .mdl-layout-spacer
         nav.mdl-navigation
           a.hover.mdl-navigation__link(href="/t/login") 登陆
@@ -26,7 +26,7 @@ body
         .mdl-cell.mdl-cell--4-col.mdl-cell--8-col-tablet
           +text-block('跨平台', '无论是PC，平板，还是手机，只要登陆网站，便可随时随地发布测试')
         .mdl-cell.mdl-cell--4-col.mdl-cell--8-col-tablet
-          +text-block('评测分析', '以图表方式展示学生测试结果，同时给出科学的分析')
+          +text-block('评测分析', '测试结束即可查看结果，同时反馈参考答案给学生，方便学生查缺补漏')
       footer.mdl-mini-footer.footer
         p
           span.material-icons email

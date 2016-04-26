@@ -91,7 +91,8 @@ gulp.task('compressJS', () => {
 });
 
 gulp.task('publish', ['compressCSS', 'compressJS'], (err) => {
-  console.log(err);
+  if (err) console.log(err);
+  else console.log('Finished');
 });
 
 gulp.task('default', ['start', 'jade', 'sass', 'scripts'], () => {
