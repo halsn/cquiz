@@ -35,7 +35,6 @@ app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
 
 app.use(router);
-//app.use('/favicon.ico', express.static('/favicon.ico'));
 app.listen(port, host, () => {
   console.log(`Node app is running on http:\/\/${host}:${port}`);
 });
