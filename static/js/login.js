@@ -1,1 +1,154 @@
-!function e(t,r,n){function o(c,a){if(!r[c]){if(!t[c]){var u="function"==typeof require&&require;if(!a&&u)return u(c,!0);if(i)return i(c,!0);var l=new Error("Cannot find module '"+c+"'");throw l.code="MODULE_NOT_FOUND",l}var d=r[c]={exports:{}};t[c][0].call(d.exports,function(e){var r=t[c][1][e];return o(r?r:e)},d,d.exports,e,t,r,n)}return r[c].exports}for(var i="function"==typeof require&&require,c=0;c<n.length;c++)o(n[c]);return o}({1:[function(e,t,r){"use strict";var n=e("./util").bindClose;new Vue({el:"#app",data:{email:"",pass:""},computed:{},methods:{submit:function(e){return this.email?this.pass?void 0:(document.querySelector('input[type="password"]').focus(),e.preventDefault()):(document.querySelector('input[type="email"]').focus(),e.preventDefault())}}}),n()},{"./util":2}],2:[function(e,t,r){"use strict";function n(e){if(Array.isArray(e)){for(var t=0,r=Array(e.length);t<e.length;t++)r[t]=e[t];return r}return Array.from(e)}function o(e,t){window.setTimeout(function(){var r=document.querySelectorAll(".mdl-layout__tab");[].forEach.call(r,function(n){new MaterialLayoutTab(n,r,e,t.MaterialLayout),new MaterialRipple(n)}),setTimeout(function(){r[0].click()},100)},100)}function i(e){var t=e.querySelector("th");t.parentNode.removeChild(t),setTimeout(function(){new MaterialDataTable(e),componentHandler.upgradeAllRegistered();var t=e.querySelectorAll("th:nth-child(2)"),r=e.querySelectorAll("td:nth-child(2)");[].concat(n(t)).forEach(function(e){0!==e.childElementCount&&(e.innerHTML="序号")}),[].concat(n(r)).forEach(function(e){0!==e.childElementCount&&e.parentNode.removeChild(e)})})}function c(e){var t=e.querySelector("th");t.parentNode.removeChild(t),setTimeout(function(){new MaterialDataTable(e),componentHandler.upgradeAllRegistered()})}function a(e){setTimeout(function(){componentHandler.upgradeAllRegistered()},100)}function u(e){setTimeout(function(){componentHandler.upgradeAllRegistered()},100)}function l(e){window.setTimeout(function(){var t=document.querySelector(e).querySelectorAll(".mdl-js-checkbox");[].forEach.call(t,function(e){new MaterialCheckbox(e)})},100)}function d(e){window.setTimeout(function(){var t=document.querySelector(e).querySelectorAll(".mdl-js-radio");[].concat(n(t)).forEach(function(e){new MaterialRadio(e)})},100)}function s(e){window.setTimeout(function(){var t=document.querySelector(e).querySelectorAll(".mdl-js-textfield");[].forEach.call(t,function(e){new MaterialTextfield(e)})},100)}function f(e,t){var r=document.querySelector("#tip");"error"===t&&(r.style.backgroundColor="#d9534f"),"success"===t&&(r.style.backgroundColor="#5cb85c"),"message"===t&&(r.style.backgroundColor="#3aaacf"),r.MaterialSnackbar.showSnackbar({message:e})}function p(){setTimeout(function(){componentHandler.upgradeAllRegistered()},100)}function m(){var e=document.querySelectorAll(".closebtn");[].concat(n(e)).forEach(function(e){e.addEventListener("click",function(e){var t=e.target,r=t.parentNode.parentNode;r.removeChild(t.parentNode)})})}t.exports.renderTabs=o,t.exports.tip=f,t.exports.renderTable=c,t.exports.renderPointTable=i,t.exports.renderButton=u,t.exports.renderRipple=a,t.exports.renderRadio=d,t.exports.renderCheckbox=l,t.exports.renderTextfield=s,t.exports.render=p,t.exports.bindClose=m},{}]},{},[1]);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+
+/* global Vue */
+var bindClose = require('./util').bindClose;
+var app = new Vue({
+  el: '#app',
+  data: {
+    email: '',
+    pass: ''
+  },
+  computed: {},
+  methods: {
+    submit: function submit(evt) {
+      if (!this.email) {
+        document.querySelector('input[type="email"]').focus();
+        return evt.preventDefault();
+      } else if (!this.pass) {
+        document.querySelector('input[type="password"]').focus();
+        return evt.preventDefault();
+      }
+    }
+  }
+});
+bindClose();
+
+},{"./util":2}],2:[function(require,module,exports){
+'use strict';
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+/* globals MaterialLayoutTab, MaterialLayout, MaterialTabs, MaterialTab, MaterialRipple, MaterialDataTable, MaterialButton, MaterialCheckbox, MaterialRadio, MaterialTextfield, componentHandler */
+
+function renderTabs(panels, layout) {
+  window.setTimeout(function () {
+    var tabs = document.querySelectorAll('.mdl-layout__tab');
+    [].forEach.call(tabs, function (el) {
+      new MaterialLayoutTab(el, tabs, panels, layout.MaterialLayout);
+      new MaterialRipple(el);
+    });
+    setTimeout(function () {
+      tabs[0].click();
+    }, 100);
+  }, 100);
+}
+
+function renderPointTable(table) {
+  var th_first = table.querySelector('th');
+  th_first.parentNode.removeChild(th_first);
+  setTimeout(function () {
+    new MaterialDataTable(table);
+    componentHandler.upgradeAllRegistered();
+    var ths = table.querySelectorAll('th:nth-child(2)');
+    var tds = table.querySelectorAll('td:nth-child(2)');
+    [].concat(_toConsumableArray(ths)).forEach(function (th) {
+      if (th.childElementCount !== 0) th.innerHTML = '序号';
+    });
+    [].concat(_toConsumableArray(tds)).forEach(function (td) {
+      if (td.childElementCount !== 0) td.parentNode.removeChild(td);
+    });
+  });
+}
+
+function renderTable(table) {
+  var th_first = table.querySelector('th');
+  th_first.parentNode.removeChild(th_first);
+  setTimeout(function () {
+    new MaterialDataTable(table);
+    componentHandler.upgradeAllRegistered();
+  });
+}
+
+function renderRipple(el) {
+  setTimeout(function () {
+    componentHandler.upgradeAllRegistered();
+  }, 100);
+}
+
+function renderButton(el) {
+  setTimeout(function () {
+    componentHandler.upgradeAllRegistered();
+  }, 100);
+}
+
+function renderCheckbox(el) {
+  window.setTimeout(function () {
+    var btns = document.querySelector(el).querySelectorAll('.mdl-js-checkbox');
+    [].forEach.call(btns, function (el) {
+      new MaterialCheckbox(el);
+    });
+  }, 100);
+}
+
+function renderRadio(el) {
+  window.setTimeout(function () {
+    var radios = document.querySelector(el).querySelectorAll('.mdl-js-radio');
+    [].concat(_toConsumableArray(radios)).forEach(function (el) {
+      new MaterialRadio(el);
+    });
+  }, 100);
+}
+
+function renderTextfield(el) {
+  window.setTimeout(function () {
+    var fields = document.querySelector(el).querySelectorAll('.mdl-js-textfield');
+    [].forEach.call(fields, function (el) {
+      new MaterialTextfield(el);
+    });
+  }, 100);
+}
+
+function tip(str, type) {
+  var el = document.querySelector('#tip');
+  //el.innerText = str;
+  // for firefox
+  //el.textContent = str;
+  if (type === 'error') el.style.backgroundColor = '#d9534f';
+  if (type === 'success') el.style.backgroundColor = '#5cb85c';
+  if (type === 'message') el.style.backgroundColor = '#3aaacf';
+  el.MaterialSnackbar.showSnackbar({
+    message: str
+  });
+}
+
+function render() {
+  setTimeout(function () {
+    componentHandler.upgradeAllRegistered();
+  }, 100);
+}
+
+function bindClose() {
+  var btnClose = document.querySelectorAll('.closebtn');
+  [].concat(_toConsumableArray(btnClose)).forEach(function (el) {
+    el.addEventListener('click', function (evt) {
+      var btn = evt.target;
+      var topElement = btn.parentNode.parentNode;
+      topElement.removeChild(btn.parentNode);
+    });
+  });
+}
+
+module.exports.renderTabs = renderTabs;
+module.exports.tip = tip;
+module.exports.renderTable = renderTable;
+module.exports.renderPointTable = renderPointTable;
+module.exports.renderButton = renderButton;
+module.exports.renderRipple = renderRipple;
+module.exports.renderRadio = renderRadio;
+module.exports.renderCheckbox = renderCheckbox;
+module.exports.renderTextfield = renderTextfield;
+module.exports.render = render;
+module.exports.bindClose = bindClose;
+
+},{}]},{},[1]);
