@@ -1,4 +1,6 @@
 include ../includes/head.jade
+  script(src="/js/xlsx.core.min.js")
+  script(src="/js/chart.min.js")
   link(href="/css/home.css", rel="stylesheet")
   title Home
 body
@@ -236,26 +238,6 @@ body
                 label 班次：
                 select(v-model="Class", @change="get")
                   option(v-for="class in classes", v-text="class.class_name", :value="class")
-              .range
-                label 用时：
-                input.mdl-slider.mdl-js-slider(type="range", min="5", max="30", value="10", step="5", v-model="duration")
-                span(v-text="duration + '分'")
-              .range
-                label 判断：
-                input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxjudgeNum", value="0", step="1", v-model="judgeNum")
-                span(v-text="judgeNum")
-              .range
-                label 单选：
-                input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxsingleNum", value="0", step="1", v-model="singleNum")
-                span(v-text="singleNum")
-              .range
-                label 多选：
-                input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxmultiNum", value="0", step="1", v-model="multiNum")
-                span(v-text="multiNum")
-              .range
-                label 问答：
-                input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxaskNum", value="0", step="1", v-model="askNum")
-                span(v-text="askNum")
               .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
                 .mdl-card__supporting-text.width-calc-30
                   p 选择章节（可多选）
@@ -283,6 +265,28 @@ body
                         td(v-text='pidx + 1')
                         td(v-text='point.title')
                         td(v-text='point.totalNum')
+              .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+                .mdl-card__supporting-text.width-calc-30
+                  .range(style='margin-top:20px;')
+                    label 用时：
+                    input.mdl-slider.mdl-js-slider(type="range", min="5", max="30", value="10", step="5", v-model="duration")
+                    span(v-text="duration + '分'")
+                  .range
+                    label 判断：
+                    input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxjudgeNum", value="0", step="1", v-model="judgeNum")
+                    span(v-text="judgeNum")
+                  .range
+                    label 单选：
+                    input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxsingleNum", value="0", step="1", v-model="singleNum")
+                    span(v-text="singleNum")
+                  .range
+                    label 多选：
+                    input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxmultiNum", value="0", step="1", v-model="multiNum")
+                    span(v-text="multiNum")
+                  .range
+                    label 问答：
+                    input.mdl-slider.mdl-js-slider(type="range", min="0", :max="maxaskNum", value="0", step="1", v-model="askNum")
+                    span(v-text="askNum")
                   h5 题目总数：{{ quizNum }}
                   h5 需完成数：{{ expireNum }}
             .mdl-card__actions.mdl-card--border
@@ -305,9 +309,15 @@ body
               a#share.pull-right.mdl-button.mdl-js-button.mdl-button--icon(:href="qrurl", target="blank", @click="share($event)")
                 i.material-icons share
               .mdl-tooltip.mdl-tooltip--left(for='share') 链接二维码
-              //button#assessment.pull-right.mdl-button.mdl-js-button.mdl-button--icon(@click="analysis($event)")
+              button#assessment.pull-right.mdl-button.mdl-js-button.mdl-button--icon(@click="analysis($event)")
                 i.material-icons assessment
-              //.mdl-tooltip.mdl-tooltip--top(for='assessment') 测试结果分析
+              .mdl-tooltip.mdl-tooltip--left(for='assessment') 测试结果分析
+          .mdl-cell.mdl-cell--12-col(v-show="showChart")
+            h4.just-center 成绩分布图
+            p.just-center 总人数：{{ test.ref_students.length }}
+            canvas#chart1
+            h4.just-center 知识点错误率 
+            canvas#chart2
           .mdl-cell.mdl-cell--12-col(v-show="showStatus")
             h5 未完成同学名单
             p {{ unfinishList | formatUnfinish }}

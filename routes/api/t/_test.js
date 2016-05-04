@@ -8,12 +8,12 @@ function _get(req, res) {
   var classId = req.query.classId;
   var uuid = req.params.uuid;
   if (uuid === 'status' && classId) {
-    if (!req.session.user) return res.end('no auth');
+    if (!req.session.user) return res.status(500).end('登陆超时，请重新登陆');
     else {
       Test.find()
         .where('ref_class').equals(classId)
         .exec((err, tests) => {
-          if (err) return res.status(500).end();
+          if (err) return res.status(500).end('内部错误');
           res.json(tests);
         });
     }
@@ -66,14 +66,16 @@ function _get(req, res) {
                   var multiQuizs = quizs.filter(q => q.genre === '多选题').slice(0, test.multiNum);
                   var askQuizs = quizs.filter(q => q.genre === '问答题').slice(0, test.askNum);
                   quizs = judgeQuizs.concat(singleQuizs).concat(multiQuizs).concat(askQuizs);
+                  quizs = quizs.sort(() => 0.5 - Math.random());
                   quizs = quizs.map(q => {
                     q.selections = q.selections.sort(() => 0.5 - Math.random());
                     return q;
                   });
+                  if (test.askNum === 0) test.ref_students[si].isChecked = true;
                   test.ref_students[si].accessed = true;
                   test.ref_students[si].ref_quizs = quizs;
                   test.save(err => {
-                    if (err) res.status(500).end();
+                    if (err) res.status(500).end('内部错误');
                     else {
                       quizs = quizs.map(q => {
                         q.answers = [];
