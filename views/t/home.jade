@@ -314,10 +314,10 @@ body
               .mdl-tooltip.mdl-tooltip--left(for='assessment') 测试结果分析
           .mdl-cell.mdl-cell--12-col(v-show="showChart")
             h4.just-center 成绩分布图
-            p.just-center 总人数：{{ test.ref_students.length }}
-            canvas#chart1
-            h4.just-center 知识点错误率 
-            canvas#chart2
+            p.just-center.c1 总人数：{{ test.ref_students.length }}
+            canvas
+            h4.just-center.c2 知识点错误率 
+            canvas
           .mdl-cell.mdl-cell--12-col(v-show="showStatus")
             h5 未完成同学名单
             p {{ unfinishList | formatUnfinish }}
