@@ -4,7 +4,7 @@ var Qset = require('../../../lib/qset');
 var Class = require('../../../lib/class');
 
 function _get(req, res) {
-  if (!req.session.user) return res.end('请重新登陆');
+  if (!req.session.user) return res.end('登陆超时，请重新登陆');
   var t_id = req.session.user._id;
   Course.find({
       ref_teacher: t_id
@@ -36,7 +36,6 @@ function _get(req, res) {
           return res.json(docs).end();
         })
         .catch(err => {
-          console.log(err);
           return res.status(500).end('内部错误');
         });
 
