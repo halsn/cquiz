@@ -10,7 +10,7 @@ function _get(req, res) {
       ref_teacher: t_id
     })
     .exec((err, docs) => {
-      if (err) return res.status('500').end('内部错误');
+      if (err) return res.status('500').end('内部错误1');
       // WTF _doc ???
       var docIds = docs.map(d => d._id);
       getInfo(docIds)
@@ -36,7 +36,7 @@ function _get(req, res) {
           return res.json(docs).end();
         })
         .catch(err => {
-          return res.status(500).end('内部错误');
+          return res.status(500).end('内部错误2');
         });
 
       function getInfo(ids) {
