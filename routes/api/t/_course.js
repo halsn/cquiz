@@ -10,19 +10,21 @@ function _get(req, res) {
       ref_teacher: t_id
     })
     .exec((err, docs) => {
-      if (err) return res.status('500').end('内部错误1');
+      if (err) return res.status('500').end('内部错误');
       // WTF _doc ???
       var docIds = docs.map(d => d._id);
       getInfo(docIds)
         .then(info => {
           docs = docs.map(d => {
             d._doc.chapters.forEach(c => {
-              if (info[d._id][c.title]) {
-                c._doc.totalNum = info[d._id][c.title].totalNum;
-                c._doc.singleNum = info[d._id][c.title].singleNum;
-                c._doc.multiNum = info[d._id][c.title].multiNum;
-                c._doc.judgeNum = info[d._id][c.title].judgeNum;
-                c._doc.askNum = info[d._id][c.title].askNum;
+              if (info[d._id]) {
+                if (info[d._id][c.title]) {
+                  c._doc.totalNum = info[d._id][c.title].totalNum;
+                  c._doc.singleNum = info[d._id][c.title].singleNum;
+                  c._doc.multiNum = info[d._id][c.title].multiNum;
+                  c._doc.judgeNum = info[d._id][c.title].judgeNum;
+                  c._doc.askNum = info[d._id][c.title].askNum;
+                }
               } else {
                 c._doc.totalNum = 0;
                 c._doc.singleNum = 0;
@@ -33,10 +35,10 @@ function _get(req, res) {
             });
             return d;
           });
-          return res.json(docs).end();
+          return res.json(docs);
         })
         .catch(err => {
-          return res.status(500).end('内部错误2');
+          return res.status(500).end('内部错误');
         });
 
       function getInfo(ids) {
