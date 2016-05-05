@@ -11,7 +11,7 @@ function _post() {
 }
 
 function _put(req, res) {
-  if (!req.session.user) return res.end('请重新登陆');
+  if (!req.session.user) return res.status(500).end('登陆超时，请重新登陆');
   var data = req.body;
   Teacher.auth(req.session.user.email, data.originPass, (err, teacher) => {
     if (err) return res.status(500).end('密码错误');

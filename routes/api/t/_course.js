@@ -65,18 +65,18 @@ function _get(req, res) {
 }
 
 function _post(req, res) {
-  if (!req.session.user) return res.end('请重新登陆');
+  if (!req.session.user) return res.end('登陆超时，请重新登陆');
   var t_id = req.session.user._id;
   var preAdd = new Course(req.body);
   preAdd.ref_teacher = t_id;
   preAdd.save(err => {
-    if (err) return res.status(500).end();
+    if (err) return res.status(500).end('内部错误');
     res.status(200).end();
   });
 }
 
 function _put(req, res) {
-  if (!req.session.user) return res.status(500).end('请重新登陆');
+  if (!req.session.user) return res.status(500).end('登陆超时，请重新登陆');
   var id = req.body._id;
   var data = req.body;
   Course.findOne()
@@ -112,7 +112,7 @@ function _put(req, res) {
               return res.status(200).end();
             })
             .catch(err => {
-              return res.status(500).end(err);
+              return res.status(500).end('内部错误');
             });
 
           function updateQset(toEditTitle) {
@@ -152,21 +152,21 @@ function _put(req, res) {
 }
 
 function _del(req, res) {
-  if (!req.session.user) return res.status(500).end('请重新登陆');
+  if (!req.session.user) return res.status(500).end('登陆超时，请重新登陆');
   var id = req.body._id;
   Course.remove({
     _id: id
   }, err => {
-    if (err) return res.status(500).end();
+    if (err) return res.status(500).end('内部错误');
     Class.remove({
       ref_course: id
     }).exec(err => {
-      if (err) return res.status(500).end();
+      if (err) return res.status(500).end('内部错误');
       else {
         Qset.remove({
           ref_course: id
         }).exec(err => {
-          if (err) return res.status(500).end();
+          if (err) return res.status(500).end('内部错误');
           res.status(200).end();
         });
       }
