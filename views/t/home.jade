@@ -82,11 +82,11 @@ body
             .mdl-card__supporting-text.width-calc-30
               .select
                 label 课程：
-                select(v-model="course._id")
-                  option(v-for="course in courses", v-text="course.name+'-'+course.term", :value="course._id")
+                select(v-model="course._id", @click='clear')
+                  option(v-for="(index, course) in courses", v-text="course.name+'-'+course.term", :value="course._id")
               .select
                 label 章节：
-                select(v-model="course.chapter")
+                select(v-model="course.chapter", @click='clear')
                   option(v-for="(index, chapter) in courses[idx].chapters", v-text="chapter.title", :value="chapter.title", track-by="$index")
               .mdl-textfield.input
                 label 文件：
