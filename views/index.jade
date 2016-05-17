@@ -1,37 +1,171 @@
-include ./includes/head.jade
-  link(href="/css/index.css", rel="stylesheet")
-  title ProcTest
-body
-  mixin text-block(title, content)
-    .text-block
-      h3.align-center= title
-      p.align-center= content
-  #app.mdl-layout.mdl-js-layout.mdl-layout--fixed-header
-    header.mdl-layout__header.mdl-layout__header--scroll.mdl-shadow--2dp
-      .mdl-layout__header-row
-        span.mdl-layout__title 过程化考核
-        .mdl-layout-spacer
-        nav.mdl-navigation
-          a.hover.mdl-navigation__link(href="/t/login") 登陆
-          a.hover.mdl-navigation__link(href="/t/signup") 注册
-    main.mdl-layout__content
-      #mgrid.mdl-grid
-        .mdl-cell.mdl-cell--12-col.just-center.align-center
-          h1.mdl-color-text--grey-100
-            便利的在线测试系统
-            br
-            实时掌握学生学习进度
-        .mdl-cell.mdl-cell--4-col.mdl-cell--8-col-tablet
-          +text-block('习题库', '可从Excel文件一键式导入习题，包括选择题，判断题，问答题')
-        .mdl-cell.mdl-cell--4-col.mdl-cell--8-col-tablet
-          +text-block('跨平台', '无论是PC，平板，还是手机，只要登陆网站，便可随时随地发布测试')
-        .mdl-cell.mdl-cell--4-col.mdl-cell--8-col-tablet
-          +text-block('评测分析', '测试结束即可查看结果，同时反馈参考答案给学生，方便学生查缺补漏')
-      footer.mdl-mini-footer.footer
-        p
-          span.material-icons email
-          span 492264408@qq.com
-    #tip.mdl-js-snackbar.mdl-snackbar
-      .mdl-snackbar__text
-      button.mdl-snackbar__action
-  script(src="/js/index.js")
+doctype html
+html
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+    |   
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    |   
+    title ProTest
+    |   
+    link(rel='stylesheet', href='css/bootstrap.min.css')
+    |   
+    link(rel='stylesheet', href='css/base.css')
+    |   
+    link(rel='stylesheet', href='css/index.css')
+    |   
+    style.
+      .login>a {
+      color: white !important;
+      }
+      .signup>a {
+      color: white !important;
+      }
+      .footer-ul {
+      margin: 40px 0 40px 135px;
+      }
+      .footer-ul li {
+      margin-top: 10px;
+      }
+      .footer-ul li:first-child {
+      margin-top: 30px;
+      }
+  body
+    div
+      header.navbar.navbar-inverse.hero
+        nav.container
+          .container-fluid
+            // Brand and toggle get grouped for better mobile display
+            .navbar-header
+              button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+                span.sr-only Toggle navigation
+                |               
+                span.icon-bar
+                |               
+                span.icon-bar
+                |               
+                span.icon-bar
+              |             
+              a.navbar-brand(style='color: white', href='#') &#x8FC7;&#x7A0B;&#x5316;&#x8003;&#x6838;
+            // Collect the nav links, forms, and other content for toggling
+            #bs-example-navbar-collapse-1.collapse.navbar-collapse
+              ul.nav.navbar-nav.navbar-right
+                li.login
+                  a(href='/t/login') &#x767B;&#x9646;
+                |               
+                li.signup
+                  a(href='/t/signup') &#x6CE8;&#x518C;
+            // /.navbar-collapse
+          // /.container-fluid
+      |     
+      section#home
+        .hero
+          .container
+            .row
+              h3.hero-text.col-sm-12 &#x6700;&#x4F73;&#x7684;&#x5728;&#x7EBF;&#x8003;&#x6838;&#x5E73;&#x53F0;
+              |             
+              h4.sub-text.col-sm-6.col-sm-offset-3.col-xs-12.text-center &#x7EDF;&#x4E00;&#x7684;&#x751F;&#x6001;&#x7CFB;&#x7EDF;&#xFF1A;&#x4ECE;&#x521B;&#x5EFA;&#x6D4B;&#x8BD5;&#xFF0C;&#x8C03;&#x67E5;&#xFF0C;&#x7075;&#x6D3B;&#x7684;&#x5206;&#x6790;&#x62A5;&#x544A;&#xFF0C;&#x4E3A;&#x6559;&#x5B66;&#x63D0;&#x4F9B;&#x5B8C;&#x6574;&#x6D4B;&#x8BD5;&#x5DE5;&#x5177;
+        |       
+        .features
+          .container
+            .row
+              img.col-xs-12.col-sm-5.col-md-5.col-md-offset-1(src='images/analytics.png', alt='')
+              |             
+              .col-xs-12.col-sm-7.col-md-4.col-md-offset-1
+                h1 &#x9AD8;&#x7EA7;&#x5206;&#x6790;&#x5DE5;&#x5177;
+                |               
+                p &#x6240;&#x6709;&#x7684;&#x6D4B;&#x8BD5;&#x6570;&#x636E;&#x90FD;&#x80FD;&#x591F;&#x5B9E;&#x65F6;&#x81EA;&#x52A8;&#x6536;&#x96C6;&#xFF0C;&#x5E76;&#x4E14;&#x4EE5;&#x56FE;&#x8868;&#x5F62;&#x5F0F;&#x5C55;&#x793A;&#x3002;&#x901A;&#x8FC7;&#x89C2;&#x770B;&#x8BE6;&#x7EC6;&#x62A5;&#x544A;&#x638C;&#x63E1;&#x5B66;&#x751F;&#x5B66;&#x4E60;&#x60C5;&#x51B5;&#xFF0C;&#x8C03;&#x6574;&#x6559;&#x5B66;&#x8BA1;&#x5212;&#xFF0C;&#x8FBE;&#x5230;&#x8DDF;&#x8E2A;&#x6559;&#x5B66;&#x7684;&#x76EE;&#x7684;
+          |         
+          hr
+          |         
+          .container
+            .row
+              .col-xs-12.col-sm-7.col-md-4.col-md-offset-1
+                h1 &#x4E30;&#x5BCC;&#x7684;&#x4E60;&#x9898;&#x5E93;
+                |               
+                p &#x53EF;&#x901A;&#x8FC7;&#x5E73;&#x53F0;&#x5185;&#x7F6E;&#x9898;&#x76EE;&#x521B;&#x5EFA;&#x6D4B;&#x8BD5;&#xFF0C;&#x4E5F;&#x53EF;&#x901A;&#x8FC7;Excel&#x6587;&#x4EF6;&#x5BFC;&#x5165;&#x81EA;&#x6709;&#x4E60;&#x9898;&#xFF0C;&#x9898;&#x578B;&#x5305;&#x62EC;&#x9009;&#x62E9;&#x9898;&#xFF0C;&#x5224;&#x65AD;&#x9898;&#xFF0C;&#x95EE;&#x7B54;&#x9898;
+              |             
+              img.col-xs-12.col-sm-5.col-md-5.col-md-offset-1(src='images/quizs.png', alt='')
+          |         
+          hr
+          |         
+          .container
+            .row
+              img.col-xs-12.col-sm-5.col-md-5.col-md-offset-1(src='images/design.png', alt='')
+              |             
+              .col-xs-12.col-sm-7.col-md-4.col-md-offset-1
+                h1 &#x8DE8;&#x5E73;&#x53F0;&#x8BBE;&#x8BA1;
+                |               
+                p &#x91C7;&#x7528;&#x6700;&#x65B0;&#x7684;Material Design&#xFF0C;&#x65E0;&#x8BBA;&#x662F;PC&#xFF0C;&#x5E73;&#x677F;&#xFF0C;&#x8FD8;&#x662F;&#x624B;&#x673A;&#xFF0C;&#x53EA;&#x8981;&#x767B;&#x9646;&#x7F51;&#x7AD9;&#xFF0C;&#x4FBF;&#x53EF;&#x968F;&#x65F6;&#x968F;&#x5730;&#x8FDB;&#x884C;&#x6D4B;&#x8BD5;
+        |       
+        hr
+        |       
+        .grid
+          .container
+            .text-center.col-md-4.col-sm-6.col-xs-12
+              span.glyphicon.glyphicon-refresh.btn-lg(aria-hidden='true')
+              |             
+              .h4
+                | &#x5B9E;&#x65F6;&#x8FDB;&#x5EA6;
+              |             
+              p &#x8DDF;&#x8E2A;&#x6D4B;&#x8BD5;&#x8FDB;&#x5EA6;&#xFF0C;&#x638C;&#x63E1;&#x5B66;&#x751F;&#x5B66;&#x4E60;&#x60C5;&#x51B5;
+            |           
+            .text-center.col-md-4.col-sm-6.col-xs-12
+              span.glyphicon.glyphicon-user.btn-lg(aria-hidden='true')
+              |             
+              .h4
+                | &#x51ED;&#x8BC1;
+              |             
+              p &#x521B;&#x5EFA;&#x81EA;&#x5DF1;&#x7684;&#x51ED;&#x8BC1;&#xFF0C;&#x5E76;&#x5C55;&#x793A;&#x5728;&#x6D4B;&#x8BD5;&#x7ED3;&#x679C;&#x4E2D;
+            |           
+            .text-center.col-md-4.col-sm-6.col-xs-12
+              span.glyphicon.glyphicon-cog.btn-lg(aria-hidden='true')
+              |             
+              .h4
+                | &#x6784;&#x9020;&#x7075;&#x6D3B;&#x7684;&#x6D4B;&#x8BD5;
+              |             
+              p &#x8BBE;&#x7F6E;&#x4E60;&#x9898;&#x987A;&#x5E8F;&#xFF0C;&#x5E76;&#x6DFB;&#x52A0;&#x63D0;&#x793A;&#x548C;&#x89E3;&#x91CA;
+            |           
+            .text-center.col-md-4.col-sm-6.col-xs-12
+              span.glyphicon.glyphicon-stats.btn-lg(aria-hidden='true')
+              |             
+              .h4
+                | &#x4E30;&#x5BCC;&#x7684;&#x62A5;&#x544A;&#x7CFB;&#x7EDF;
+              |             
+              p &#x901A;&#x8FC7;&#x5E73;&#x53F0;&#x4E30;&#x5BCC;&#x7684;&#x62A5;&#x544A;&#x7CFB;&#x7EDF;&#xFF0C;&#x5206;&#x6790;&#x6D4B;&#x8BD5;&#x7ED3;&#x679C;
+            |           
+            .text-center.col-md-4.col-sm-6.col-xs-12
+              span.glyphicon.glyphicon-wrench.btn-lg(aria-hidden='true')
+              |             
+              .h4
+                | &#x6F02;&#x4EAE;&#x7684;Material design
+              |             
+              p &#x5E94;&#x7528;&#x91C7;&#x7528;&#x6F02;&#x4EAE;&#x7B80;&#x5355;&#x7684;MaterialUI&#x8FDB;&#x884C;&#x8BBE;&#x8BA1;
+            |           
+            .text-center.col-md-4.col-sm-6.col-xs-12
+              span.glyphicon.glyphicon-star.btn-lg(aria-hidden='true')
+              |             
+              .h4
+                | &#x9AD8;&#x7EA7;&#x95EE;&#x9898;&#x7F16;&#x8F91;&#x5668;
+              |             
+              p &#x901A;&#x8FC7;&#x5185;&#x7F6E;&#x5DE5;&#x5177;&#x7F16;&#x8F91;&#x4E60;&#x9898;&#xFF0C;&#x652F;&#x6301;&#x9009;&#x62E9;&#x9898;&#xFF0C;&#x5224;&#x65AD;&#x9898;&#xFF0C;&#x95EE;&#x7B54;&#x9898;3&#x79CD;&#x7C7B;&#x578B;
+        |       
+        hr
+      |     
+      footer(style='background: #223741')
+        .container
+          .row.col-md-6.col-md-offset-3.col-sm-12.col-xs-12
+            .col-md-4.col-sm-4.col-xs-12
+          |         
+          .container
+            .row.col-md-6.col-sm-12.col-xs-12
+              ul.col-md-4.col-sm-4.col-xs-12.footer-ul(style='color: white;list-style: none;')
+                | MENU
+                li
+                  a(href='#') &#x5173;&#x4E8E;&#x6211;&#x4EEC;
+                |               
+                li
+                  a(href='#') &#x8054;&#x7CFB;&#x6211;&#x4EEC;
+    |   
+    script(src='js/jquery.min.js')
+    |   
+    script(src='js/bootstrap.min.js')
