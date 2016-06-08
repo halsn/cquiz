@@ -79,3 +79,20 @@ var app = new Vue({
     }, 1000);
   }
 });
+
+var hour = (new Date).getHours();
+var header = document.querySelector('.home-drawer-header');
+var greeting = document.querySelector('.greeting');
+if (hour >= 6 && hour < 12) {
+  greeting.innerText = '早上好';
+  greeting.textContent = '早上好';
+  header.style.backgroundImage = "url('/images/morning.jpg')";
+} else if (hour >= 12 && hour < 19) {
+  greeting.innerText = '下午好';
+  greeting.textContent = '下午好';
+  header.style.backgroundImage = "url('/images/dusk.jpg')";
+} else {
+  greeting.innerText = '晚上好';
+  greeting.textContent = '晚上好';
+  header.style.backgroundImage = "url('/images/night.jpg')";
+}
