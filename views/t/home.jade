@@ -11,7 +11,7 @@ body
       .mdl-layout__tab-bar.mdl-js-ripple-effect
         a.mdl-layout__tab(:href="tab.url", v-for="tab in tabs") {{tab.title}}
     .border-none.mdl-layout__drawer.mdl-color--blue-grey-900.mdl-color-text--blue-grey-50
-      - var hour = (new Date()).getHours()
+      - hour = (new Date()).getHours()
       if hour >= 6 && hour < 12
         - time = 'morning'
         - greeting = '早上好'

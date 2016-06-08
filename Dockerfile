@@ -1,5 +1,5 @@
 #FROM alpine:edge
-FROM mhart/alpine-node:4.4.2
+FROM mhart/alpine-node:latest
 #RUN apk add --update nodejs
 #RUN apk add --update mongodb
 RUN mkdir -p /usr/src/cquiz
