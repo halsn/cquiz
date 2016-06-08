@@ -9,6 +9,7 @@ var tTeacher = require('./api/t/_teacher');
 var tQset = require('./api/t/_qset');
 var tClass = require('./api/t/_class');
 var tTest = require('./api/t/_test');
+var Analysis = require('./api/_analysis')
 var qr = require('./api/qr');
 
 module.exports = router;
@@ -63,6 +64,9 @@ router
 
 router
   .get('/api/qr', qr.get);
+
+router
+  .get('/api/analysis', Analysis.get);
 
 router.get('*', (req, res) => {
   res.status(404).render('404');

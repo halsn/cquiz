@@ -11,8 +11,18 @@ body
       .mdl-layout__tab-bar.mdl-js-ripple-effect
         a.mdl-layout__tab(:href="tab.url", v-for="tab in tabs") {{tab.title}}
     .border-none.mdl-layout__drawer.mdl-color--blue-grey-900.mdl-color-text--blue-grey-50
-      header.home-drawer-header
-        img.home-user-avator(src="/images/user.jpg")
+      - var hour = (new Date()).getHours()
+      if hour >= 6 && hour < 12
+        - time = 'morning'
+        - greeting = '早上好'
+      else if hour >= 12 && hour < 19
+        - time = 'dusk'
+        - greeting = '下午好'
+      else
+        - time = 'night'
+        - greeting = '晚上好'
+      header.home-drawer-header(style="background-image:url('/images/#{time}.jpg');background-size:cover;")
+        span #{greeting}
         span.home-user-info #{useremail}
       nav.home-drawer-nav.mdl-navigation.mdl-color--blue-grey-800
         a.align-center.mdl-navigation__link(href="#", @click="setCourseTabs") 课程管理
@@ -23,8 +33,9 @@ body
     main.mdl-layout__content.mdl-color--grey-100
       section.mdl-layout__tab-panel#course-tab-1
         .mdl-grid
-          .mdl-cell.mdl-cell--12-col
-            h4 已添加课程
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+            .mdl-card__title
+              p.mdl-card__title-text 已添加课程
           .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-for="(cardIdx, card) in cards")
             .mdl-card__title.mdl-card--border
               p.mdl-card__title-text(v-text="card.name+'-'+card.term+'('+card.duration+'课时)'")
@@ -91,11 +102,11 @@ body
               .mdl-textfield.input
                 label 文件：
                 input.mdl-textfield__input(type="file", @change="read($event)", @click="read($event)")
-              p
+              p.flex
                 i.material-icons.mdl-color-text--blue-600 info
                 请参考示例文件录入习题
                 a(href="/quiz.xlsx") 下载
-              p
+              p.flex
                 i.material-icons.mdl-color-text--blue-600 info
                 习题可叠加录入，重复习题会自动过滤
               .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
@@ -155,8 +166,9 @@ body
               button.pull-right.mdl-button.mdl-js-button.mdl-button--primary(@click="del($event)") 删除
       section.mdl-layout__tab-panel#class-tab-1
         .mdl-grid
-          .mdl-cell.mdl-cell--12-col
-            h4 已添加班次
+          .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
+            .mdl-card__title
+              p.mdl-card__title-text 已添加班次
           .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-for="(cidx, class) in classes")
             .mdl-card__title.mdl-card--border
               p.mdl-card__title-text(v-text="class.class_name")
@@ -204,11 +216,11 @@ body
               .mdl-textfield.input
                 label 名单：
                 input.mdl-textfield__input(type="file", @change="read($event)", @click="read($event)")
-              p
+              p.flex
                 i.material-icons.mdl-color-text--blue-600 info
                 请参考示例文件录入学生名单
                 a(href="/student.xlsx") 下载
-              p
+              p.flex
                 i.material-icons.mdl-color-text--blue-600 info
                 本班次学生名单以最后一次录入为准
               .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp
@@ -312,7 +324,7 @@ body
               button#assessment.pull-right.mdl-button.mdl-js-button.mdl-button--icon(@click="analysis($event)")
                 i.material-icons assessment
               .mdl-tooltip.mdl-tooltip--left(for='assessment') 测试结果分析
-          .mdl-cell.mdl-cell--12-col(v-show="showChart")
+          .mdl-cell.mdl-cell--12-col.mdl-shadow--2dp(v-show="showChart")
             h4.just-center 成绩分布图
             p.just-center.c1 总人数：{{ test.ref_students.length }}
             canvas

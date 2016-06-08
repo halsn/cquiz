@@ -1,2 +1,3241 @@
-!function e(t,r,n){function i(u,o){if(!r[u]){if(!t[u]){var a="function"==typeof require&&require;if(!o&&a)return a(u,!0);if(s)return s(u,!0);var c=new Error("Cannot find module '"+u+"'");throw c.code="MODULE_NOT_FOUND",c}var l=r[u]={exports:{}};t[u][0].call(l.exports,function(e){var r=t[u][1][e];return i(r?r:e)},l,l.exports,e,t,r,n)}return r[u].exports}for(var s="function"==typeof require&&require,u=0;u<n.length;u++)i(n[u]);return i}({1:[function(e,t,r){"use strict";var n=e("../util").tip,i=e("./classview");Vue.use(e("vue-resource")),Vue.filter("validName",function(e){return e.slice(0,48)});var s=new Vue({el:"#class-tab-2",data:{courses:[],className:"",course:{}},methods:{addClass:function(e){var t=this;if(!this.course||!this.className||this.className.length>48)return e.preventDefault();var r={};r.ref_course=this.course._id,r.class_name=this.course.name+"-"+this.course.term+"-"+this.className,this.$http.post("/api/t/class",r).then(function(e){t.className="",t.course={};var r=document.querySelectorAll(".mdl-layout__tab");r[2].click(),i.get(),n("添加成功，录入学生后即可发布测试","success")},function(e){return n(e.data,"error")})}}});t.exports=s},{"../util":13,"./classview":5,"vue-resource":27}],2:[function(e,t,r){"use strict";var n=e("../util").tip,i=e("./courseview");Vue.use(e("vue-resource")),Vue.filter("validName",function(e){return e.slice(0,48)});var s=new Vue({el:"#course-tab-2",data:{course:{name:"",duration:32,term:"",chapters:[],ref_qset:[]}},methods:{add:function(e){var t=this;this.course.name?this.$http.post("/api/t/course",this.course).then(function(e){n("添加成功，请在设置章节后录入习题","success"),t.course.name="",t.course.duration=32,document.querySelectorAll(".mdl-layout__tab")[0].click(),i.get()},function(e){return n(e.data,"error")}):e.preventDefault()}}});t.exports=s},{"../util":13,"./courseview":6,"vue-resource":27}],3:[function(e,t,r){"use strict";var n=(e("./courseview"),e("./classview")),i=e("../util").tip;Vue.use(e("vue-resource"));var s=new Vue({el:"#course-tab-3",data:{courses:[],course:{_id:"",chapter:""},jsonData:[]},computed:{idx:function(){for(var e=0,t=this.courses.length;t>e;e++)if(this.courses[e]._id===this.course._id)return e;return-1}},methods:{clear:function(){this.jsonData=[]},save:function(e){var t=this;if(!(this.course._id&&this.jsonData.length&&this.course.chapter&&this.courses[this.idx].chapters.length))return e.preventDefault();var r=[],s={};this.jsonData.forEach(function(e){var t={};if(t.genre=e.类型,t.describe={},t.describe.content=e.题目,t.ref_point=e.知识点,t.answers=[e.参考答案],"单选题"===t.genre||"多选题"===t.genre){var n=e.选项.split(";");t.selections=n.map(function(e){return e.trim().slice(2)}),t.answers=e.参考答案.split("").map(function(e){return n.filter(function(t){return 0===t.indexOf(e)}).join("").slice(2).trim()})}r.push(t)}),s.quizs=r,s.ref_course=this.course._id,s.ref_chapter=this.course.chapter,this.$http.post("/api/t/qset",s).then(function(e){i("录入成功","success"),t.course={},t.jsonData=[],window.courseView.get(),n.get()},function(e){return i(e.data,"error")})},read:function(e,t){var r=this;if(!this.course._id||!this.course.chapter||!this.courses[this.idx].chapters.length)return e.preventDefault();var n=this.courses.filter(function(e){return e._id===r.course._id})[0],i=(n.chapters.filter(function(e){return e.title===r.course.chapter})[0]||{},e.target.files[0]),u=new FileReader;return u.onload=function(e){var t=e.target.result,r=XLSX.read(t,{type:"binary"}),n=r.SheetNames[0],i=r.Sheets[n],u=XLSX.utils.sheet_to_json(i),o=[];s.jsonData=u.filter(function(e){if(-1!==o.indexOf(e.题目))return!1;if(e.知识点){if("问答题"===e.类型)return e.选项="",o.push(e.题目.trim()),!(!e.题目||!e.参考答案);if("判断题"===e.类型)return o.push(e.题目.trim()),e.参考答案&&("正确"===e.参考答案||"错误"===e.参考答案)?!0:!1;if("单选题"===e.类型||"多选题"===e.类型){if(o.push(e.题目.trim()),!e.选项)return!1;var t=e.选项.split(/\;|\n/).map(function(e){return e.trim().replace(/\&\#10/g,"")}).filter(function(e){return/^[A-Z]\.[^\.]/.test(e)&&1===e.match(/[A-Z]\./g).length});if(t.length<2)return!1;e.选项=t.join(";");var r=!(!e.题目||!e.参考答案);return r?/^[A-Z]+$/.test(e.参考答案)&&e.参考答案.split("").length<=t.length:r}return!1}return!1})},i?void u.readAsBinaryString(i):null}}});t.exports=s},{"../util":13,"./classview":5,"./courseview":6,"vue-resource":27}],4:[function(e,t,r){"use strict";var n=e("../util").tip;Vue.use(e("vue-resource"));var i=new Vue({el:"#class-tab-3",data:{classes:[],Class:{},jsonData:[]},methods:{read:function(e){if(!this.Class._id)return e.preventDefault();var t=e.target.files[0],r=new FileReader;return r.onload=function(e){var t=e.target.result,r=XLSX.read(t,{type:"binary"}),n=r.SheetNames[0],s=r.Sheets[n];i.jsonData=XLSX.utils.sheet_to_json(s).filter(function(e){return e.姓名&&e.学号&&e.专业&&e.班级?!0:!1})},t?void r.readAsBinaryString(t):null},save:function(e){var t=this;return this.Class._id&&this.jsonData.length?(this.Class.ref_students=this.jsonData.map(function(e){return{name:e.姓名,no:e.学号,spercialty:e.专业,className:e.班级}}),void this.$http.put("/api/t/class",this.Class).then(function(e){n("录入成功","success"),t.jsonData=[],t.Class={};var r=document.querySelectorAll(".mdl-layout__tab");r[3].click()},function(e){return n(e.data,"error")})):e.preventDefault()}}});t.exports=i},{"../util":13,"vue-resource":27}],5:[function(e,t,r){"use strict";var n=e("./addstudents"),i=e("./pubquiz"),s=e("./testview"),u=e("../util").tip;Vue.use(e("vue-resource"));var o=new Vue({el:"#class-tab-1",data:{classes:[]},methods:{toggleCard:function(e){var t=e.target;"I"===t.nodeName&&(t=t.parentNode);var r=t.parentNode.parentNode,n=r.querySelectorAll(".body"),i=r.querySelector(".full-text");"fullscreen_exit"===i.innerText?i.innerText="fullscreen":i.innerText="fullscreen_exit",[].forEach.call(n,function(e){e.style.display&&"none"!==e.style.display?e.style.display="none":e.style.display="block"})},get:function(){var e=this;this.$http.get("/api/t/class").then(function(t){e.classes=t.data,n.classes=e.classes,i.classes=e.classes,i.get(),s.classes=e.classes,s.get()},function(e){return u(e.data,"error")})},del:function(e){var t=this;this.$http["delete"]("/api/t/class",this.classes[e]).then(function(r){t.classes.splice(e,1),n.classes=t.classes,i.classes=t.classes,i.get(),s.classes=t.classes,s.get(),u("删除成功","success")},function(e){return u(e.data,"error")})}},ready:function(){this.get()}});t.exports=o},{"../util":13,"./addstudents":4,"./pubquiz":8,"./testview":11,"vue-resource":27}],6:[function(e,t,r){"use strict";var n=e("../util").tip,i=e("../util").renderButton,s=e("./addquiz"),u=e("./quizview"),o=e("./addclass"),a=e("./classview");Vue.use(e("vue-resource")),Vue.filter("validChapter",function(e){return e?e.slice(0,28):"新章节"}),Vue.filter("validTag",function(e){return e?e.slice(0,16):""});var c=new Vue({el:"#course-tab-1",data:{cards:[]},methods:{toggleCard:function(e){var t=e.target;"I"===t.nodeName&&(t=t.parentNode);var r=t.parentNode.parentNode,n=r.querySelectorAll(".body"),i=r.querySelector(".full-text");"fullscreen_exit"===i.innerText?i.innerText="fullscreen":i.innerText="fullscreen_exit",[].forEach.call(n,function(e){e.style.display&&"none"!==e.style.display?e.style.display="none":e.style.display="block"})},editChapter:function(e){var t=e.target,r=e.target.parentNode,n=r.querySelector(".editable"),i=r.querySelector(".editInput");t===n?(t.style.display="none",i.style.display="inline",window.setTimeout(function(){r.querySelector(".editInput").focus()},300)):(t.style.display="none",n.style.display="inline")},addChapter:function(e){var t={title:"新章节"+this.cards[e].chapters.length,tags:[]};this.cards[e].chapters.push(t),i("#course-tab-1")},removeChapter:function(e,t){this.cards[t].chapters.splice(e,1)},save:function(e,t){var r=this,i=this.cards[e];return new Set(i.chapters.map(function(e){return e.title})).size!==i.chapters.length?(n("章节名不能重复","error"),t.preventDefault()):void this.$http.put("/api/t/course",i).then(function(e){n("保存成功","success"),s.courses=r.cards,u.courses=r.cards,u.quizs=[],o.courses=r.cards,a.get()},function(e){return n(e.data,"error")})},del:function(e){var t=this,r={};r._id=this.cards[e]._id,this.$http["delete"]("/api/t/course",r).then(function(r){n("删除成功","success"),t.cards.splice(e,1),s.courses=t.cards,u.courses=t.cards,o.courses=t.cards,o.courses=t.cards,a.get()},function(e){return n(e.data,"error")})},get:function(){var e=this;this.$http.get("/api/t/course").then(function(t){e.cards=t.data,i("#course-tab-1"),s.courses=e.cards,u.courses=e.cards,o.courses=e.cards},function(e){return n(e.data,"error")})}},ready:function(){var e=this;this.$http.get("/api/t/course").then(function(t){e.cards=t.data,i("#course-tab-1"),s.courses=e.cards,u.courses=e.cards,o.courses=e.cards},function(e){return n(e.data,"error")})}});window.courseView=c,t.exports=c},{"../util":13,"./addclass":1,"./addquiz":3,"./classview":5,"./quizview":9,"vue-resource":27}],7:[function(e,t,r){"use strict";var n=e("../util").renderTabs,i=(e("./courseview"),e("./addcourse"),e("./classview"),e("./testview"),e("./updateinfo"),document.querySelector(".mdl-js-layout")),s=document.querySelectorAll(".mdl-layout__tab-panel"),u=[{url:"#course-tab-1",title:"查看课程"},{url:"#course-tab-2",title:"添加课程"},{url:"#course-tab-3",title:"录入习题"},{url:"#course-tab-4",title:"查看习题"}],o=[{url:"#class-tab-1",title:"查看班次"},{url:"#class-tab-2",title:"添加班次"},{url:"#class-tab-3",title:"录入学生"},{url:"#class-tab-4",title:"发布测试"},{url:"#class-tab-5",title:"查看测试"}],a=[{url:"#info-tab-1",title:"更新信息"}];new Vue({el:"#app",data:{tabs:u},methods:{setCourseTabs:function(e){this.tabs=u,n(s,i)},setClassTabs:function(e){this.tabs=o,n(s,i)},setInfoTabs:function(e){this.tabs=a,n(s,i)}},ready:function(){window.setTimeout(function(){document.querySelectorAll(".mdl-layout__tab")[0].click();var e=document.querySelector(".mdl-layout__tab-bar-left-button"),t=document.querySelector(".mdl-layout__tab-bar-right-button");if(e&&t){var r=e.parentNode;r.removeChild(e),r.removeChild(t)}var n=document.querySelectorAll("select");[].forEach.call(n,function(e){return e.value=null})},1e3)}})},{"../util":13,"./addcourse":2,"./classview":5,"./courseview":6,"./testview":11,"./updateinfo":12}],8:[function(e,t,r){"use strict";function n(e){if(Array.isArray(e)){for(var t=0,r=Array(e.length);t<e.length;t++)r[t]=e[t];return r}return Array.from(e)}var i=(e("./classview"),e("../util").tip),s=e("../util").renderTable,u=e("../util").renderPointTable,o=(e("../util").render,e("./testview"));Vue.use(e("vue-resource"));var a=new Vue({el:"#class-tab-4",data:{classes:[],Class:{},qsets:[],points:[],pointList:[],chapterList:[],duration:10,maxjudgeNum:0,maxsingleNum:0,maxmultiNum:0,maxaskNum:0,quizNum:0,judgeNum:0,singleNum:0,multiNum:0,askNum:0},computed:{studentNum:function(){return Object.keys(this.Class).length?this.Class.ref_students.length:0},expireNum:function(){return this.judgeNum+this.singleNum+this.multiNum+this.askNum}},methods:{getNum:function(e){var t=this;return-1===["INPUT","SPAN"].indexOf(e.target.nodeName)?e.preventDefault():void setTimeout(function(){var e=document.querySelector(".point-table"),r=e.querySelectorAll(".is-selected");t.quizNum=0,t.judgeNum=0,t.singleNum=0,t.multiNum=0,t.askNum=0,t.pointList=[];var i=document.querySelectorAll("#class-tab-4 .mdl-slider__background-upper"),s=document.querySelectorAll("#class-tab-4 .mdl-slider__background-lower");[].concat(n(i)).forEach(function(e,t){t>0&&(e.style.flex="1")}),[].concat(n(s)).forEach(function(e,t){t>0&&(e.style.flex="0")}),[].concat(n(r)).forEach(function(e){t.quizNum+=Number(e.childNodes[3].textContent||e.childNodes[3].innerText),t.pointList.push(e.childNodes[2].textContent||e.childNodes[2].innerText)});var u=t.qsets.filter(function(e){return-1!==t.chapterList.indexOf(e.ref_chapter)}),o=[];u.forEach(function(e){var t;(t=o).splice.apply(t,[o.length,0].concat(n(e.quizs)))}),o=o.filter(function(e){return-1!==t.pointList.indexOf(e.ref_point)}),t.maxjudgeNum=o.filter(function(e){return"判断题"===e.genre}).length,t.maxsingleNum=o.filter(function(e){return"单选题"===e.genre}).length,t.maxmultiNum=o.filter(function(e){return"多选题"===e.genre}).length,t.maxaskNum=o.filter(function(e){return"问答题"===e.genre}).length},100)},getPoint:function(e){var t=this;return-1===["INPUT","SPAN"].indexOf(e.target.nodeName)?e.preventDefault():void setTimeout(function(){var e=document.querySelector(".pub-table"),r=e.querySelectorAll(".is-selected");t.quizNum=0,t.singleNum=0,t.multiNum=0,t.askNum=0,t.judgeNum=0,t.maxsingleNum=0,t.maxmultiNum=0,t.maxjudgeNum=0,t.maxaskNum=0,t.chapterList=[],t.pointList=[];var i=document.querySelectorAll("#class-tab-4 .mdl-slider__background-upper"),s=document.querySelectorAll("#class-tab-4 .mdl-slider__background-lower");[].concat(n(i)).forEach(function(e,t){t>0&&(e.style.flex="1")}),[].concat(n(s)).forEach(function(e,t){t>0&&(e.style.flex="0")}),[].forEach.call(r,function(e){t.chapterList.push(e.childNodes[2].textContent||e.childNodes[2].innerText)});var o=t.qsets.filter(function(e){return-1!==t.chapterList.indexOf(e.ref_chapter)});if(o.length){var a=[],c=[];o.forEach(function(e){var t,r=e.quizs.map(function(e){return e.ref_point});(t=a).splice.apply(t,[a.length,0].concat(n(r))),c.splice.apply(c,[c.length,0].concat(n(r)))}),a=[].concat(n(new Set(a))).map(function(e){var t=c.filter(function(t){return t===e}).length;return{title:e,totalNum:t}}),t.points=a}else t.points=[];u(document.querySelector(".point-table"))},100)},get:function(){var e=this;if(this.Class._id){var t={};t.ref_course=this.Class.ref_course,this.$http.get("/api/t/qset",t).then(function(t){e.qsets=t.data,e.quizNum=0,s(document.querySelector(".pub-table"))},function(e){return i(e.data,"error")})}},pub:function(e){var t=this;if(this.studentNum||i("未录入学生","message"),!Object.keys(this.Class).length||!this.quizNum||!this.expireNum||!this.studentNum||this.quizNum<this.expireNum)return e.preventDefault();if(this.judgeNum>this.maxjudgeNum||this.singleNum>this.maxsingleNum||this.multiNum>this.maxmultiNum||this.askNum>this.maxaskNum)return e.preventDefault();var r={};r.class_id=this.Class._id,r.duration=this.duration,r.chapterList=this.chapterList,r.pointList=this.pointList,r.ref_students=this.Class.ref_students,r.quizNum=this.quizNum,r.expireNum=this.expireNum,r.judgeNum=this.judgeNum,r.singleNum=this.singleNum,r.multiNum=this.multiNum,r.askNum=this.askNum,this.$http.post("/api/t/test",r).then(function(e){t.Class={},t.qsets=[],t.duration=10,t.quizNum=0,t.expireNum=0,t.judgeNum=0,t.singleNum=0,t.multiNum=0,t.askNum=0,t.maxjudgeNum=0,t.maxsingleNum=0,t.maxmultiNum=0,t.maxaskNum=0,t.chapterList=[],t.pointList=[],t.points=[],i("发布成功","success");var r=document.querySelectorAll("#class-tab-4 .mdl-slider__background-upper"),s=document.querySelectorAll("#class-tab-4 .mdl-slider__background-lower");[].concat(n(r)).forEach(function(e,t){t>0&&(e.style.flex="1")}),[].concat(n(s)).forEach(function(e,t){t>0&&(e.style.flex="0")}),o.get()},function(e){return i(e.data,"error")})}}});t.exports=a},{"../util":13,"./classview":5,"./testview":11,"vue-resource":27}],9:[function(e,t,r){"use strict";var n=(e("./courseview"),e("./pubquiz")),i=e("../util").tip;Vue.use(e("vue-resource"));var s=new Vue({el:"#course-tab-4",data:{courses:[],course:{_id:"",chapter:""},quizs:[]},computed:{idx:function(){for(var e=0,t=this.courses.length;t>e;e++)if(this.courses[e]._id===this.course._id)return e;return-1}},methods:{clear:function(){this.quizs=[]},get:function(e){var t=this;if(!this.course._id||!this.course.chapter)return e.preventDefault();var r={};r.ref_course=this.course._id,r.ref_chapter=this.course.chapter,this.$http.get("/api/t/qset",r).then(function(e){e.data?t.quizs=e.data:(i("未录入习题","message"),t.quizs=[])},function(e){return i(e.data,"error")})},del:function(e){var t=this;if(!this.course._id||!this.course.chapter||!this.quizs.length)return e.preventDefault();var r={};r.ref_course=this.course._id,r.ref_chapter=this.course.chapter,this.$http["delete"]("/api/t/qset",r).then(function(e){i("删除成功","success"),t.quizs=[],window.courseView.get(),n.get()},function(e){return i(e.data,"error")})}}});t.exports=s},{"../util":13,"./courseview":6,"./pubquiz":8,"vue-resource":27}],10:[function(e,t,r){"use strict";function n(e){return e&&"undefined"!=typeof Symbol&&e.constructor===Symbol?"symbol":typeof e}!function(e,i){if("function"==typeof define&&define.amd)define([],i);else if("object"===("undefined"==typeof r?"undefined":n(r))){var s=i();"object"===("undefined"==typeof t?"undefined":n(t))&&t&&t.exports&&(r=t.exports=s),r.randomColor=s}else e.randomColor=i()}(void 0,function(){function e(e){var t=s(e.hue),r=a(t);return 0>r&&(r=360+r),r}function t(e,t){if("random"===t.luminosity)return a([0,100]);if("monochrome"===t.hue)return 0;var r=u(e),n=r[0],i=r[1];switch(t.luminosity){case"bright":n=55;break;case"dark":n=i-10;break;case"light":i=55}return a([n,i])}function r(e,t,r){var n=i(e,t),s=100;switch(r.luminosity){case"dark":s=n+20;break;case"light":n=(s+n)/2;break;case"random":n=0,s=100}return a([n,s])}function n(e,t){switch(t.format){case"hsvArray":return e;case"hslArray":return d(e);case"hsl":var r=d(e);return"hsl("+r[0]+", "+r[1]+"%, "+r[2]+"%)";case"hsla":var n=d(e);return"hsla("+n[0]+", "+n[1]+"%, "+n[2]+"%, "+Math.random()+")";case"rgbArray":return h(e);case"rgb":var i=h(e);return"rgb("+i.join(", ")+")";case"rgba":var s=h(e);return"rgba("+s.join(", ")+", "+Math.random()+")";default:return c(e)}}function i(e,t){for(var r=o(e).lowerBounds,n=0;n<r.length-1;n++){var i=r[n][0],s=r[n][1],u=r[n+1][0],a=r[n+1][1];if(t>=i&&u>=t){var c=(a-s)/(u-i),l=s-c*i;return c*t+l}}return 0}function s(e){if("number"==typeof parseInt(e)){var t=parseInt(e);if(360>t&&t>0)return[t,t]}if("string"==typeof e&&v[e]){var r=v[e];if(r.hueRange)return r.hueRange}return[0,360]}function u(e){return o(e).saturationRange}function o(e){e>=334&&360>=e&&(e-=360);for(var t in v){var r=v[t];if(r.hueRange&&e>=r.hueRange[0]&&e<=r.hueRange[1])return v[t]}return"Color not found"}function a(e){if(null===m)return Math.floor(e[0]+Math.random()*(e[1]+1-e[0]));var t=e[1]||1,r=e[0]||0;m=(9301*m+49297)%233280;var n=m/233280;return Math.floor(r+n*(t-r))}function c(e){function t(e){var t=e.toString(16);return 1==t.length?"0"+t:t}var r=h(e),n="#"+t(r[0])+t(r[1])+t(r[2]);return n}function l(e,t,r){var n=r[0][0],i=r[r.length-1][0],s=r[r.length-1][1],u=r[0][1];v[e]={hueRange:t,lowerBounds:r,saturationRange:[n,i],brightnessRange:[s,u]}}function f(){l("monochrome",null,[[0,0],[100,0]]),l("red",[-26,18],[[20,100],[30,92],[40,89],[50,85],[60,78],[70,70],[80,60],[90,55],[100,50]]),l("orange",[19,46],[[20,100],[30,93],[40,88],[50,86],[60,85],[70,70],[100,70]]),l("yellow",[47,62],[[25,100],[40,94],[50,89],[60,86],[70,84],[80,82],[90,80],[100,75]]),l("green",[63,178],[[30,100],[40,90],[50,85],[60,81],[70,74],[80,64],[90,50],[100,40]]),l("blue",[179,257],[[20,100],[30,86],[40,80],[50,74],[60,60],[70,52],[80,44],[90,39],[100,35]]),l("purple",[258,282],[[20,100],[30,87],[40,79],[50,70],[60,65],[70,59],[80,52],[90,45],[100,42]]),l("pink",[283,334],[[20,100],[30,90],[40,86],[60,84],[80,80],[90,75],[100,73]])}function h(e){var t=e[0];0===t&&(t=1),360===t&&(t=359),t/=360;var r=e[1]/100,n=e[2]/100,i=Math.floor(6*t),s=6*t-i,u=n*(1-r),o=n*(1-s*r),a=n*(1-(1-s)*r),c=256,l=256,f=256;switch(i){case 0:c=n,l=a,f=u;break;case 1:c=o,l=n,f=u;break;case 2:c=u,l=n,f=a;break;case 3:c=u,l=o,f=n;break;case 4:c=a,l=u,f=n;break;case 5:c=n,l=u,f=o}var h=[Math.floor(255*c),Math.floor(255*l),Math.floor(255*f)];return h}function d(e){var t=e[0],r=e[1]/100,n=e[2]/100,i=(2-r)*n;return[t,Math.round(r*n/(1>i?i:2-i)*1e4)/100,i/2*100]}function p(e){for(var t=0,r=0;r!==e.length&&!(t>=Number.MAX_SAFE_INTEGER);r++)t+=e.charCodeAt(r);return t}var m=null,v={};f();var g=function y(i){if(i=i||{},void 0!==i.seed&&null!==i.seed&&i.seed===parseInt(i.seed,10))m=i.seed;else if("string"==typeof i.seed)m=p(i.seed);else{if(void 0!==i.seed&&null!==i.seed)throw new TypeError("The seed value must be an integer or string");m=null}var s,u,o;if(null!==i.count&&void 0!==i.count){var a=i.count,c=[];for(i.count=null;a>c.length;)m&&i.seed&&(i.seed+=1),c.push(y(i));return i.count=a,c}return s=e(i),u=t(s,i),o=r(s,u,i),n([s,u,o],i)};return g})},{}],11:[function(e,t,r){"use strict";var n=(e("./courseview"),e("./pubquiz"),e("../util").tip),i=e("../util").render,s=e("../t/randomColor");Vue.use(e("vue-resource")),Vue.filter("formatTime",function(e){if(!e)return"";var t=new Date(e);return t.getFullYear()+"年"+(t.getMonth()+1)+"月"+t.getDate()+"日  "+t.getHours()+"时:"+t.getMinutes()+"分"}),Vue.filter("formatUnfinish",function(e){return e.map(function(e,t){return t+1+" "+e.name+"("+e.no+")"}).join(",  ")}),Vue.filter("validScore",function(e){return e>10?10:e}),Vue.filter("getRightNum",function(e){return e.filter(function(e){return e.isRight}).length}),Vue.filter("getWrongNum",function(e){return e.filter(function(e){return!e.isRight}).length}),Vue.filter("getSum",function(e){var t=e.filter(function(e){return"判断题"===e.genre}).length,r=e.filter(function(e){return"单选题"===e.genre}).length,n=e.filter(function(e){return"多选题"===e.genre}).length,i=e.filter(function(e){return"问答题"===e.genre}).length;return 5*t+5*r+10*n+10*i}),Vue.filter("getAskScore",function(e){return e.filter(function(e){return"问答题"===e.genre}).map(function(e){return e.score}).reduce(function(e,t){return e+t},0)}),Vue.filter("getOtherScore",function(e){return e.filter(function(e){return"问答题"!==e.genre&&e.isRight}).map(function(e){return e.score}).reduce(function(e,t){return e+t},0)}),Vue.filter("getSumScore",function(e){var t=e.filter(function(e){return"判断题"===e.genre}).length,r=e.filter(function(e){return"单选题"===e.genre}).length,n=e.filter(function(e){return"多选题"===e.genre}).length,i=e.filter(function(e){return"问答题"===e.genre}).length,s=5*t+5*r+10*n+10*i,u=e.map(function(e){return e.score}).reduce(function(e,t){return e+t});return Math.round(u/s*100)});var u=new Vue({el:"#class-tab-5",data:{showStatus:!1,showChart:!1,finishedList:[],unfinishList:[],classes:[],testList:[],result:[],classId:""},computed:{qrurl:function(){return this.test&&this.testList.length?"/api/qr/?url="+window.location.origin+"/api/t/test/"+this.test.uuid:"#"},canGetStatus:function(){return this.testList.length},showAnalysis:function(){return this.test.ref_students.every(function(e){return e.isChecked||!e.canGetAnswers})}},methods:{save:function(e,t){this.finishedList[t].isChecked=!0,this.unfinishList.forEach(function(e){return e.isChecked=!0});var r=this.finishedList.concat(this.unfinishList);this.$http.put("/api/t/test/"+this.test.uuid,{data:r}).then(function(e){n("保存成功","success")},function(e){return n(e.data,"error")})},share:function(e){return this.test&&this.testList.length?void 0:e.preventDefault()},analysis:function(e){if(this.test.ref_students.every(function(e){return!e.canGetAnswers}))return void n("数据不足","message");if(!this.showAnalysis)return void n("请完成先批改任务","message");var t=document.querySelector("canvas").parentNode,r=document.querySelectorAll("canvas");t.removeChild(r[0]),t.removeChild(r[1]);var i=document.createElement("canvas"),u=document.createElement("canvas"),o=document.querySelector(".c2");t.insertBefore(i,o),t.appendChild(u),this.showChart=!0,this.showStatus=!1;var a=this.test.ref_students.map(function(e){var t=e.ref_quizs.filter(function(e){return"判断题"===e.genre}).length,r=e.ref_quizs.filter(function(e){return"单选题"===e.genre}).length,n=e.ref_quizs.filter(function(e){return"多选题"===e.genre}).length,i=e.ref_quizs.filter(function(e){return"问答题"===e.genre}).length,s=5*t+5*r+10*n+10*i,u=e.ref_quizs.map(function(e){return e.score}).reduce(function(e,t){return e+t},0);return Math.round(u/s*100)}),c=document.querySelectorAll("canvas")[0],l=document.querySelectorAll("canvas")[1],f=[],h=[],d=[],p=[];f=["0-10","11-20","21-30","31-40","41-50","51-60","61-70","71-80","81-90","91-100"],h=this.test.ref_points;var m=f.map(function(e){var t=Number(e.split("-")[0]),r=Number(e.split("-")[1]);return a.filter(function(e){return e>=t&&r>=e}).length}),v=this.test.ref_students.map(function(e){return e.ref_quizs}).reduce(function(e,t){return e.concat(t)},[]),g=h.map(function(e){return v.filter(function(t){return t.ref_point===e&&!t.isRight}).length}),y=s({luminosity:"light",count:g.length});d=[{label:"人数",backgroundColor:"rgba(255,99,132,0.2)",borderColor:"rgba(255,99,132,1)",borderWidth:1,hoverBackgroundColor:"rgba(255,99,132,0.4)",hoverBorderColor:"rgba(255,99,132,1)",data:m}],p=[{data:g,backgroundColor:y}];new Chart(c,{type:"bar",data:{labels:f,datasets:d}}),new Chart(l,{type:"pie",data:{labels:h,datasets:p}})},clearStatus:function(){this.showStatus=!1,this.showChart=!1},getStatus:function(e){var t=this;if(!this.canGetStatus||!this.test)return e.preventDefault();if(new Date(this.test.expireAt)-Date.now()>0)n("测试未结束","message");else{var r=this.testList.indexOf(this.test);this.get(function(){t.test=t.testList[r],t.showStatus=!0,t.showChart=!1,t.unfinishList=t.test.ref_students.filter(function(e){return!e.canGetAnswers}),t.finishedList=t.test.ref_students.filter(function(e){return e.canGetAnswers}),setTimeout(function(){return i()},100)})}},get:function(e){var t=this;this.classId&&(this.showStatus=!1,this.$http.get("/api/t/test/status",{classId:this.classId}).then(function(r){t.testList=r.data,"function"==typeof e&&e()},function(e){return n(e.data,"error")}))}}});t.exports=u},{"../t/randomColor":10,"../util":13,"./courseview":6,"./pubquiz":8,"vue-resource":27}],12:[function(e,t,r){"use strict";var n=e("../util").tip;Vue.use(e("vue-resource"));var i=new Vue({el:"#info-tab-1",data:{originPass:"",newPass:"",cknPass:""},computed:{},methods:{save:function(e){var t=this;if(!/^[0-9A-Za-z\_]{6,30}$/.test(this.newPass))return n("新密码由数字，字母，下划线组成，至少6个字符","message"),e.preventDefault();if(this.newPass!==this.cknPass)return n("确认密码与新密码不一致","message"),e.preventDefault();var r={};r.originPass=this.originPass,r.newPass=this.newPass,r.cknPass=this.cknPass,this.$http.put("/api/t",r).then(function(e){n("修改成功","success"),t.originPass="",t.newPass="",t.cknPass=""},function(e){return n(e.data,"error")})}}});t.exports=i},{"../util":13,"vue-resource":27}],13:[function(e,t,r){"use strict";function n(e){if(Array.isArray(e)){for(var t=0,r=Array(e.length);t<e.length;t++)r[t]=e[t];return r}return Array.from(e)}function i(e,t){window.setTimeout(function(){var r=document.querySelectorAll(".mdl-layout__tab");[].forEach.call(r,function(n){new MaterialLayoutTab(n,r,e,t.MaterialLayout),new MaterialRipple(n)}),setTimeout(function(){r[0].click()},100)},100)}function s(e){var t=e.querySelector("th");t.parentNode.removeChild(t),setTimeout(function(){new MaterialDataTable(e),componentHandler.upgradeAllRegistered();var t=e.querySelectorAll("th:nth-child(2)"),r=e.querySelectorAll("td:nth-child(2)");[].concat(n(t)).forEach(function(e){0!==e.childElementCount&&(e.innerHTML="序号")}),[].concat(n(r)).forEach(function(e){0!==e.childElementCount&&e.parentNode.removeChild(e)})})}function u(e){var t=e.querySelector("th");t.parentNode.removeChild(t),setTimeout(function(){new MaterialDataTable(e),componentHandler.upgradeAllRegistered()})}function o(e){setTimeout(function(){componentHandler.upgradeAllRegistered()},100)}function a(e){setTimeout(function(){componentHandler.upgradeAllRegistered()},100)}function c(e){window.setTimeout(function(){var t=document.querySelector(e).querySelectorAll(".mdl-js-checkbox");[].forEach.call(t,function(e){new MaterialCheckbox(e)})},100)}function l(e){window.setTimeout(function(){var t=document.querySelector(e).querySelectorAll(".mdl-js-radio");[].concat(n(t)).forEach(function(e){new MaterialRadio(e)})},100)}function f(e){window.setTimeout(function(){var t=document.querySelector(e).querySelectorAll(".mdl-js-textfield");[].forEach.call(t,function(e){new MaterialTextfield(e)})},100)}function h(e,t){var r=document.querySelector("#tip");"error"===t&&(r.style.backgroundColor="#d9534f"),"success"===t&&(r.style.backgroundColor="#5cb85c"),"message"===t&&(r.style.backgroundColor="#3aaacf"),r.MaterialSnackbar.showSnackbar({message:e})}function d(){setTimeout(function(){componentHandler.upgradeAllRegistered()},100)}function p(){var e=document.querySelectorAll(".closebtn");[].concat(n(e)).forEach(function(e){e.addEventListener("click",function(e){var t=e.target,r=t.parentNode.parentNode;r.removeChild(t.parentNode)})})}t.exports.renderTabs=i,t.exports.tip=h,t.exports.renderTable=u,t.exports.renderPointTable=s,t.exports.renderButton=a,t.exports.renderRipple=o,t.exports.renderRadio=l,t.exports.renderCheckbox=c,t.exports.renderTextfield=f,t.exports.render=d,t.exports.bindClose=p},{}],14:[function(e,t,r){var n=e("../util");t.exports={request:function(e){return n.isFunction(e.beforeSend)&&e.beforeSend.call(this,e),e}}},{"../util":37}],15:[function(e,t,r){function n(e){var t,r,n,s={};return i.isString(e)&&i.each(e.split("\n"),function(e){n=e.indexOf(":"),r=i.trim(i.toLower(e.slice(0,n))),t=i.trim(e.slice(n+1)),s[r]?i.isArray(s[r])?s[r].push(t):s[r]=[s[r],t]:s[r]=t}),s}var i=e("../../util"),s=e("../../promise"),u=e("./xhr");t.exports=function(e){var t=(e.client||u)(e);return s.resolve(t).then(function(e){if(e.headers){var t=n(e.headers);e.headers=function(e){return e?t[i.toLower(e)]:t}}return e.ok=e.status>=200&&e.status<300,e})}},{"../../promise":30,"../../util":37,"./xhr":18}],16:[function(e,t,r){var n=e("../../util"),i=e("../../promise");t.exports=function(e){return new i(function(t){var r,i,s="_jsonp"+Math.random().toString(36).substr(2),u={request:e,data:null};e.params[e.jsonp]=s,e.cancel=function(){r({type:"cancel"})},i=document.createElement("script"),i.src=n.url(e),i.type="text/javascript",i.async=!0,window[s]=function(e){u.data=e},r=function(e){"load"===e.type&&null!==u.data?u.status=200:"error"===e.type?u.status=404:u.status=0,t(u),delete window[s],document.body.removeChild(i)},i.onload=r,i.onerror=r,document.body.appendChild(i)})}},{"../../promise":30,"../../util":37}],17:[function(e,t,r){var n=e("../../util"),i=e("../../promise");t.exports=function(e){return new i(function(t){var r,i=new XDomainRequest,s={request:e};e.cancel=function(){i.abort()},i.open(e.method,n.url(e),!0),r=function(e){s.data=i.responseText,s.status=i.status,s.statusText=i.statusText,t(s)},i.timeout=0,i.onload=r,i.onabort=r,i.onerror=r,i.ontimeout=function(){},i.onprogress=function(){},i.send(e.data)})}},{"../../promise":30,"../../util":37}],18:[function(e,t,r){var n=e("../../util"),i=e("../../promise");t.exports=function(e){return new i(function(t){var r,i=new XMLHttpRequest,s={request:e};e.cancel=function(){i.abort()},i.open(e.method,n.url(e),!0),r=function(e){s.data=i.responseText,s.status=i.status,s.statusText=i.statusText,s.headers=i.getAllResponseHeaders(),t(s)},i.timeout=0,i.onload=r,i.onabort=r,i.onerror=r,i.ontimeout=function(){},i.onprogress=function(){},n.isPlainObject(e.xhr)&&n.extend(i,e.xhr),n.isPlainObject(e.upload)&&n.extend(i.upload,e.upload),n.each(e.headers||{},function(e,t){i.setRequestHeader(t,e)}),i.send(e.data)})}},{"../../promise":30,"../../util":37}],19:[function(e,t,r){function n(e){var t=i.url.parse(i.url(e));return t.protocol!==o.protocol||t.host!==o.host}var i=e("../util"),s=e("./client/xdr"),u="withCredentials"in new XMLHttpRequest,o=i.url.parse(location.href);t.exports={request:function(e){return null===e.crossOrigin&&(e.crossOrigin=n(e)),e.crossOrigin&&(u||(e.client=s),e.emulateHTTP=!1),e}}},{"../util":37,"./client/xdr":17}],20:[function(e,t,r){var n=e("../util");t.exports={request:function(e){return e.method=e.method.toUpperCase(),e.headers=n.extend({},n.http.headers.common,e.crossOrigin?{}:n.http.headers.custom,n.http.headers[e.method.toLowerCase()],e.headers),n.isPlainObject(e.data)&&/^(GET|JSONP)$/i.test(e.method)&&(n.extend(e.params,e.data),delete e.data),e}}},{"../util":37}],21:[function(e,t,r){function n(e,t){var r,a,c=s;return n.interceptors.forEach(function(e){c=o(e,this.$vm)(c)},this),t=i.isObject(e)?e:i.extend({url:e},t),r=i.merge({},n.options,this.$options,t),a=c(r).bind(this.$vm).then(function(e){return e.ok?e:u.reject(e)},function(e){return e instanceof Error&&i.error(e),u.reject(e)}),r.success&&a.success(r.success),r.error&&a.error(r.error),a}
-var i=e("../util"),s=e("./client"),u=e("../promise"),o=e("./interceptor"),a={"Content-Type":"application/json"};n.options={method:"get",data:"",params:{},headers:{},xhr:null,upload:null,jsonp:"callback",beforeSend:null,crossOrigin:null,emulateHTTP:!1,emulateJSON:!1,timeout:0},n.interceptors=[e("./before"),e("./timeout"),e("./jsonp"),e("./method"),e("./mime"),e("./header"),e("./cors")],n.headers={put:a,post:a,patch:a,"delete":a,common:{Accept:"application/json, text/plain, */*"},custom:{"X-Requested-With":"XMLHttpRequest"}},["get","put","post","patch","delete","jsonp"].forEach(function(e){n[e]=function(t,r,n,s){return i.isFunction(r)&&(s=n,n=r,r=void 0),i.isObject(n)&&(s=n,n=void 0),this(t,i.extend({method:e,data:r,success:n},s))}}),t.exports=i.http=n},{"../promise":30,"../util":37,"./before":14,"./client":15,"./cors":19,"./header":20,"./interceptor":22,"./jsonp":23,"./method":24,"./mime":25,"./timeout":26}],22:[function(e,t,r){function n(e,t,r){var n=s.resolve(e);return arguments.length<2?n:n.then(t,r)}var i=e("../util"),s=e("../promise");t.exports=function(e,t){return function(r){return i.isFunction(e)&&(e=e.call(t,s)),function(s){return i.isFunction(e.request)&&(s=e.request.call(t,s)),n(s,function(s){return n(r(s),function(r){return i.isFunction(e.response)&&(r=e.response.call(t,r)),r})})}}}},{"../promise":30,"../util":37}],23:[function(e,t,r){var n=e("./client/jsonp");t.exports={request:function(e){return"JSONP"==e.method&&(e.client=n),e}}},{"./client/jsonp":16}],24:[function(e,t,r){t.exports={request:function(e){return e.emulateHTTP&&/^(PUT|PATCH|DELETE)$/i.test(e.method)&&(e.headers["X-HTTP-Method-Override"]=e.method,e.method="POST"),e}}},{}],25:[function(e,t,r){var n=e("../util");t.exports={request:function(e){return e.emulateJSON&&n.isPlainObject(e.data)&&(e.headers["Content-Type"]="application/x-www-form-urlencoded",e.data=n.url.params(e.data)),n.isObject(e.data)&&/FormData/i.test(e.data.toString())&&delete e.headers["Content-Type"],n.isPlainObject(e.data)&&(e.data=JSON.stringify(e.data)),e},response:function(e){try{e.data=JSON.parse(e.data)}catch(t){}return e}}},{"../util":37}],26:[function(e,t,r){t.exports=function(){var e;return{request:function(t){return t.timeout&&(e=setTimeout(function(){t.cancel()},t.timeout)),t},response:function(t){return clearTimeout(e),t}}}},{}],27:[function(e,t,r){function n(t){var r=e("./util");r.config=t.config,r.warning=t.util.warn,r.nextTick=t.util.nextTick,t.url=e("./url"),t.http=e("./http"),t.resource=e("./resource"),t.Promise=e("./promise"),Object.defineProperties(t.prototype,{$url:{get:function(){return r.options(t.url,this,this.$options.url)}},$http:{get:function(){return r.options(t.http,this,this.$options.http)}},$resource:{get:function(){return t.resource.bind(this)}},$promise:{get:function(){return function(e){return new t.Promise(e,this)}.bind(this)}}})}window.Vue&&Vue.use(n),t.exports=n},{"./http":21,"./promise":30,"./resource":31,"./url":32,"./util":37}],28:[function(e,t,r){function n(e){this.state=o,this.value=void 0,this.deferred=[];var t=this;try{e(function(e){t.resolve(e)},function(e){t.reject(e)})}catch(r){t.reject(r)}}var i=e("../util"),s=0,u=1,o=2;n.reject=function(e){return new n(function(t,r){r(e)})},n.resolve=function(e){return new n(function(t,r){t(e)})},n.all=function(e){return new n(function(t,r){function i(r){return function(n){u[r]=n,s+=1,s===e.length&&t(u)}}var s=0,u=[];0===e.length&&t(u);for(var o=0;o<e.length;o+=1)n.resolve(e[o]).then(i(o),r)})},n.race=function(e){return new n(function(t,r){for(var i=0;i<e.length;i+=1)n.resolve(e[i]).then(t,r)})};var a=n.prototype;a.resolve=function(e){var t=this;if(t.state===o){if(e===t)throw new TypeError("Promise settled with itself.");var r=!1;try{var n=e&&e.then;if(null!==e&&"object"==typeof e&&"function"==typeof n)return void n.call(e,function(e){r||t.resolve(e),r=!0},function(e){r||t.reject(e),r=!0})}catch(i){return void(r||t.reject(i))}t.state=s,t.value=e,t.notify()}},a.reject=function(e){var t=this;if(t.state===o){if(e===t)throw new TypeError("Promise settled with itself.");t.state=u,t.value=e,t.notify()}},a.notify=function(){var e=this;i.nextTick(function(){if(e.state!==o)for(;e.deferred.length;){var t=e.deferred.shift(),r=t[0],n=t[1],i=t[2],a=t[3];try{e.state===s?i("function"==typeof r?r.call(void 0,e.value):e.value):e.state===u&&("function"==typeof n?i(n.call(void 0,e.value)):a(e.value))}catch(c){a(c)}}})},a.then=function(e,t){var r=this;return new n(function(n,i){r.deferred.push([e,t,n,i]),r.notify()})},a["catch"]=function(e){return this.then(void 0,e)},t.exports=n},{"../util":37}],29:[function(e,t,r){r.expand=function(e,t,r){var n=this.parse(e),i=n.expand(t);return r&&r.push.apply(r,n.vars),i},r.parse=function(e){var t=["+","#",".","/",";","?","&"],n=[];return{vars:n,expand:function(i){return e.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g,function(e,s,u){if(s){var o=null,a=[];if(-1!==t.indexOf(s.charAt(0))&&(o=s.charAt(0),s=s.substr(1)),s.split(/,/g).forEach(function(e){var t=/([^:\*]*)(?::(\d+)|(\*))?/.exec(e);a.push.apply(a,r.getValues(i,o,t[1],t[2]||t[3])),n.push(t[1])}),o&&"+"!==o){var c=",";return"?"===o?c="&":"#"!==o&&(c=o),(0!==a.length?o:"")+a.join(c)}return a.join(",")}return r.encodeReserved(u)})}}},r.getValues=function(e,t,r,n){var i=e[r],s=[];if(this.isDefined(i)&&""!==i)if("string"==typeof i||"number"==typeof i||"boolean"==typeof i)i=i.toString(),n&&"*"!==n&&(i=i.substring(0,parseInt(n,10))),s.push(this.encodeValue(t,i,this.isKeyOperator(t)?r:null));else if("*"===n)Array.isArray(i)?i.filter(this.isDefined).forEach(function(e){s.push(this.encodeValue(t,e,this.isKeyOperator(t)?r:null))},this):Object.keys(i).forEach(function(e){this.isDefined(i[e])&&s.push(this.encodeValue(t,i[e],e))},this);else{var u=[];Array.isArray(i)?i.filter(this.isDefined).forEach(function(e){u.push(this.encodeValue(t,e))},this):Object.keys(i).forEach(function(e){this.isDefined(i[e])&&(u.push(encodeURIComponent(e)),u.push(this.encodeValue(t,i[e].toString())))},this),this.isKeyOperator(t)?s.push(encodeURIComponent(r)+"="+u.join(",")):0!==u.length&&s.push(u.join(","))}else";"===t?s.push(encodeURIComponent(r)):""!==i||"&"!==t&&"?"!==t?""===i&&s.push(""):s.push(encodeURIComponent(r)+"=");return s},r.isDefined=function(e){return void 0!==e&&null!==e},r.isKeyOperator=function(e){return";"===e||"&"===e||"?"===e},r.encodeValue=function(e,t,r){return t="+"===e||"#"===e?this.encodeReserved(t):encodeURIComponent(t),r?encodeURIComponent(r)+"="+t:t},r.encodeReserved=function(e){return e.split(/(%[0-9A-Fa-f]{2})/g).map(function(e){return/%[0-9A-Fa-f]/.test(e)||(e=encodeURI(e)),e}).join("")}},{}],30:[function(e,t,r){function n(e,t){e instanceof s?this.promise=e:this.promise=new s(e.bind(t)),this.context=t}var i=e("./util"),s=window.Promise||e("./lib/promise");n.all=function(e,t){return new n(s.all(e),t)},n.resolve=function(e,t){return new n(s.resolve(e),t)},n.reject=function(e,t){return new n(s.reject(e),t)},n.race=function(e,t){return new n(s.race(e),t)};var u=n.prototype;u.bind=function(e){return this.context=e,this},u.then=function(e,t){return e&&e.bind&&this.context&&(e=e.bind(this.context)),t&&t.bind&&this.context&&(t=t.bind(this.context)),this.promise=this.promise.then(e,t),this},u["catch"]=function(e){return e&&e.bind&&this.context&&(e=e.bind(this.context)),this.promise=this.promise["catch"](e),this},u["finally"]=function(e){return this.then(function(t){return e.call(this),t},function(t){return e.call(this),s.reject(t)})},u.success=function(e){return i.warn("The `success` method has been deprecated. Use the `then` method instead."),this.then(function(t){return e.call(this,t.data,t.status,t)||t})},u.error=function(e){return i.warn("The `error` method has been deprecated. Use the `catch` method instead."),this["catch"](function(t){return e.call(this,t.data,t.status,t)||t})},u.always=function(e){i.warn("The `always` method has been deprecated. Use the `finally` method instead.");var t=function(t){return e.call(this,t.data,t.status,t)||t};return this.then(t,t)},t.exports=n},{"./lib/promise":28,"./util":37}],31:[function(e,t,r){function n(e,t,r,u){var o=this,a={};return r=s.extend({},n.actions,r),s.each(r,function(r,n){r=s.merge({url:e,params:t||{}},u,r),a[n]=function(){return(o.$http||s.http)(i(r,arguments))}}),a}function i(e,t){var r,n,i,u=s.extend({},e),o={};switch(t.length){case 4:i=t[3],n=t[2];case 3:case 2:if(!s.isFunction(t[1])){o=t[0],r=t[1],n=t[2];break}if(s.isFunction(t[0])){n=t[0],i=t[1];break}n=t[1],i=t[2];case 1:s.isFunction(t[0])?n=t[0]:/^(POST|PUT|PATCH)$/i.test(u.method)?r=t[0]:o=t[0];break;case 0:break;default:throw"Expected up to 4 arguments [params, data, success, error], got "+t.length+" arguments"}return u.data=r,u.params=s.extend({},u.params,o),n&&(u.success=n),i&&(u.error=i),u}var s=e("./util");n.actions={get:{method:"GET"},save:{method:"POST"},query:{method:"GET"},update:{method:"PUT"},remove:{method:"DELETE"},"delete":{method:"DELETE"}},t.exports=s.resource=n},{"./util":37}],32:[function(e,t,r){function n(e,t){var r,s=e;return u.isString(e)&&(s={url:e,params:t}),s=u.merge({},n.options,this.$options,s),n.transforms.forEach(function(e){r=i(e,r,this.$vm)},this),r(s)}function i(e,t,r){return function(n){return e.call(r,n,t)}}function s(e,t,r){var n,i=u.isArray(t),o=u.isPlainObject(t);u.each(t,function(t,a){n=u.isObject(t)||u.isArray(t),r&&(a=r+"["+(o||n?a:"")+"]"),!r&&i?e.add(t.name,t.value):n?s(e,t,a):e.add(a,t)})}var u=e("../util"),o=document.documentMode,a=document.createElement("a");n.options={url:"",root:null,params:{}},n.transforms=[e("./template"),e("./legacy"),e("./query"),e("./root")],n.params=function(e){var t=[],r=encodeURIComponent;return t.add=function(e,t){u.isFunction(t)&&(t=t()),null===t&&(t=""),this.push(r(e)+"="+r(t))},s(t,e),t.join("&").replace(/%20/g,"+")},n.parse=function(e){return o&&(a.href=e,e=a.href),a.href=e,{href:a.href,protocol:a.protocol?a.protocol.replace(/:$/,""):"",port:a.port,host:a.host,hostname:a.hostname,pathname:"/"===a.pathname.charAt(0)?a.pathname:"/"+a.pathname,search:a.search?a.search.replace(/^\?/,""):"",hash:a.hash?a.hash.replace(/^#/,""):""}},t.exports=u.url=n},{"../util":37,"./legacy":33,"./query":34,"./root":35,"./template":36}],33:[function(e,t,r){function n(e){return i(e,!0).replace(/%26/gi,"&").replace(/%3D/gi,"=").replace(/%2B/gi,"+")}function i(e,t){return encodeURIComponent(e).replace(/%40/gi,"@").replace(/%3A/gi,":").replace(/%24/g,"$").replace(/%2C/gi,",").replace(/%20/g,t?"%20":"+")}var s=e("../util");t.exports=function(e,t){var r=[],i=t(e);return i=i.replace(/(\/?):([a-z]\w*)/gi,function(t,i,u){return s.warn("The `:"+u+"` parameter syntax has been deprecated. Use the `{"+u+"}` syntax instead."),e.params[u]?(r.push(u),i+n(e.params[u])):""}),r.forEach(function(t){delete e.params[t]}),i}},{"../util":37}],34:[function(e,t,r){var n=e("../util");t.exports=function(e,t){var r=Object.keys(n.url.options.params),i={},s=t(e);return n.each(e.params,function(e,t){-1===r.indexOf(t)&&(i[t]=e)}),i=n.url.params(i),i&&(s+=(-1==s.indexOf("?")?"?":"&")+i),s}},{"../util":37}],35:[function(e,t,r){var n=e("../util");t.exports=function(e,t){var r=t(e);return n.isString(e.root)&&!r.match(/^(https?:)?\//)&&(r=e.root+"/"+r),r}},{"../util":37}],36:[function(e,t,r){var n=e("../lib/url-template");t.exports=function(e){var t=[],r=n.expand(e.url,e.params,t);return t.forEach(function(t){delete e.params[t]}),r}},{"../lib/url-template":29}],37:[function(e,t,r){function n(e,t,r){for(var s in t)r&&(i.isPlainObject(t[s])||i.isArray(t[s]))?(i.isPlainObject(t[s])&&!i.isPlainObject(e[s])&&(e[s]={}),i.isArray(t[s])&&!i.isArray(e[s])&&(e[s]=[]),n(e[s],t[s],r)):void 0!==t[s]&&(e[s]=t[s])}var i=r,s=[],u=window.console;i.warn=function(e){u&&i.warning&&(!i.config.silent||i.config.debug)&&u.warn("[VueResource warn]: "+e)},i.error=function(e){u&&u.error(e)},i.trim=function(e){return e.replace(/^\s*|\s*$/g,"")},i.toLower=function(e){return e?e.toLowerCase():""},i.isArray=Array.isArray,i.isString=function(e){return"string"==typeof e},i.isFunction=function(e){return"function"==typeof e},i.isObject=function(e){return null!==e&&"object"==typeof e},i.isPlainObject=function(e){return i.isObject(e)&&Object.getPrototypeOf(e)==Object.prototype},i.options=function(e,t,r){return r=r||{},i.isFunction(r)&&(r=r.call(t)),i.merge(e.bind({$vm:t,$options:r}),e,{$options:r})},i.each=function(e,t){var r,n;if("number"==typeof e.length)for(r=0;r<e.length;r++)t.call(e[r],e[r],r);else if(i.isObject(e))for(n in e)e.hasOwnProperty(n)&&t.call(e[n],e[n],n);return e},i.defaults=function(e,t){for(var r in t)void 0===e[r]&&(e[r]=t[r]);return e},i.extend=function(e){var t=s.slice.call(arguments,1);return t.forEach(function(t){n(e,t)}),e},i.merge=function(e){var t=s.slice.call(arguments,1);return t.forEach(function(t){n(e,t,!0)}),e}},{}]},{},[7]);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+
+/* globals Vue */
+//var Vue = require('../vendor/vue.min.js');
+var tip = require('../util').tip;
+var classView = require('./classview');
+Vue.use(require('vue-resource'));
+Vue.filter('validName', function (value) {
+  return value.slice(0, 48);
+});
+
+var addClass = new Vue({
+  el: '#class-tab-2',
+  data: {
+    courses: [],
+    className: '',
+    course: {}
+  },
+  methods: {
+    addClass: function addClass(evt) {
+      var _this = this;
+
+      if (!this.course || !this.className || this.className.length > 48) return evt.preventDefault();
+      var preAdd = {};
+      preAdd.ref_course = this.course._id;
+      preAdd.class_name = this.course.name + '-' + this.course.term + '-' + this.className;
+      this.$http.post('/api/t/class', preAdd).then(function (res) {
+        _this.className = '';
+        _this.course = {};
+        var tabs = document.querySelectorAll('.mdl-layout__tab');
+        tabs[2].click();
+        classView.get();
+        tip('添加成功，录入学生后即可发布测试', 'success');
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    }
+  }
+});
+
+module.exports = addClass;
+
+},{"../util":13,"./classview":5,"vue-resource":27}],2:[function(require,module,exports){
+'use strict';
+
+/* globals Vue */
+//var Vue = require('../vendor/vue.min.js');
+var tip = require('../util').tip;
+var courseView = require('./courseview');
+Vue.use(require('vue-resource'));
+
+Vue.filter('validName', function (value) {
+  return value.slice(0, 48);
+});
+var addCourse = new Vue({
+  el: '#course-tab-2',
+  data: {
+    course: {
+      name: '',
+      duration: 32,
+      term: '',
+      chapters: [],
+      ref_qset: []
+    }
+  },
+  methods: {
+    add: function add(evt) {
+      var _this = this;
+
+      if (!this.course.name) evt.preventDefault();else {
+        this.$http.post('/api/t/course', this.course).then(function (res) {
+          tip('添加成功，请在设置章节后录入习题', 'success');
+          _this.course.name = '';
+          _this.course.duration = 32;
+          document.querySelectorAll('.mdl-layout__tab')[0].click();
+          courseView.get();
+        }, function (err) {
+          return tip(err.data, 'error');
+        });
+      }
+    }
+  }
+});
+
+module.exports = addCourse;
+
+},{"../util":13,"./courseview":6,"vue-resource":27}],3:[function(require,module,exports){
+'use strict';
+
+/* globals Vue XLSX */
+var courseView = require('./courseview');
+var classView = require('./classview');
+var tip = require('../util').tip;
+Vue.use(require('vue-resource'));
+
+var addQuiz = new Vue({
+  el: '#course-tab-3',
+  data: {
+    courses: [],
+    course: {
+      _id: '',
+      chapter: ''
+    },
+    jsonData: []
+  },
+  computed: {
+    idx: function idx() {
+      for (var i = 0, l = this.courses.length; i < l; i++) {
+        if (this.courses[i]._id === this.course._id) return i;
+      }
+      return -1;
+    }
+  },
+  methods: {
+    clear: function clear() {
+      this.jsonData = [];
+    },
+    save: function save(evt) {
+      var _this = this;
+
+      if (!this.course._id || !this.jsonData.length || !this.course.chapter || !this.courses[this.idx].chapters.length) return evt.preventDefault();
+      var quizs = [];
+      var qset = {};
+      this.jsonData.forEach(function (el) {
+        var q = {};
+        q.genre = el.类型;
+        q.describe = {};
+        q.describe.content = el.题目;
+        q.ref_point = el.知识点;
+        q.answers = [el.参考答案];
+        if (q.genre === '单选题' || q.genre === '多选题') {
+          var secs = el.选项.split(';');
+          q.selections = secs.map(function (el) {
+            return el.trim().slice(2);
+          });
+          q.answers = el.参考答案.split('').map(function (el) {
+            return secs.filter(function (sec) {
+              return sec.indexOf(el) === 0;
+            }).join('').slice(2).trim();
+          });
+        }
+        quizs.push(q);
+      });
+      qset.quizs = quizs;
+      qset.ref_course = this.course._id;
+      qset.ref_chapter = this.course.chapter;
+      this.$http.post('/api/t/qset', qset).then(function (res) {
+        tip('录入成功', 'success');
+        _this.course = {};
+        _this.jsonData = [];
+        window.courseView.get();
+        classView.get();
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    },
+    read: function read(evt, idx) {
+      var _this2 = this;
+
+      if (!this.course._id || !this.course.chapter || !this.courses[this.idx].chapters.length) return evt.preventDefault();
+      var course = this.courses.filter(function (course) {
+        return course._id === _this2.course._id;
+      })[0];
+      var chapter = course.chapters.filter(function (chap) {
+        return chap.title === _this2.course.chapter;
+      })[0] || {};
+      var file = evt.target.files[0];
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var data = e.target.result;
+        var workbook = XLSX.read(data, {
+          type: 'binary'
+        });
+        var first_sheet_name = workbook.SheetNames[0];
+        var first_sheet = workbook.Sheets[first_sheet_name];
+        var sheetData = XLSX.utils.sheet_to_json(first_sheet);
+        var contentList = [];
+        addQuiz.jsonData = sheetData.filter(function (el) {
+          if (contentList.indexOf(el.题目) !== -1) return false;else if (!el.知识点) return false;else if (el.类型 === '问答题') {
+            el.选项 = '';
+            contentList.push(el.题目.trim());
+            return !!(el.题目 && el.参考答案);
+          } else if (el.类型 === '判断题') {
+            contentList.push(el.题目.trim());
+            if (!el.参考答案) return false;else if (el.参考答案 === '正确' || el.参考答案 === '错误') return true;
+            return false;
+          } else if (el.类型 === '单选题' || el.类型 === '多选题') {
+            contentList.push(el.题目.trim());
+            if (!el.选项) return false;
+            var selection = el.选项.split(/\;|\n/).map(function (s) {
+              return s.trim().replace(/\&\#10/g, '');
+            }).filter(function (el) {
+              return (/^[A-Z]\.[^\.]/.test(el) && el.match(/[A-Z]\./g).length === 1
+              );
+            });
+            if (selection.length < 2) return false;
+            el.选项 = selection.join(';');
+            var pre = !!(el.题目 && el.参考答案);
+            if (pre) return (/^[A-Z]+$/.test(el.参考答案) && el.参考答案.split('').length <= selection.length
+            );
+            return pre;
+          } else return false;
+        });
+      };
+      if (!file) return null;else reader.readAsBinaryString(file);
+    }
+  }
+});
+
+module.exports = addQuiz;
+
+},{"../util":13,"./classview":5,"./courseview":6,"vue-resource":27}],4:[function(require,module,exports){
+'use strict';
+
+/* globals Vue XLSX */
+var tip = require('../util').tip;
+Vue.use(require('vue-resource'));
+
+var addStudents = new Vue({
+  el: '#class-tab-3',
+  data: {
+    classes: [],
+    Class: {},
+    jsonData: []
+  },
+  methods: {
+    read: function read(evt) {
+      if (!this.Class._id) return evt.preventDefault();
+      var file = evt.target.files[0];
+      var reader = new FileReader();
+      reader.onload = function (evt) {
+        var data = evt.target.result;
+        var workbook = XLSX.read(data, {
+          type: 'binary'
+        });
+        var first_sheet_name = workbook.SheetNames[0];
+        var first_sheet = workbook.Sheets[first_sheet_name];
+        addStudents.jsonData = XLSX.utils.sheet_to_json(first_sheet).filter(function (el) {
+          if (!el.姓名 || !el.学号 || !el.专业 || !el.班级) return false;
+          return true;
+        });
+      };
+      if (!file) return null;else reader.readAsBinaryString(file);
+    },
+    save: function save(evt) {
+      var _this = this;
+
+      if (!this.Class._id || !this.jsonData.length) return evt.preventDefault();
+      this.Class.ref_students = this.jsonData.map(function (el) {
+        return {
+          name: el.姓名,
+          no: el.学号,
+          spercialty: el.专业,
+          className: el.班级
+        };
+      });
+      this.$http.put('/api/t/class', this.Class).then(function (res) {
+        tip('录入成功', 'success');
+        _this.jsonData = [];
+        _this.Class = {};
+        var tabs = document.querySelectorAll('.mdl-layout__tab');
+        tabs[3].click();
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    }
+  }
+});
+
+module.exports = addStudents;
+
+},{"../util":13,"vue-resource":27}],5:[function(require,module,exports){
+'use strict';
+
+/* globals MaterialButton Vue */
+//var Vue = require('../vendor/vue.min.js');
+var addStudents = require('./addstudents');
+var pubQuiz = require('./pubquiz');
+var testView = require('./testview');
+var tip = require('../util').tip;
+Vue.use(require('vue-resource'));
+
+var classView = new Vue({
+  el: '#class-tab-1',
+  data: {
+    classes: []
+  },
+  methods: {
+    toggleCard: function toggleCard(evt) {
+      var target = evt.target;
+      // target is different in chrome and firefox
+      if (target.nodeName === 'I') target = target.parentNode;
+      var card = target.parentNode.parentNode;
+      var bodys = card.querySelectorAll('.body');
+      var fullText = card.querySelector('.full-text');
+      if (fullText.innerText === 'fullscreen_exit') fullText.innerText = 'fullscreen';else fullText.innerText = 'fullscreen_exit';
+      [].forEach.call(bodys, function (el) {
+        if (!el.style.display || el.style.display === 'none') el.style.display = 'block';else el.style.display = 'none';
+      });
+    },
+    get: function get() {
+      var _this = this;
+
+      this.$http.get('/api/t/class').then(function (res) {
+        _this.classes = res.data;
+        addStudents.classes = _this.classes;
+        pubQuiz.classes = _this.classes;
+        pubQuiz.get();
+        testView.classes = _this.classes;
+        testView.get();
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    },
+    del: function del(idx) {
+      var _this2 = this;
+
+      this.$http.delete('/api/t/class', this.classes[idx]).then(function (res) {
+        _this2.classes.splice(idx, 1);
+        addStudents.classes = _this2.classes;
+        pubQuiz.classes = _this2.classes;
+        pubQuiz.get();
+        testView.classes = _this2.classes;
+        testView.get();
+        tip('删除成功', 'success');
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    }
+  },
+  ready: function ready() {
+    this.get();
+  }
+});
+
+module.exports = classView;
+
+},{"../util":13,"./addstudents":4,"./pubquiz":8,"./testview":11,"vue-resource":27}],6:[function(require,module,exports){
+'use strict';
+
+/* globals MaterialButton Vue */
+//var Vue = require('../vendor/vue.min.js');
+var tip = require('../util').tip;
+var renderButton = require('../util').renderButton;
+var addQuiz = require('./addquiz');
+var quizView = require('./quizview');
+var addClass = require('./addclass');
+var classView = require('./classview');
+Vue.use(require('vue-resource'));
+
+Vue.filter('validChapter', function (value) {
+  if (!value) return '新章节';
+  return value.slice(0, 28);
+});
+Vue.filter('validTag', function (value) {
+  if (!value) return '';
+  return value.slice(0, 16);
+});
+var courseView = new Vue({
+  el: '#course-tab-1',
+  data: {
+    cards: []
+  },
+  methods: {
+    toggleCard: function toggleCard(evt) {
+      var target = evt.target;
+      // target is different in chrome and firefox
+      if (target.nodeName === 'I') target = target.parentNode;
+      var card = target.parentNode.parentNode;
+      var bodys = card.querySelectorAll('.body');
+      var fullText = card.querySelector('.full-text');
+      if (fullText.innerText === 'fullscreen_exit') fullText.innerText = 'fullscreen';else fullText.innerText = 'fullscreen_exit';
+      [].forEach.call(bodys, function (el) {
+        if (!el.style.display || el.style.display === 'none') el.style.display = 'block';else el.style.display = 'none';
+      });
+    },
+    editChapter: function editChapter(evt) {
+      var t = evt.target;
+      var p = evt.target.parentNode;
+      var ctx = p.querySelector('.editable');
+      var input = p.querySelector('.editInput');
+      if (t === ctx) {
+        t.style.display = 'none';
+        input.style.display = 'inline';
+        window.setTimeout(function () {
+          p.querySelector('.editInput').focus();
+        }, 300);
+      } else {
+        t.style.display = 'none';
+        ctx.style.display = 'inline';
+      }
+    },
+    addChapter: function addChapter(cardIdx) {
+      var chapter = {
+        title: '新章节' + this.cards[cardIdx].chapters.length,
+        tags: []
+      };
+      this.cards[cardIdx].chapters.push(chapter);
+      renderButton('#course-tab-1');
+    },
+    removeChapter: function removeChapter(chapidx, cardIdx) {
+      this.cards[cardIdx].chapters.splice(chapidx, 1);
+    },
+    save: function save(cardIdx, evt) {
+      var _this = this;
+
+      var data = this.cards[cardIdx];
+      if (new Set(data.chapters.map(function (e) {
+        return e.title;
+      })).size !== data.chapters.length) {
+        tip('章节名不能重复', 'error');
+        return evt.preventDefault();
+      }
+      this.$http.put('/api/t/course', data).then(function (res) {
+        tip('保存成功', 'success');
+        addQuiz.courses = _this.cards;
+        quizView.courses = _this.cards;
+        quizView.quizs = [];
+        addClass.courses = _this.cards;
+        classView.get();
+      }, function (error) {
+        return tip(error.data, 'error');
+      });
+    },
+    del: function del(cardIdx) {
+      var _this2 = this;
+
+      var id = {};
+      id._id = this.cards[cardIdx]._id;
+      this.$http.delete('/api/t/course', id).then(function (res) {
+        tip('删除成功', 'success');
+        _this2.cards.splice(cardIdx, 1);
+        addQuiz.courses = _this2.cards;
+        quizView.courses = _this2.cards;
+        addClass.courses = _this2.cards;
+        addClass.courses = _this2.cards;
+        classView.get();
+      }, function (error) {
+        return tip(error.data, 'error');
+      });
+    },
+    get: function get() {
+      var _this3 = this;
+
+      this.$http.get('/api/t/course').then(function (res) {
+        _this3.cards = res.data;
+        renderButton('#course-tab-1');
+        addQuiz.courses = _this3.cards;
+        quizView.courses = _this3.cards;
+        addClass.courses = _this3.cards;
+      }, function (error) {
+        return tip(error.data, 'error');
+      });
+    }
+  },
+  ready: function ready() {
+    var _this4 = this;
+
+    this.$http.get('/api/t/course').then(function (res) {
+      _this4.cards = res.data;
+      renderButton('#course-tab-1');
+      addQuiz.courses = _this4.cards;
+      quizView.courses = _this4.cards;
+      addClass.courses = _this4.cards;
+    }, function (error) {
+      return tip(error.data, 'error');
+    });
+  }
+});
+
+window.courseView = courseView;
+
+module.exports = courseView;
+
+},{"../util":13,"./addclass":1,"./addquiz":3,"./classview":5,"./quizview":9,"vue-resource":27}],7:[function(require,module,exports){
+'use strict';
+
+/* globals MaterialLayoutTab, MaterialLayout, MaterialTabs, MaterialTab, MaterialRipple */
+/* globals Vue */
+var renderTabs = require('../util').renderTabs;
+var courseView = require('./courseview');
+var addCourse = require('./addcourse');
+var classView = require('./classview');
+var collect = require('./testview');
+var info = require('./updateinfo');
+
+var layout = document.querySelector('.mdl-js-layout');
+var panels = document.querySelectorAll('.mdl-layout__tab-panel');
+
+var courseTabs = [{
+  url: '#course-tab-1',
+  title: '查看课程'
+}, {
+  url: '#course-tab-2',
+  title: '添加课程'
+}, {
+  url: '#course-tab-3',
+  title: '录入习题'
+}, {
+  url: '#course-tab-4',
+  title: '查看习题'
+}];
+var classTabs = [{
+  url: '#class-tab-1',
+  title: '查看班次'
+}, {
+  url: '#class-tab-2',
+  title: '添加班次'
+}, {
+  url: '#class-tab-3',
+  title: '录入学生'
+}, {
+  url: '#class-tab-4',
+  title: '发布测试'
+}, {
+  url: '#class-tab-5',
+  title: '查看测试'
+}];
+var myInfo = [{
+  url: '#info-tab-1',
+  title: '更新信息'
+}];
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    tabs: courseTabs
+  },
+  methods: {
+    setCourseTabs: function setCourseTabs(evt) {
+      this.tabs = courseTabs;
+      renderTabs(panels, layout);
+    },
+    setClassTabs: function setClassTabs(evt) {
+      this.tabs = classTabs;
+      renderTabs(panels, layout);
+    },
+    setInfoTabs: function setInfoTabs(evt) {
+      this.tabs = myInfo;
+      renderTabs(panels, layout);
+    }
+  },
+  ready: function ready() {
+    window.setTimeout(function () {
+      document.querySelectorAll('.mdl-layout__tab')[0].click();
+      /* 删除tab-bar-left-button */
+      var tabBarLeftBtn = document.querySelector('.mdl-layout__tab-bar-left-button');
+      var tabBarRightBtn = document.querySelector('.mdl-layout__tab-bar-right-button');
+      if (tabBarLeftBtn && tabBarRightBtn) {
+        var tabBarParent = tabBarLeftBtn.parentNode;
+        tabBarParent.removeChild(tabBarLeftBtn);
+        tabBarParent.removeChild(tabBarRightBtn);
+      }
+      var selects = document.querySelectorAll('select');
+      [].forEach.call(selects, function (el) {
+        return el.value = null;
+      });
+    }, 1000);
+  }
+});
+
+},{"../util":13,"./addcourse":2,"./classview":5,"./courseview":6,"./testview":11,"./updateinfo":12}],8:[function(require,module,exports){
+'use strict';
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+/* globals Vue */
+//var Vue = require('../vendor/vue.min.js');
+var classView = require('./classview');
+var tip = require('../util').tip;
+var renderTable = require('../util').renderTable;
+var renderPointTable = require('../util').renderPointTable;
+var render = require('../util').render;
+var testView = require('./testview');
+Vue.use(require('vue-resource'));
+
+var pubQuiz = new Vue({
+  el: '#class-tab-4',
+  data: {
+    classes: [],
+    Class: {},
+    qsets: [],
+    points: [],
+    pointList: [],
+    chapterList: [],
+    duration: 10,
+    maxjudgeNum: 0,
+    maxsingleNum: 0,
+    maxmultiNum: 0,
+    maxaskNum: 0,
+    quizNum: 0,
+    judgeNum: 0,
+    singleNum: 0,
+    multiNum: 0,
+    askNum: 0
+  },
+  computed: {
+    studentNum: function studentNum() {
+      if (!Object.keys(this.Class).length) return 0;else return this.Class.ref_students.length;
+    },
+    expireNum: function expireNum() {
+      return this.judgeNum + this.singleNum + this.multiNum + this.askNum;
+    }
+  },
+  methods: {
+    getNum: function getNum(evt) {
+      var _this = this;
+
+      if (['INPUT', 'SPAN'].indexOf(evt.target.nodeName) === -1) return evt.preventDefault();
+      setTimeout(function () {
+        var table = document.querySelector('.point-table');
+        var selected = table.querySelectorAll('.is-selected');
+        _this.quizNum = 0;
+        _this.judgeNum = 0;
+        _this.singleNum = 0;
+        _this.multiNum = 0;
+        _this.askNum = 0;
+        _this.pointList = [];
+        var uppers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-upper');
+        var lowers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-lower');
+        [].concat(_toConsumableArray(uppers)).forEach(function (up, idx) {
+          if (idx > 0) up.style.flex = '1';
+        });
+        [].concat(_toConsumableArray(lowers)).forEach(function (lo, idx) {
+          if (idx > 0) lo.style.flex = '0';
+        });
+        [].concat(_toConsumableArray(selected)).forEach(function (el) {
+          _this.quizNum += Number(el.childNodes[3].textContent || el.childNodes[3].innerText);
+          _this.pointList.push(el.childNodes[2].textContent || el.childNodes[2].innerText);
+        });
+        var sets = _this.qsets.filter(function (qset) {
+          return _this.chapterList.indexOf(qset.ref_chapter) !== -1;
+        });
+        var quizs = [];
+        sets.forEach(function (set) {
+          var _quizs;
+
+          (_quizs = quizs).splice.apply(_quizs, [quizs.length, 0].concat(_toConsumableArray(set.quizs)));
+        });
+        quizs = quizs.filter(function (q) {
+          return _this.pointList.indexOf(q.ref_point) !== -1;
+        });
+        _this.maxjudgeNum = quizs.filter(function (q) {
+          return q.genre === '判断题';
+        }).length;
+        _this.maxsingleNum = quizs.filter(function (q) {
+          return q.genre === '单选题';
+        }).length;
+        _this.maxmultiNum = quizs.filter(function (q) {
+          return q.genre === '多选题';
+        }).length;
+        _this.maxaskNum = quizs.filter(function (q) {
+          return q.genre === '问答题';
+        }).length;
+      }, 100);
+    },
+    getPoint: function getPoint(evt) {
+      var _this2 = this;
+
+      if (['INPUT', 'SPAN'].indexOf(evt.target.nodeName) === -1) return evt.preventDefault();
+      setTimeout(function () {
+        var table = document.querySelector('.pub-table');
+        var selected = table.querySelectorAll('.is-selected');
+        _this2.quizNum = 0;
+        _this2.singleNum = 0;
+        _this2.multiNum = 0;
+        _this2.askNum = 0;
+        _this2.judgeNum = 0;
+        _this2.maxsingleNum = 0;
+        _this2.maxmultiNum = 0;
+        _this2.maxjudgeNum = 0;
+        _this2.maxaskNum = 0;
+        _this2.chapterList = [];
+        _this2.pointList = [];
+        var uppers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-upper');
+        var lowers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-lower');
+        [].concat(_toConsumableArray(uppers)).forEach(function (up, idx) {
+          if (idx > 0) up.style.flex = '1';
+        });
+        [].concat(_toConsumableArray(lowers)).forEach(function (lo, idx) {
+          if (idx > 0) lo.style.flex = '0';
+        });
+        [].forEach.call(selected, function (el) {
+          _this2.chapterList.push(el.childNodes[2].textContent || el.childNodes[2].innerText);
+        });
+        var sets = _this2.qsets.filter(function (qset) {
+          return _this2.chapterList.indexOf(qset.ref_chapter) !== -1;
+        });
+        if (!sets.length) _this2.points = [];else {
+          var prePoints = [];
+          var quizs = [];
+          sets.forEach(function (set) {
+            var _prePoints;
+
+            var titles = set.quizs.map(function (q) {
+              return q.ref_point;
+            });
+            (_prePoints = prePoints).splice.apply(_prePoints, [prePoints.length, 0].concat(_toConsumableArray(titles)));
+            quizs.splice.apply(quizs, [quizs.length, 0].concat(_toConsumableArray(titles)));
+          });
+          prePoints = [].concat(_toConsumableArray(new Set(prePoints))).map(function (q) {
+            var num = quizs.filter(function (e) {
+              return e === q;
+            }).length;
+            return {
+              title: q,
+              totalNum: num
+            };
+          });
+          _this2.points = prePoints;
+        }
+        renderPointTable(document.querySelector('.point-table'));
+      }, 100);
+    },
+    get: function get() {
+      var _this3 = this;
+
+      if (!this.Class._id) return;
+      var qset = {};
+      qset.ref_course = this.Class.ref_course;
+      this.$http.get('/api/t/qset', qset).then(function (res) {
+        _this3.qsets = res.data;
+        _this3.quizNum = 0;
+        renderTable(document.querySelector('.pub-table'));
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    },
+    pub: function pub(evt) {
+      var _this4 = this;
+
+      if (!this.studentNum) tip('未录入学生', 'message');
+      if (!Object.keys(this.Class).length || !this.quizNum || !this.expireNum || !this.studentNum || this.quizNum < this.expireNum) return evt.preventDefault();
+      if (this.judgeNum > this.maxjudgeNum || this.singleNum > this.maxsingleNum || this.multiNum > this.maxmultiNum || this.askNum > this.maxaskNum) return evt.preventDefault();
+      var data = {};
+      data.class_id = this.Class._id;
+      data.duration = this.duration;
+      data.chapterList = this.chapterList;
+      data.pointList = this.pointList;
+      data.ref_students = this.Class.ref_students;
+      data.quizNum = this.quizNum;
+      data.expireNum = this.expireNum;
+      data.judgeNum = this.judgeNum;
+      data.singleNum = this.singleNum;
+      data.multiNum = this.multiNum;
+      data.askNum = this.askNum;
+      this.$http.post('/api/t/test', data).then(function (res) {
+        _this4.Class = {};
+        _this4.qsets = [];
+        _this4.duration = 10;
+        _this4.quizNum = 0;
+        _this4.expireNum = 0;
+        _this4.judgeNum = 0;
+        _this4.singleNum = 0;
+        _this4.multiNum = 0;
+        _this4.askNum = 0;
+        _this4.maxjudgeNum = 0;
+        _this4.maxsingleNum = 0;
+        _this4.maxmultiNum = 0;
+        _this4.maxaskNum = 0;
+        _this4.chapterList = [];
+        _this4.pointList = [];
+        _this4.points = [];
+        tip('发布成功', 'success');
+        var uppers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-upper');
+        var lowers = document.querySelectorAll('#class-tab-4 .mdl-slider__background-lower');
+        [].concat(_toConsumableArray(uppers)).forEach(function (up, idx) {
+          if (idx > 0) up.style.flex = '1';
+        });
+        [].concat(_toConsumableArray(lowers)).forEach(function (lo, idx) {
+          if (idx > 0) lo.style.flex = '0';
+        });
+        testView.get();
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    }
+  }
+});
+
+module.exports = pubQuiz;
+
+},{"../util":13,"./classview":5,"./testview":11,"vue-resource":27}],9:[function(require,module,exports){
+'use strict';
+
+/* globals Vue */
+//var Vue = require('../vendor/vue.min.js');
+var courseView = require('./courseview');
+var pubQuiz = require('./pubquiz');
+var tip = require('../util').tip;
+Vue.use(require('vue-resource'));
+
+var quizView = new Vue({
+  el: '#course-tab-4',
+  data: {
+    courses: [],
+    course: {
+      _id: '',
+      chapter: ''
+    },
+    quizs: []
+  },
+  computed: {
+    idx: function idx() {
+      for (var i = 0, l = this.courses.length; i < l; i++) {
+        if (this.courses[i]._id === this.course._id) return i;
+      }
+      return -1;
+    }
+  },
+  methods: {
+    clear: function clear() {
+      this.quizs = [];
+    },
+    get: function get(evt) {
+      var _this = this;
+
+      if (!this.course._id || !this.course.chapter) return evt.preventDefault();
+      var qset = {};
+      qset.ref_course = this.course._id;
+      qset.ref_chapter = this.course.chapter;
+      this.$http.get('/api/t/qset', qset).then(function (res) {
+        if (!res.data) {
+          tip('未录入习题', 'message');
+          _this.quizs = [];
+        } else _this.quizs = res.data;
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    },
+    del: function del(evt) {
+      var _this2 = this;
+
+      if (!this.course._id || !this.course.chapter || !this.quizs.length) return evt.preventDefault();
+      var qset = {};
+      qset.ref_course = this.course._id;
+      qset.ref_chapter = this.course.chapter;
+      this.$http.delete('/api/t/qset', qset).then(function (res) {
+        tip('删除成功', 'success');
+        _this2.quizs = [];
+        window.courseView.get();
+        pubQuiz.get();
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    }
+  }
+});
+
+module.exports = quizView;
+
+},{"../util":13,"./courseview":6,"./pubquiz":8,"vue-resource":27}],10:[function(require,module,exports){
+'use strict';
+
+function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+
+// randomColor by David Merfield under the CC0 license
+// https://github.com/davidmerfield/randomColor/
+
+;(function (root, factory) {
+
+  // Support AMD
+  if (typeof define === 'function' && define.amd) {
+    define([], factory);
+
+    // Support CommonJS
+  } else if ((typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object') {
+      var randomColor = factory();
+
+      // Support NodeJS & Component, which allow module.exports to be a function
+      if ((typeof module === 'undefined' ? 'undefined' : _typeof(module)) === 'object' && module && module.exports) {
+        exports = module.exports = randomColor;
+      }
+
+      // Support CommonJS 1.1.1 spec
+      exports.randomColor = randomColor;
+
+      // Support vanilla script loading
+    } else {
+        root.randomColor = factory();
+      }
+})(undefined, function () {
+
+  // Seed to get repeatable colors
+  var seed = null;
+
+  // Shared color dictionary
+  var colorDictionary = {};
+
+  // Populate the color dictionary
+  loadColorBounds();
+
+  var randomColor = function randomColor(options) {
+
+    options = options || {};
+
+    // Check if there is a seed and ensure it's an
+    // integer. Otherwise, reset the seed value.
+    if (options.seed !== undefined && options.seed !== null && options.seed === parseInt(options.seed, 10)) {
+      seed = options.seed;
+
+      // A string was passed as a seed
+    } else if (typeof options.seed === 'string') {
+        seed = stringToInteger(options.seed);
+
+        // Something was passed as a seed but it wasn't an integer or string
+      } else if (options.seed !== undefined && options.seed !== null) {
+          throw new TypeError('The seed value must be an integer or string');
+
+          // No seed, reset the value outside.
+        } else {
+            seed = null;
+          }
+
+    var H, S, B;
+
+    // Check if we need to generate multiple colors
+    if (options.count !== null && options.count !== undefined) {
+
+      var totalColors = options.count,
+          colors = [];
+
+      options.count = null;
+
+      while (totalColors > colors.length) {
+
+        // Since we're generating multiple colors,
+        // incremement the seed. Otherwise we'd just
+        // generate the same color each time...
+        if (seed && options.seed) options.seed += 1;
+
+        colors.push(randomColor(options));
+      }
+
+      options.count = totalColors;
+
+      return colors;
+    }
+
+    // First we pick a hue (H)
+    H = pickHue(options);
+
+    // Then use H to determine saturation (S)
+    S = pickSaturation(H, options);
+
+    // Then use S and H to determine brightness (B).
+    B = pickBrightness(H, S, options);
+
+    // Then we return the HSB color in the desired format
+    return setFormat([H, S, B], options);
+  };
+
+  function pickHue(options) {
+
+    var hueRange = getHueRange(options.hue),
+        hue = randomWithin(hueRange);
+
+    // Instead of storing red as two seperate ranges,
+    // we group them, using negative numbers
+    if (hue < 0) {
+      hue = 360 + hue;
+    }
+
+    return hue;
+  }
+
+  function pickSaturation(hue, options) {
+
+    if (options.luminosity === 'random') {
+      return randomWithin([0, 100]);
+    }
+
+    if (options.hue === 'monochrome') {
+      return 0;
+    }
+
+    var saturationRange = getSaturationRange(hue);
+
+    var sMin = saturationRange[0],
+        sMax = saturationRange[1];
+
+    switch (options.luminosity) {
+
+      case 'bright':
+        sMin = 55;
+        break;
+
+      case 'dark':
+        sMin = sMax - 10;
+        break;
+
+      case 'light':
+        sMax = 55;
+        break;
+    }
+
+    return randomWithin([sMin, sMax]);
+  }
+
+  function pickBrightness(H, S, options) {
+
+    var bMin = getMinimumBrightness(H, S),
+        bMax = 100;
+
+    switch (options.luminosity) {
+
+      case 'dark':
+        bMax = bMin + 20;
+        break;
+
+      case 'light':
+        bMin = (bMax + bMin) / 2;
+        break;
+
+      case 'random':
+        bMin = 0;
+        bMax = 100;
+        break;
+    }
+
+    return randomWithin([bMin, bMax]);
+  }
+
+  function setFormat(hsv, options) {
+
+    switch (options.format) {
+
+      case 'hsvArray':
+        return hsv;
+
+      case 'hslArray':
+        return HSVtoHSL(hsv);
+
+      case 'hsl':
+        var hsl = HSVtoHSL(hsv);
+        return 'hsl(' + hsl[0] + ', ' + hsl[1] + '%, ' + hsl[2] + '%)';
+
+      case 'hsla':
+        var hslColor = HSVtoHSL(hsv);
+        return 'hsla(' + hslColor[0] + ', ' + hslColor[1] + '%, ' + hslColor[2] + '%, ' + Math.random() + ')';
+
+      case 'rgbArray':
+        return HSVtoRGB(hsv);
+
+      case 'rgb':
+        var rgb = HSVtoRGB(hsv);
+        return 'rgb(' + rgb.join(', ') + ')';
+
+      case 'rgba':
+        var rgbColor = HSVtoRGB(hsv);
+        return 'rgba(' + rgbColor.join(', ') + ', ' + Math.random() + ')';
+
+      default:
+        return HSVtoHex(hsv);
+    }
+  }
+
+  function getMinimumBrightness(H, S) {
+
+    var lowerBounds = getColorInfo(H).lowerBounds;
+
+    for (var i = 0; i < lowerBounds.length - 1; i++) {
+
+      var s1 = lowerBounds[i][0],
+          v1 = lowerBounds[i][1];
+
+      var s2 = lowerBounds[i + 1][0],
+          v2 = lowerBounds[i + 1][1];
+
+      if (S >= s1 && S <= s2) {
+
+        var m = (v2 - v1) / (s2 - s1),
+            b = v1 - m * s1;
+
+        return m * S + b;
+      }
+    }
+
+    return 0;
+  }
+
+  function getHueRange(colorInput) {
+
+    if (typeof parseInt(colorInput) === 'number') {
+
+      var number = parseInt(colorInput);
+
+      if (number < 360 && number > 0) {
+        return [number, number];
+      }
+    }
+
+    if (typeof colorInput === 'string') {
+
+      if (colorDictionary[colorInput]) {
+        var color = colorDictionary[colorInput];
+        if (color.hueRange) {
+          return color.hueRange;
+        }
+      }
+    }
+
+    return [0, 360];
+  }
+
+  function getSaturationRange(hue) {
+    return getColorInfo(hue).saturationRange;
+  }
+
+  function getColorInfo(hue) {
+
+    // Maps red colors to make picking hue easier
+    if (hue >= 334 && hue <= 360) {
+      hue -= 360;
+    }
+
+    for (var colorName in colorDictionary) {
+      var color = colorDictionary[colorName];
+      if (color.hueRange && hue >= color.hueRange[0] && hue <= color.hueRange[1]) {
+        return colorDictionary[colorName];
+      }
+    }return 'Color not found';
+  }
+
+  function randomWithin(range) {
+    if (seed === null) {
+      return Math.floor(range[0] + Math.random() * (range[1] + 1 - range[0]));
+    } else {
+      //Seeded random algorithm from http://indiegamr.com/generate-repeatable-random-numbers-in-js/
+      var max = range[1] || 1;
+      var min = range[0] || 0;
+      seed = (seed * 9301 + 49297) % 233280;
+      var rnd = seed / 233280.0;
+      return Math.floor(min + rnd * (max - min));
+    }
+  }
+
+  function HSVtoHex(hsv) {
+
+    var rgb = HSVtoRGB(hsv);
+
+    function componentToHex(c) {
+      var hex = c.toString(16);
+      return hex.length == 1 ? '0' + hex : hex;
+    }
+
+    var hex = '#' + componentToHex(rgb[0]) + componentToHex(rgb[1]) + componentToHex(rgb[2]);
+
+    return hex;
+  }
+
+  function defineColor(name, hueRange, lowerBounds) {
+
+    var sMin = lowerBounds[0][0],
+        sMax = lowerBounds[lowerBounds.length - 1][0],
+        bMin = lowerBounds[lowerBounds.length - 1][1],
+        bMax = lowerBounds[0][1];
+
+    colorDictionary[name] = {
+      hueRange: hueRange,
+      lowerBounds: lowerBounds,
+      saturationRange: [sMin, sMax],
+      brightnessRange: [bMin, bMax]
+    };
+  }
+
+  function loadColorBounds() {
+
+    defineColor('monochrome', null, [[0, 0], [100, 0]]);
+
+    defineColor('red', [-26, 18], [[20, 100], [30, 92], [40, 89], [50, 85], [60, 78], [70, 70], [80, 60], [90, 55], [100, 50]]);
+
+    defineColor('orange', [19, 46], [[20, 100], [30, 93], [40, 88], [50, 86], [60, 85], [70, 70], [100, 70]]);
+
+    defineColor('yellow', [47, 62], [[25, 100], [40, 94], [50, 89], [60, 86], [70, 84], [80, 82], [90, 80], [100, 75]]);
+
+    defineColor('green', [63, 178], [[30, 100], [40, 90], [50, 85], [60, 81], [70, 74], [80, 64], [90, 50], [100, 40]]);
+
+    defineColor('blue', [179, 257], [[20, 100], [30, 86], [40, 80], [50, 74], [60, 60], [70, 52], [80, 44], [90, 39], [100, 35]]);
+
+    defineColor('purple', [258, 282], [[20, 100], [30, 87], [40, 79], [50, 70], [60, 65], [70, 59], [80, 52], [90, 45], [100, 42]]);
+
+    defineColor('pink', [283, 334], [[20, 100], [30, 90], [40, 86], [60, 84], [80, 80], [90, 75], [100, 73]]);
+  }
+
+  function HSVtoRGB(hsv) {
+
+    // this doesn't work for the values of 0 and 360
+    // here's the hacky fix
+    var h = hsv[0];
+    if (h === 0) {
+      h = 1;
+    }
+    if (h === 360) {
+      h = 359;
+    }
+
+    // Rebase the h,s,v values
+    h = h / 360;
+    var s = hsv[1] / 100,
+        v = hsv[2] / 100;
+
+    var h_i = Math.floor(h * 6),
+        f = h * 6 - h_i,
+        p = v * (1 - s),
+        q = v * (1 - f * s),
+        t = v * (1 - (1 - f) * s),
+        r = 256,
+        g = 256,
+        b = 256;
+
+    switch (h_i) {
+      case 0:
+        r = v;g = t;b = p;break;
+      case 1:
+        r = q;g = v;b = p;break;
+      case 2:
+        r = p;g = v;b = t;break;
+      case 3:
+        r = p;g = q;b = v;break;
+      case 4:
+        r = t;g = p;b = v;break;
+      case 5:
+        r = v;g = p;b = q;break;
+    }
+
+    var result = [Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255)];
+    return result;
+  }
+
+  function HSVtoHSL(hsv) {
+    var h = hsv[0],
+        s = hsv[1] / 100,
+        v = hsv[2] / 100,
+        k = (2 - s) * v;
+
+    return [h, Math.round(s * v / (k < 1 ? k : 2 - k) * 10000) / 100, k / 2 * 100];
+  }
+
+  function stringToInteger(string) {
+    var total = 0;
+    for (var i = 0; i !== string.length; i++) {
+      if (total >= Number.MAX_SAFE_INTEGER) break;
+      total += string.charCodeAt(i);
+    }
+    return total;
+  }
+
+  return randomColor;
+});
+
+},{}],11:[function(require,module,exports){
+'use strict';
+
+/* globals Vue Chart */
+//var Vue = require('../vendor/vue.min.js');
+var courseView = require('./courseview');
+var pubQuiz = require('./pubquiz');
+var tip = require('../util').tip;
+var render = require('../util').render;
+var randomColor = require('../t/randomColor');
+Vue.use(require('vue-resource'));
+
+Vue.filter('formatTime', function (value) {
+  if (!value) return '';
+  var date = new Date(value);
+  return date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日  ' + date.getHours() + '时:' + date.getMinutes() + '分';
+});
+
+Vue.filter('formatUnfinish', function (value) {
+  return value.map(function (v, idx) {
+    return idx + 1 + ' ' + v.name + '(' + v.no + ')';
+  }).join(',  ');
+});
+
+Vue.filter('validScore', function (value) {
+  return value > 10 ? 10 : value;
+});
+
+Vue.filter('getRightNum', function (quizs) {
+  return quizs.filter(function (q) {
+    return q.isRight;
+  }).length;
+});
+
+Vue.filter('getWrongNum', function (quizs) {
+  return quizs.filter(function (q) {
+    return !q.isRight;
+  }).length;
+});
+
+Vue.filter('getSum', function (quizs) {
+  var judgeNum = quizs.filter(function (q) {
+    return q.genre === '判断题';
+  }).length;
+  var singleNum = quizs.filter(function (q) {
+    return q.genre === '单选题';
+  }).length;
+  var multiNum = quizs.filter(function (q) {
+    return q.genre === '多选题';
+  }).length;
+  var askNum = quizs.filter(function (q) {
+    return q.genre === '问答题';
+  }).length;
+  return judgeNum * 5 + singleNum * 5 + multiNum * 10 + askNum * 10;
+});
+
+Vue.filter('getAskScore', function (quizs) {
+  return quizs.filter(function (q) {
+    return q.genre === '问答题';
+  }).map(function (x) {
+    return x.score;
+  }).reduce(function (p, a) {
+    return p + a;
+  }, 0);
+});
+
+Vue.filter('getOtherScore', function (quizs) {
+  return quizs.filter(function (q) {
+    return q.genre !== '问答题' && q.isRight;
+  }).map(function (x) {
+    return x.score;
+  }).reduce(function (p, a) {
+    return p + a;
+  }, 0);
+});
+
+Vue.filter('getSumScore', function (quizs) {
+  var judgeNum = quizs.filter(function (q) {
+    return q.genre === '判断题';
+  }).length;
+  var singleNum = quizs.filter(function (q) {
+    return q.genre === '单选题';
+  }).length;
+  var multiNum = quizs.filter(function (q) {
+    return q.genre === '多选题';
+  }).length;
+  var askNum = quizs.filter(function (q) {
+    return q.genre === '问答题';
+  }).length;
+  var total = judgeNum * 5 + singleNum * 5 + multiNum * 10 + askNum * 10;
+  var sum = quizs.map(function (x) {
+    return x.score;
+  }).reduce(function (p, a) {
+    return p + a;
+  });
+  return Math.round(sum / total * 100);
+});
+
+var collect = new Vue({
+  el: '#class-tab-5',
+  data: {
+    showStatus: false,
+    showChart: false,
+    finishedList: [],
+    unfinishList: [],
+    classes: [],
+    testList: [],
+    result: [],
+    classId: ''
+  },
+  computed: {
+    qrurl: function qrurl() {
+      if (!this.test || !this.testList.length) return '#';else return '/api/qr/?url=' + window.location.origin + '/api/t/test/' + this.test.uuid;
+    },
+    canGetStatus: function canGetStatus() {
+      return this.testList.length;
+    },
+    showAnalysis: function showAnalysis() {
+      return this.test.ref_students.every(function (s) {
+        return s.isChecked || !s.canGetAnswers;
+      });
+    }
+  },
+  methods: {
+    save: function save(evt, sidx) {
+      this.finishedList[sidx].isChecked = true;
+      this.unfinishList.forEach(function (e) {
+        return e.isChecked = true;
+      });
+      var data = this.finishedList.concat(this.unfinishList);
+      this.$http.put('/api/t/test/' + this.test.uuid, {
+        data: data
+      }).then(function (res) {
+        tip('保存成功', 'success');
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    },
+    share: function share(evt) {
+      if (!this.test || !this.testList.length) return evt.preventDefault();
+    },
+    analysis: function analysis(evt) {
+      if (this.test.ref_students.every(function (s) {
+        return !s.canGetAnswers;
+      })) {
+        tip('数据不足', 'message');
+        return;
+      }
+      if (!this.showAnalysis) {
+        tip('请完成先批改任务', 'message');
+        return;
+      }
+      var canvasParent = document.querySelector('canvas').parentNode;
+      var canvas = document.querySelectorAll('canvas');
+      canvasParent.removeChild(canvas[0]);
+      canvasParent.removeChild(canvas[1]);
+      var canvas1 = document.createElement('canvas');
+      var canvas2 = document.createElement('canvas');
+      var c2 = document.querySelector('.c2');
+      canvasParent.insertBefore(canvas1, c2);
+      canvasParent.appendChild(canvas2);
+      this.showChart = true;
+      this.showStatus = false;
+      var scoreList = this.test.ref_students.map(function (s) {
+        var judgeNum = s.ref_quizs.filter(function (q) {
+          return q.genre === '判断题';
+        }).length;
+        var singleNum = s.ref_quizs.filter(function (q) {
+          return q.genre === '单选题';
+        }).length;
+        var multiNum = s.ref_quizs.filter(function (q) {
+          return q.genre === '多选题';
+        }).length;
+        var askNum = s.ref_quizs.filter(function (q) {
+          return q.genre === '问答题';
+        }).length;
+        var total = judgeNum * 5 + singleNum * 5 + multiNum * 10 + askNum * 10;
+        var sum = s.ref_quizs.map(function (x) {
+          return x.score;
+        }).reduce(function (p, a) {
+          return p + a;
+        }, 0);
+        return Math.round(sum / total * 100);
+      });
+      var ctx1 = document.querySelectorAll('canvas')[0];
+      var ctx2 = document.querySelectorAll('canvas')[1];
+      var chart1Labels = [];
+      var chart2Labels = [];
+      var chart1Datasets = [];
+      var chart2Datasets = [];
+      chart1Labels = ['0-10', '11-20', '21-30', '31-40', '41-50', '51-60', '61-70', '71-80', '81-90', '91-100'];
+      chart2Labels = this.test.ref_points;
+      var num = chart1Labels.map(function (lab) {
+        var from = Number(lab.split('-')[0]);
+        var to = Number(lab.split('-')[1]);
+        return scoreList.filter(function (score) {
+          return score >= from && score <= to;
+        }).length;
+      });
+      var quizSet = this.test.ref_students.map(function (s) {
+        return s.ref_quizs;
+      }).reduce(function (p, a) {
+        return p.concat(a);
+      }, []);
+      var chart2Data = chart2Labels.map(function (lab) {
+        return quizSet.filter(function (q) {
+          return q.ref_point === lab && !q.isRight;
+        }).length;
+      });
+      var chart2ColorList = randomColor({
+        luminosity: 'light',
+        count: chart2Data.length
+      });
+      chart1Datasets = [{
+        label: '人数',
+        backgroundColor: "rgba(255,99,132,0.2)",
+        borderColor: "rgba(255,99,132,1)",
+        borderWidth: 1,
+        hoverBackgroundColor: "rgba(255,99,132,0.4)",
+        hoverBorderColor: "rgba(255,99,132,1)",
+        data: num
+      }];
+      chart2Datasets = [{
+        data: chart2Data,
+        backgroundColor: chart2ColorList
+      }];
+      var chart1 = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: chart1Labels,
+          datasets: chart1Datasets
+        }
+      });
+      var chart2 = new Chart(ctx2, {
+        type: 'pie',
+        data: {
+          labels: chart2Labels,
+          datasets: chart2Datasets
+        }
+      });
+    },
+    clearStatus: function clearStatus() {
+      this.showStatus = false;
+      this.showChart = false;
+    },
+    getStatus: function getStatus(evt) {
+      var _this = this;
+
+      if (!this.canGetStatus || !this.test) return evt.preventDefault();
+      if (new Date(this.test.expireAt) - Date.now() > 0) {
+        tip('测试未结束', 'message');
+      } else {
+        var idx = this.testList.indexOf(this.test);
+        this.get(function () {
+          _this.test = _this.testList[idx];
+          _this.showStatus = true;
+          _this.showChart = false;
+          _this.unfinishList = _this.test.ref_students.filter(function (s) {
+            return !s.canGetAnswers;
+          });
+          _this.finishedList = _this.test.ref_students.filter(function (s) {
+            return s.canGetAnswers;
+          });
+          setTimeout(function () {
+            return render();
+          }, 100);
+        });
+      }
+    },
+    get: function get(cb) {
+      var _this2 = this;
+
+      if (!this.classId) return;
+      this.showStatus = false;
+      this.$http.get('/api/t/test/status', {
+        classId: this.classId
+      }).then(function (res) {
+        _this2.testList = res.data;
+        if (typeof cb === 'function') cb();
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    }
+  }
+});
+
+module.exports = collect;
+
+},{"../t/randomColor":10,"../util":13,"./courseview":6,"./pubquiz":8,"vue-resource":27}],12:[function(require,module,exports){
+/* globals Vue */
+'use strict';
+
+var tip = require('../util').tip;
+Vue.use(require('vue-resource'));
+
+var info = new Vue({
+  el: '#info-tab-1',
+  data: {
+    originPass: '',
+    newPass: '',
+    cknPass: ''
+  },
+  computed: {},
+  methods: {
+    save: function save(evt) {
+      var _this = this;
+
+      if (!/^[0-9A-Za-z\_]{6,30}$/.test(this.newPass)) {
+        tip('新密码由数字，字母，下划线组成，至少6个字符', 'message');
+        return evt.preventDefault();
+      }
+      if (this.newPass !== this.cknPass) {
+        tip('确认密码与新密码不一致', 'message');
+        return evt.preventDefault();
+      }
+      var data = {};
+      data.originPass = this.originPass;
+      data.newPass = this.newPass;
+      data.cknPass = this.cknPass;
+      this.$http.put('/api/t', data).then(function (res) {
+        tip('修改成功', 'success');
+        _this.originPass = '';
+        _this.newPass = '';
+        _this.cknPass = '';
+      }, function (err) {
+        return tip(err.data, 'error');
+      });
+    }
+  }
+});
+
+module.exports = info;
+
+},{"../util":13,"vue-resource":27}],13:[function(require,module,exports){
+'use strict';
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+/* globals MaterialLayoutTab, MaterialLayout, MaterialTabs, MaterialTab, MaterialRipple, MaterialDataTable, MaterialButton, MaterialCheckbox, MaterialRadio, MaterialTextfield, componentHandler */
+
+function renderTabs(panels, layout) {
+  window.setTimeout(function () {
+    var tabs = document.querySelectorAll('.mdl-layout__tab');
+    [].forEach.call(tabs, function (el) {
+      new MaterialLayoutTab(el, tabs, panels, layout.MaterialLayout);
+      new MaterialRipple(el);
+    });
+    setTimeout(function () {
+      tabs[0].click();
+    }, 100);
+  }, 100);
+}
+
+function renderPointTable(table) {
+  var th_first = table.querySelector('th');
+  th_first.parentNode.removeChild(th_first);
+  setTimeout(function () {
+    new MaterialDataTable(table);
+    componentHandler.upgradeAllRegistered();
+    var ths = table.querySelectorAll('th:nth-child(2)');
+    var tds = table.querySelectorAll('td:nth-child(2)');
+    [].concat(_toConsumableArray(ths)).forEach(function (th) {
+      if (th.childElementCount !== 0) th.innerHTML = '序号';
+    });
+    [].concat(_toConsumableArray(tds)).forEach(function (td) {
+      if (td.childElementCount !== 0) td.parentNode.removeChild(td);
+    });
+  });
+}
+
+function renderTable(table) {
+  var th_first = table.querySelector('th');
+  th_first.parentNode.removeChild(th_first);
+  setTimeout(function () {
+    new MaterialDataTable(table);
+    componentHandler.upgradeAllRegistered();
+  });
+}
+
+function renderRipple(el) {
+  setTimeout(function () {
+    componentHandler.upgradeAllRegistered();
+  }, 100);
+}
+
+function renderButton(el) {
+  setTimeout(function () {
+    componentHandler.upgradeAllRegistered();
+  }, 100);
+}
+
+function renderCheckbox(el) {
+  window.setTimeout(function () {
+    var btns = document.querySelector(el).querySelectorAll('.mdl-js-checkbox');
+    [].forEach.call(btns, function (el) {
+      new MaterialCheckbox(el);
+    });
+  }, 100);
+}
+
+function renderRadio(el) {
+  window.setTimeout(function () {
+    var radios = document.querySelector(el).querySelectorAll('.mdl-js-radio');
+    [].concat(_toConsumableArray(radios)).forEach(function (el) {
+      new MaterialRadio(el);
+    });
+  }, 100);
+}
+
+function renderTextfield(el) {
+  window.setTimeout(function () {
+    var fields = document.querySelector(el).querySelectorAll('.mdl-js-textfield');
+    [].forEach.call(fields, function (el) {
+      new MaterialTextfield(el);
+    });
+  }, 100);
+}
+
+function tip(str, type) {
+  var el = document.querySelector('#tip');
+  //el.innerText = str;
+  // for firefox
+  //el.textContent = str;
+  if (type === 'error') el.style.backgroundColor = '#d9534f';
+  if (type === 'success') el.style.backgroundColor = '#5cb85c';
+  if (type === 'message') el.style.backgroundColor = '#3aaacf';
+  el.MaterialSnackbar.showSnackbar({
+    message: str
+  });
+}
+
+function render() {
+  setTimeout(function () {
+    componentHandler.upgradeAllRegistered();
+  }, 100);
+}
+
+function bindClose() {
+  var btnClose = document.querySelectorAll('.closebtn');
+  [].concat(_toConsumableArray(btnClose)).forEach(function (el) {
+    el.addEventListener('click', function (evt) {
+      var btn = evt.target;
+      var topElement = btn.parentNode.parentNode;
+      topElement.removeChild(btn.parentNode);
+    });
+  });
+}
+
+module.exports.renderTabs = renderTabs;
+module.exports.tip = tip;
+module.exports.renderTable = renderTable;
+module.exports.renderPointTable = renderPointTable;
+module.exports.renderButton = renderButton;
+module.exports.renderRipple = renderRipple;
+module.exports.renderRadio = renderRadio;
+module.exports.renderCheckbox = renderCheckbox;
+module.exports.renderTextfield = renderTextfield;
+module.exports.render = render;
+module.exports.bindClose = bindClose;
+
+},{}],14:[function(require,module,exports){
+/**
+ * Before Interceptor.
+ */
+
+var _ = require('../util');
+
+module.exports = {
+
+    request: function (request) {
+
+        if (_.isFunction(request.beforeSend)) {
+            request.beforeSend.call(this, request);
+        }
+
+        return request;
+    }
+
+};
+
+},{"../util":37}],15:[function(require,module,exports){
+/**
+ * Base client.
+ */
+
+var _ = require('../../util');
+var Promise = require('../../promise');
+var xhrClient = require('./xhr');
+
+module.exports = function (request) {
+
+    var response = (request.client || xhrClient)(request);
+
+    return Promise.resolve(response).then(function (response) {
+
+        if (response.headers) {
+
+            var headers = parseHeaders(response.headers);
+
+            response.headers = function (name) {
+
+                if (name) {
+                    return headers[_.toLower(name)];
+                }
+
+                return headers;
+            };
+
+        }
+
+        response.ok = response.status >= 200 && response.status < 300;
+
+        return response;
+    });
+
+};
+
+function parseHeaders(str) {
+
+    var headers = {}, value, name, i;
+
+    if (_.isString(str)) {
+        _.each(str.split('\n'), function (row) {
+
+            i = row.indexOf(':');
+            name = _.trim(_.toLower(row.slice(0, i)));
+            value = _.trim(row.slice(i + 1));
+
+            if (headers[name]) {
+
+                if (_.isArray(headers[name])) {
+                    headers[name].push(value);
+                } else {
+                    headers[name] = [headers[name], value];
+                }
+
+            } else {
+
+                headers[name] = value;
+            }
+
+        });
+    }
+
+    return headers;
+}
+
+},{"../../promise":30,"../../util":37,"./xhr":18}],16:[function(require,module,exports){
+/**
+ * JSONP client.
+ */
+
+var _ = require('../../util');
+var Promise = require('../../promise');
+
+module.exports = function (request) {
+    return new Promise(function (resolve) {
+
+        var callback = '_jsonp' + Math.random().toString(36).substr(2), response = {request: request, data: null}, handler, script;
+
+        request.params[request.jsonp] = callback;
+        request.cancel = function () {
+            handler({type: 'cancel'});
+        };
+
+        script = document.createElement('script');
+        script.src = _.url(request);
+        script.type = 'text/javascript';
+        script.async = true;
+
+        window[callback] = function (data) {
+            response.data = data;
+        };
+
+        handler = function (event) {
+
+            if (event.type === 'load' && response.data !== null) {
+                response.status = 200;
+            } else if (event.type === 'error') {
+                response.status = 404;
+            } else {
+                response.status = 0;
+            }
+
+            resolve(response);
+
+            delete window[callback];
+            document.body.removeChild(script);
+        };
+
+        script.onload = handler;
+        script.onerror = handler;
+
+        document.body.appendChild(script);
+    });
+};
+
+},{"../../promise":30,"../../util":37}],17:[function(require,module,exports){
+/**
+ * XDomain client (Internet Explorer).
+ */
+
+var _ = require('../../util');
+var Promise = require('../../promise');
+
+module.exports = function (request) {
+    return new Promise(function (resolve) {
+
+        var xdr = new XDomainRequest(), response = {request: request}, handler;
+
+        request.cancel = function () {
+            xdr.abort();
+        };
+
+        xdr.open(request.method, _.url(request), true);
+
+        handler = function (event) {
+
+            response.data = xdr.responseText;
+            response.status = xdr.status;
+            response.statusText = xdr.statusText;
+
+            resolve(response);
+        };
+
+        xdr.timeout = 0;
+        xdr.onload = handler;
+        xdr.onabort = handler;
+        xdr.onerror = handler;
+        xdr.ontimeout = function () {};
+        xdr.onprogress = function () {};
+
+        xdr.send(request.data);
+    });
+};
+
+},{"../../promise":30,"../../util":37}],18:[function(require,module,exports){
+/**
+ * XMLHttp client.
+ */
+
+var _ = require('../../util');
+var Promise = require('../../promise');
+
+module.exports = function (request) {
+    return new Promise(function (resolve) {
+
+        var xhr = new XMLHttpRequest(), response = {request: request}, handler;
+
+        request.cancel = function () {
+            xhr.abort();
+        };
+
+        xhr.open(request.method, _.url(request), true);
+
+        handler = function (event) {
+
+            response.data = xhr.responseText;
+            response.status = xhr.status;
+            response.statusText = xhr.statusText;
+            response.headers = xhr.getAllResponseHeaders();
+
+            resolve(response);
+        };
+
+        xhr.timeout = 0;
+        xhr.onload = handler;
+        xhr.onabort = handler;
+        xhr.onerror = handler;
+        xhr.ontimeout = function () {};
+        xhr.onprogress = function () {};
+
+        if (_.isPlainObject(request.xhr)) {
+            _.extend(xhr, request.xhr);
+        }
+
+        if (_.isPlainObject(request.upload)) {
+            _.extend(xhr.upload, request.upload);
+        }
+
+        _.each(request.headers || {}, function (value, header) {
+            xhr.setRequestHeader(header, value);
+        });
+
+        xhr.send(request.data);
+    });
+};
+
+},{"../../promise":30,"../../util":37}],19:[function(require,module,exports){
+/**
+ * CORS Interceptor.
+ */
+
+var _ = require('../util');
+var xdrClient = require('./client/xdr');
+var xhrCors = 'withCredentials' in new XMLHttpRequest();
+var originUrl = _.url.parse(location.href);
+
+module.exports = {
+
+    request: function (request) {
+
+        if (request.crossOrigin === null) {
+            request.crossOrigin = crossOrigin(request);
+        }
+
+        if (request.crossOrigin) {
+
+            if (!xhrCors) {
+                request.client = xdrClient;
+            }
+
+            request.emulateHTTP = false;
+        }
+
+        return request;
+    }
+
+};
+
+function crossOrigin(request) {
+
+    var requestUrl = _.url.parse(_.url(request));
+
+    return (requestUrl.protocol !== originUrl.protocol || requestUrl.host !== originUrl.host);
+}
+
+},{"../util":37,"./client/xdr":17}],20:[function(require,module,exports){
+/**
+ * Header Interceptor.
+ */
+
+var _ = require('../util');
+
+module.exports = {
+
+    request: function (request) {
+
+        request.method = request.method.toUpperCase();
+        request.headers = _.extend({}, _.http.headers.common,
+            !request.crossOrigin ? _.http.headers.custom : {},
+            _.http.headers[request.method.toLowerCase()],
+            request.headers
+        );
+
+        if (_.isPlainObject(request.data) && /^(GET|JSONP)$/i.test(request.method)) {
+            _.extend(request.params, request.data);
+            delete request.data;
+        }
+
+        return request;
+    }
+
+};
+
+},{"../util":37}],21:[function(require,module,exports){
+/**
+ * Service for sending network requests.
+ */
+
+var _ = require('../util');
+var Client = require('./client');
+var Promise = require('../promise');
+var interceptor = require('./interceptor');
+var jsonType = {'Content-Type': 'application/json'};
+
+function Http(url, options) {
+
+    var client = Client, request, promise;
+
+    Http.interceptors.forEach(function (handler) {
+        client = interceptor(handler, this.$vm)(client);
+    }, this);
+
+    options = _.isObject(url) ? url : _.extend({url: url}, options);
+    request = _.merge({}, Http.options, this.$options, options);
+    promise = client(request).bind(this.$vm).then(function (response) {
+
+        return response.ok ? response : Promise.reject(response);
+
+    }, function (response) {
+
+        if (response instanceof Error) {
+            _.error(response);
+        }
+
+        return Promise.reject(response);
+    });
+
+    if (request.success) {
+        promise.success(request.success);
+    }
+
+    if (request.error) {
+        promise.error(request.error);
+    }
+
+    return promise;
+}
+
+Http.options = {
+    method: 'get',
+    data: '',
+    params: {},
+    headers: {},
+    xhr: null,
+    upload: null,
+    jsonp: 'callback',
+    beforeSend: null,
+    crossOrigin: null,
+    emulateHTTP: false,
+    emulateJSON: false,
+    timeout: 0
+};
+
+Http.interceptors = [
+    require('./before'),
+    require('./timeout'),
+    require('./jsonp'),
+    require('./method'),
+    require('./mime'),
+    require('./header'),
+    require('./cors')
+];
+
+Http.headers = {
+    put: jsonType,
+    post: jsonType,
+    patch: jsonType,
+    delete: jsonType,
+    common: {'Accept': 'application/json, text/plain, */*'},
+    custom: {'X-Requested-With': 'XMLHttpRequest'}
+};
+
+['get', 'put', 'post', 'patch', 'delete', 'jsonp'].forEach(function (method) {
+
+    Http[method] = function (url, data, success, options) {
+
+        if (_.isFunction(data)) {
+            options = success;
+            success = data;
+            data = undefined;
+        }
+
+        if (_.isObject(success)) {
+            options = success;
+            success = undefined;
+        }
+
+        return this(url, _.extend({method: method, data: data, success: success}, options));
+    };
+});
+
+module.exports = _.http = Http;
+
+},{"../promise":30,"../util":37,"./before":14,"./client":15,"./cors":19,"./header":20,"./interceptor":22,"./jsonp":23,"./method":24,"./mime":25,"./timeout":26}],22:[function(require,module,exports){
+/**
+ * Interceptor factory.
+ */
+
+var _ = require('../util');
+var Promise = require('../promise');
+
+module.exports = function (handler, vm) {
+
+    return function (client) {
+
+        if (_.isFunction(handler)) {
+            handler = handler.call(vm, Promise);
+        }
+
+        return function (request) {
+
+            if (_.isFunction(handler.request)) {
+                request = handler.request.call(vm, request);
+            }
+
+            return when(request, function (request) {
+                return when(client(request), function (response) {
+
+                    if (_.isFunction(handler.response)) {
+                        response = handler.response.call(vm, response);
+                    }
+
+                    return response;
+                });
+            });
+        };
+    };
+};
+
+function when(value, fulfilled, rejected) {
+
+    var promise = Promise.resolve(value);
+
+    if (arguments.length < 2) {
+        return promise;
+    }
+
+    return promise.then(fulfilled, rejected);
+}
+
+},{"../promise":30,"../util":37}],23:[function(require,module,exports){
+/**
+ * JSONP Interceptor.
+ */
+
+var jsonpClient = require('./client/jsonp');
+
+module.exports = {
+
+    request: function (request) {
+
+        if (request.method == 'JSONP') {
+            request.client = jsonpClient;
+        }
+
+        return request;
+    }
+
+};
+
+},{"./client/jsonp":16}],24:[function(require,module,exports){
+/**
+ * HTTP method override Interceptor.
+ */
+
+module.exports = {
+
+    request: function (request) {
+
+        if (request.emulateHTTP && /^(PUT|PATCH|DELETE)$/i.test(request.method)) {
+            request.headers['X-HTTP-Method-Override'] = request.method;
+            request.method = 'POST';
+        }
+
+        return request;
+    }
+
+};
+
+},{}],25:[function(require,module,exports){
+/**
+ * Mime Interceptor.
+ */
+
+var _ = require('../util');
+
+module.exports = {
+
+    request: function (request) {
+
+        if (request.emulateJSON && _.isPlainObject(request.data)) {
+            request.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            request.data = _.url.params(request.data);
+        }
+
+        if (_.isObject(request.data) && /FormData/i.test(request.data.toString())) {
+            delete request.headers['Content-Type'];
+        }
+
+        if (_.isPlainObject(request.data)) {
+            request.data = JSON.stringify(request.data);
+        }
+
+        return request;
+    },
+
+    response: function (response) {
+
+        try {
+            response.data = JSON.parse(response.data);
+        } catch (e) {}
+
+        return response;
+    }
+
+};
+
+},{"../util":37}],26:[function(require,module,exports){
+/**
+ * Timeout Interceptor.
+ */
+
+module.exports = function () {
+
+    var timeout;
+
+    return {
+
+        request: function (request) {
+
+            if (request.timeout) {
+                timeout = setTimeout(function () {
+                    request.cancel();
+                }, request.timeout);
+            }
+
+            return request;
+        },
+
+        response: function (response) {
+
+            clearTimeout(timeout);
+
+            return response;
+        }
+
+    };
+};
+
+},{}],27:[function(require,module,exports){
+/**
+ * Install plugin.
+ */
+
+function install(Vue) {
+
+    var _ = require('./util');
+
+    _.config = Vue.config;
+    _.warning = Vue.util.warn;
+    _.nextTick = Vue.util.nextTick;
+
+    Vue.url = require('./url');
+    Vue.http = require('./http');
+    Vue.resource = require('./resource');
+    Vue.Promise = require('./promise');
+
+    Object.defineProperties(Vue.prototype, {
+
+        $url: {
+            get: function () {
+                return _.options(Vue.url, this, this.$options.url);
+            }
+        },
+
+        $http: {
+            get: function () {
+                return _.options(Vue.http, this, this.$options.http);
+            }
+        },
+
+        $resource: {
+            get: function () {
+                return Vue.resource.bind(this);
+            }
+        },
+
+        $promise: {
+            get: function () {
+                return function (executor) {
+                    return new Vue.Promise(executor, this);
+                }.bind(this);
+            }
+        }
+
+    });
+}
+
+if (window.Vue) {
+    Vue.use(install);
+}
+
+module.exports = install;
+
+},{"./http":21,"./promise":30,"./resource":31,"./url":32,"./util":37}],28:[function(require,module,exports){
+/**
+ * Promises/A+ polyfill v1.1.4 (https://github.com/bramstein/promis)
+ */
+
+var _ = require('../util');
+
+var RESOLVED = 0;
+var REJECTED = 1;
+var PENDING  = 2;
+
+function Promise(executor) {
+
+    this.state = PENDING;
+    this.value = undefined;
+    this.deferred = [];
+
+    var promise = this;
+
+    try {
+        executor(function (x) {
+            promise.resolve(x);
+        }, function (r) {
+            promise.reject(r);
+        });
+    } catch (e) {
+        promise.reject(e);
+    }
+}
+
+Promise.reject = function (r) {
+    return new Promise(function (resolve, reject) {
+        reject(r);
+    });
+};
+
+Promise.resolve = function (x) {
+    return new Promise(function (resolve, reject) {
+        resolve(x);
+    });
+};
+
+Promise.all = function all(iterable) {
+    return new Promise(function (resolve, reject) {
+        var count = 0, result = [];
+
+        if (iterable.length === 0) {
+            resolve(result);
+        }
+
+        function resolver(i) {
+            return function (x) {
+                result[i] = x;
+                count += 1;
+
+                if (count === iterable.length) {
+                    resolve(result);
+                }
+            };
+        }
+
+        for (var i = 0; i < iterable.length; i += 1) {
+            Promise.resolve(iterable[i]).then(resolver(i), reject);
+        }
+    });
+};
+
+Promise.race = function race(iterable) {
+    return new Promise(function (resolve, reject) {
+        for (var i = 0; i < iterable.length; i += 1) {
+            Promise.resolve(iterable[i]).then(resolve, reject);
+        }
+    });
+};
+
+var p = Promise.prototype;
+
+p.resolve = function resolve(x) {
+    var promise = this;
+
+    if (promise.state === PENDING) {
+        if (x === promise) {
+            throw new TypeError('Promise settled with itself.');
+        }
+
+        var called = false;
+
+        try {
+            var then = x && x['then'];
+
+            if (x !== null && typeof x === 'object' && typeof then === 'function') {
+                then.call(x, function (x) {
+                    if (!called) {
+                        promise.resolve(x);
+                    }
+                    called = true;
+
+                }, function (r) {
+                    if (!called) {
+                        promise.reject(r);
+                    }
+                    called = true;
+                });
+                return;
+            }
+        } catch (e) {
+            if (!called) {
+                promise.reject(e);
+            }
+            return;
+        }
+
+        promise.state = RESOLVED;
+        promise.value = x;
+        promise.notify();
+    }
+};
+
+p.reject = function reject(reason) {
+    var promise = this;
+
+    if (promise.state === PENDING) {
+        if (reason === promise) {
+            throw new TypeError('Promise settled with itself.');
+        }
+
+        promise.state = REJECTED;
+        promise.value = reason;
+        promise.notify();
+    }
+};
+
+p.notify = function notify() {
+    var promise = this;
+
+    _.nextTick(function () {
+        if (promise.state !== PENDING) {
+            while (promise.deferred.length) {
+                var deferred = promise.deferred.shift(),
+                    onResolved = deferred[0],
+                    onRejected = deferred[1],
+                    resolve = deferred[2],
+                    reject = deferred[3];
+
+                try {
+                    if (promise.state === RESOLVED) {
+                        if (typeof onResolved === 'function') {
+                            resolve(onResolved.call(undefined, promise.value));
+                        } else {
+                            resolve(promise.value);
+                        }
+                    } else if (promise.state === REJECTED) {
+                        if (typeof onRejected === 'function') {
+                            resolve(onRejected.call(undefined, promise.value));
+                        } else {
+                            reject(promise.value);
+                        }
+                    }
+                } catch (e) {
+                    reject(e);
+                }
+            }
+        }
+    });
+};
+
+p.then = function then(onResolved, onRejected) {
+    var promise = this;
+
+    return new Promise(function (resolve, reject) {
+        promise.deferred.push([onResolved, onRejected, resolve, reject]);
+        promise.notify();
+    });
+};
+
+p.catch = function (onRejected) {
+    return this.then(undefined, onRejected);
+};
+
+module.exports = Promise;
+
+},{"../util":37}],29:[function(require,module,exports){
+/**
+ * URL Template v2.0.6 (https://github.com/bramstein/url-template)
+ */
+
+exports.expand = function (url, params, variables) {
+
+    var tmpl = this.parse(url), expanded = tmpl.expand(params);
+
+    if (variables) {
+        variables.push.apply(variables, tmpl.vars);
+    }
+
+    return expanded;
+};
+
+exports.parse = function (template) {
+
+    var operators = ['+', '#', '.', '/', ';', '?', '&'], variables = [];
+
+    return {
+        vars: variables,
+        expand: function (context) {
+            return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function (_, expression, literal) {
+                if (expression) {
+
+                    var operator = null, values = [];
+
+                    if (operators.indexOf(expression.charAt(0)) !== -1) {
+                        operator = expression.charAt(0);
+                        expression = expression.substr(1);
+                    }
+
+                    expression.split(/,/g).forEach(function (variable) {
+                        var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
+                        values.push.apply(values, exports.getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
+                        variables.push(tmp[1]);
+                    });
+
+                    if (operator && operator !== '+') {
+
+                        var separator = ',';
+
+                        if (operator === '?') {
+                            separator = '&';
+                        } else if (operator !== '#') {
+                            separator = operator;
+                        }
+
+                        return (values.length !== 0 ? operator : '') + values.join(separator);
+                    } else {
+                        return values.join(',');
+                    }
+
+                } else {
+                    return exports.encodeReserved(literal);
+                }
+            });
+        }
+    };
+};
+
+exports.getValues = function (context, operator, key, modifier) {
+
+    var value = context[key], result = [];
+
+    if (this.isDefined(value) && value !== '') {
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            value = value.toString();
+
+            if (modifier && modifier !== '*') {
+                value = value.substring(0, parseInt(modifier, 10));
+            }
+
+            result.push(this.encodeValue(operator, value, this.isKeyOperator(operator) ? key : null));
+        } else {
+            if (modifier === '*') {
+                if (Array.isArray(value)) {
+                    value.filter(this.isDefined).forEach(function (value) {
+                        result.push(this.encodeValue(operator, value, this.isKeyOperator(operator) ? key : null));
+                    }, this);
+                } else {
+                    Object.keys(value).forEach(function (k) {
+                        if (this.isDefined(value[k])) {
+                            result.push(this.encodeValue(operator, value[k], k));
+                        }
+                    }, this);
+                }
+            } else {
+                var tmp = [];
+
+                if (Array.isArray(value)) {
+                    value.filter(this.isDefined).forEach(function (value) {
+                        tmp.push(this.encodeValue(operator, value));
+                    }, this);
+                } else {
+                    Object.keys(value).forEach(function (k) {
+                        if (this.isDefined(value[k])) {
+                            tmp.push(encodeURIComponent(k));
+                            tmp.push(this.encodeValue(operator, value[k].toString()));
+                        }
+                    }, this);
+                }
+
+                if (this.isKeyOperator(operator)) {
+                    result.push(encodeURIComponent(key) + '=' + tmp.join(','));
+                } else if (tmp.length !== 0) {
+                    result.push(tmp.join(','));
+                }
+            }
+        }
+    } else {
+        if (operator === ';') {
+            result.push(encodeURIComponent(key));
+        } else if (value === '' && (operator === '&' || operator === '?')) {
+            result.push(encodeURIComponent(key) + '=');
+        } else if (value === '') {
+            result.push('');
+        }
+    }
+
+    return result;
+};
+
+exports.isDefined = function (value) {
+    return value !== undefined && value !== null;
+};
+
+exports.isKeyOperator = function (operator) {
+    return operator === ';' || operator === '&' || operator === '?';
+};
+
+exports.encodeValue = function (operator, value, key) {
+
+    value = (operator === '+' || operator === '#') ? this.encodeReserved(value) : encodeURIComponent(value);
+
+    if (key) {
+        return encodeURIComponent(key) + '=' + value;
+    } else {
+        return value;
+    }
+};
+
+exports.encodeReserved = function (str) {
+    return str.split(/(%[0-9A-Fa-f]{2})/g).map(function (part) {
+        if (!/%[0-9A-Fa-f]/.test(part)) {
+            part = encodeURI(part);
+        }
+        return part;
+    }).join('');
+};
+
+},{}],30:[function(require,module,exports){
+/**
+ * Promise adapter.
+ */
+
+var _ = require('./util');
+var PromiseObj = window.Promise || require('./lib/promise');
+
+function Promise(executor, context) {
+
+    if (executor instanceof PromiseObj) {
+        this.promise = executor;
+    } else {
+        this.promise = new PromiseObj(executor.bind(context));
+    }
+
+    this.context = context;
+}
+
+Promise.all = function (iterable, context) {
+    return new Promise(PromiseObj.all(iterable), context);
+};
+
+Promise.resolve = function (value, context) {
+    return new Promise(PromiseObj.resolve(value), context);
+};
+
+Promise.reject = function (reason, context) {
+    return new Promise(PromiseObj.reject(reason), context);
+};
+
+Promise.race = function (iterable, context) {
+    return new Promise(PromiseObj.race(iterable), context);
+};
+
+var p = Promise.prototype;
+
+p.bind = function (context) {
+    this.context = context;
+    return this;
+};
+
+p.then = function (fulfilled, rejected) {
+
+    if (fulfilled && fulfilled.bind && this.context) {
+        fulfilled = fulfilled.bind(this.context);
+    }
+
+    if (rejected && rejected.bind && this.context) {
+        rejected = rejected.bind(this.context);
+    }
+
+    this.promise = this.promise.then(fulfilled, rejected);
+
+    return this;
+};
+
+p.catch = function (rejected) {
+
+    if (rejected && rejected.bind && this.context) {
+        rejected = rejected.bind(this.context);
+    }
+
+    this.promise = this.promise.catch(rejected);
+
+    return this;
+};
+
+p.finally = function (callback) {
+
+    return this.then(function (value) {
+            callback.call(this);
+            return value;
+        }, function (reason) {
+            callback.call(this);
+            return PromiseObj.reject(reason);
+        }
+    );
+};
+
+p.success = function (callback) {
+
+    _.warn('The `success` method has been deprecated. Use the `then` method instead.');
+
+    return this.then(function (response) {
+        return callback.call(this, response.data, response.status, response) || response;
+    });
+};
+
+p.error = function (callback) {
+
+    _.warn('The `error` method has been deprecated. Use the `catch` method instead.');
+
+    return this.catch(function (response) {
+        return callback.call(this, response.data, response.status, response) || response;
+    });
+};
+
+p.always = function (callback) {
+
+    _.warn('The `always` method has been deprecated. Use the `finally` method instead.');
+
+    var cb = function (response) {
+        return callback.call(this, response.data, response.status, response) || response;
+    };
+
+    return this.then(cb, cb);
+};
+
+module.exports = Promise;
+
+},{"./lib/promise":28,"./util":37}],31:[function(require,module,exports){
+/**
+ * Service for interacting with RESTful services.
+ */
+
+var _ = require('./util');
+
+function Resource(url, params, actions, options) {
+
+    var self = this, resource = {};
+
+    actions = _.extend({},
+        Resource.actions,
+        actions
+    );
+
+    _.each(actions, function (action, name) {
+
+        action = _.merge({url: url, params: params || {}}, options, action);
+
+        resource[name] = function () {
+            return (self.$http || _.http)(opts(action, arguments));
+        };
+    });
+
+    return resource;
+}
+
+function opts(action, args) {
+
+    var options = _.extend({}, action), params = {}, data, success, error;
+
+    switch (args.length) {
+
+        case 4:
+
+            error = args[3];
+            success = args[2];
+
+        case 3:
+        case 2:
+
+            if (_.isFunction(args[1])) {
+
+                if (_.isFunction(args[0])) {
+
+                    success = args[0];
+                    error = args[1];
+
+                    break;
+                }
+
+                success = args[1];
+                error = args[2];
+
+            } else {
+
+                params = args[0];
+                data = args[1];
+                success = args[2];
+
+                break;
+            }
+
+        case 1:
+
+            if (_.isFunction(args[0])) {
+                success = args[0];
+            } else if (/^(POST|PUT|PATCH)$/i.test(options.method)) {
+                data = args[0];
+            } else {
+                params = args[0];
+            }
+
+            break;
+
+        case 0:
+
+            break;
+
+        default:
+
+            throw 'Expected up to 4 arguments [params, data, success, error], got ' + args.length + ' arguments';
+    }
+
+    options.data = data;
+    options.params = _.extend({}, options.params, params);
+
+    if (success) {
+        options.success = success;
+    }
+
+    if (error) {
+        options.error = error;
+    }
+
+    return options;
+}
+
+Resource.actions = {
+
+    get: {method: 'GET'},
+    save: {method: 'POST'},
+    query: {method: 'GET'},
+    update: {method: 'PUT'},
+    remove: {method: 'DELETE'},
+    delete: {method: 'DELETE'}
+
+};
+
+module.exports = _.resource = Resource;
+
+},{"./util":37}],32:[function(require,module,exports){
+/**
+ * Service for URL templating.
+ */
+
+var _ = require('../util');
+var ie = document.documentMode;
+var el = document.createElement('a');
+
+function Url(url, params) {
+
+    var options = url, transform;
+
+    if (_.isString(url)) {
+        options = {url: url, params: params};
+    }
+
+    options = _.merge({}, Url.options, this.$options, options);
+
+    Url.transforms.forEach(function (handler) {
+        transform = factory(handler, transform, this.$vm);
+    }, this);
+
+    return transform(options);
+};
+
+/**
+ * Url options.
+ */
+
+Url.options = {
+    url: '',
+    root: null,
+    params: {}
+};
+
+/**
+ * Url transforms.
+ */
+
+Url.transforms = [
+    require('./template'),
+    require('./legacy'),
+    require('./query'),
+    require('./root')
+];
+
+/**
+ * Encodes a Url parameter string.
+ *
+ * @param {Object} obj
+ */
+
+Url.params = function (obj) {
+
+    var params = [], escape = encodeURIComponent;
+
+    params.add = function (key, value) {
+
+        if (_.isFunction(value)) {
+            value = value();
+        }
+
+        if (value === null) {
+            value = '';
+        }
+
+        this.push(escape(key) + '=' + escape(value));
+    };
+
+    serialize(params, obj);
+
+    return params.join('&').replace(/%20/g, '+');
+};
+
+/**
+ * Parse a URL and return its components.
+ *
+ * @param {String} url
+ */
+
+Url.parse = function (url) {
+
+    if (ie) {
+        el.href = url;
+        url = el.href;
+    }
+
+    el.href = url;
+
+    return {
+        href: el.href,
+        protocol: el.protocol ? el.protocol.replace(/:$/, '') : '',
+        port: el.port,
+        host: el.host,
+        hostname: el.hostname,
+        pathname: el.pathname.charAt(0) === '/' ? el.pathname : '/' + el.pathname,
+        search: el.search ? el.search.replace(/^\?/, '') : '',
+        hash: el.hash ? el.hash.replace(/^#/, '') : ''
+    };
+};
+
+function factory(handler, next, vm) {
+    return function (options) {
+        return handler.call(vm, options, next);
+    };
+}
+
+function serialize(params, obj, scope) {
+
+    var array = _.isArray(obj), plain = _.isPlainObject(obj), hash;
+
+    _.each(obj, function (value, key) {
+
+        hash = _.isObject(value) || _.isArray(value);
+
+        if (scope) {
+            key = scope + '[' + (plain || hash ? key : '') + ']';
+        }
+
+        if (!scope && array) {
+            params.add(value.name, value.value);
+        } else if (hash) {
+            serialize(params, value, key);
+        } else {
+            params.add(key, value);
+        }
+    });
+}
+
+module.exports = _.url = Url;
+
+},{"../util":37,"./legacy":33,"./query":34,"./root":35,"./template":36}],33:[function(require,module,exports){
+/**
+ * Legacy Transform.
+ */
+
+var _ = require('../util');
+
+module.exports = function (options, next) {
+
+    var variables = [], url = next(options);
+
+    url = url.replace(/(\/?):([a-z]\w*)/gi, function (match, slash, name) {
+
+        _.warn('The `:' + name + '` parameter syntax has been deprecated. Use the `{' + name + '}` syntax instead.');
+
+        if (options.params[name]) {
+            variables.push(name);
+            return slash + encodeUriSegment(options.params[name]);
+        }
+
+        return '';
+    });
+
+    variables.forEach(function (key) {
+        delete options.params[key];
+    });
+
+    return url;
+};
+
+function encodeUriSegment(value) {
+
+    return encodeUriQuery(value, true).
+        replace(/%26/gi, '&').
+        replace(/%3D/gi, '=').
+        replace(/%2B/gi, '+');
+}
+
+function encodeUriQuery(value, spaces) {
+
+    return encodeURIComponent(value).
+        replace(/%40/gi, '@').
+        replace(/%3A/gi, ':').
+        replace(/%24/g, '$').
+        replace(/%2C/gi, ',').
+        replace(/%20/g, (spaces ? '%20' : '+'));
+}
+
+},{"../util":37}],34:[function(require,module,exports){
+/**
+ * Query Parameter Transform.
+ */
+
+var _ = require('../util');
+
+module.exports = function (options, next) {
+
+    var urlParams = Object.keys(_.url.options.params), query = {}, url = next(options);
+
+   _.each(options.params, function (value, key) {
+        if (urlParams.indexOf(key) === -1) {
+            query[key] = value;
+        }
+    });
+
+    query = _.url.params(query);
+
+    if (query) {
+        url += (url.indexOf('?') == -1 ? '?' : '&') + query;
+    }
+
+    return url;
+};
+
+},{"../util":37}],35:[function(require,module,exports){
+/**
+ * Root Prefix Transform.
+ */
+
+var _ = require('../util');
+
+module.exports = function (options, next) {
+
+    var url = next(options);
+
+    if (_.isString(options.root) && !url.match(/^(https?:)?\//)) {
+        url = options.root + '/' + url;
+    }
+
+    return url;
+};
+
+},{"../util":37}],36:[function(require,module,exports){
+/**
+ * URL Template (RFC 6570) Transform.
+ */
+
+var UrlTemplate = require('../lib/url-template');
+
+module.exports = function (options) {
+
+    var variables = [], url = UrlTemplate.expand(options.url, options.params, variables);
+
+    variables.forEach(function (key) {
+        delete options.params[key];
+    });
+
+    return url;
+};
+
+},{"../lib/url-template":29}],37:[function(require,module,exports){
+/**
+ * Utility functions.
+ */
+
+var _ = exports, array = [], console = window.console;
+
+_.warn = function (msg) {
+    if (console && _.warning && (!_.config.silent || _.config.debug)) {
+        console.warn('[VueResource warn]: ' + msg);
+    }
+};
+
+_.error = function (msg) {
+    if (console) {
+        console.error(msg);
+    }
+};
+
+_.trim = function (str) {
+    return str.replace(/^\s*|\s*$/g, '');
+};
+
+_.toLower = function (str) {
+    return str ? str.toLowerCase() : '';
+};
+
+_.isArray = Array.isArray;
+
+_.isString = function (val) {
+    return typeof val === 'string';
+};
+
+_.isFunction = function (val) {
+    return typeof val === 'function';
+};
+
+_.isObject = function (obj) {
+    return obj !== null && typeof obj === 'object';
+};
+
+_.isPlainObject = function (obj) {
+    return _.isObject(obj) && Object.getPrototypeOf(obj) == Object.prototype;
+};
+
+_.options = function (fn, obj, options) {
+
+    options = options || {};
+
+    if (_.isFunction(options)) {
+        options = options.call(obj);
+    }
+
+    return _.merge(fn.bind({$vm: obj, $options: options}), fn, {$options: options});
+};
+
+_.each = function (obj, iterator) {
+
+    var i, key;
+
+    if (typeof obj.length == 'number') {
+        for (i = 0; i < obj.length; i++) {
+            iterator.call(obj[i], obj[i], i);
+        }
+    } else if (_.isObject(obj)) {
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                iterator.call(obj[key], obj[key], key);
+            }
+        }
+    }
+
+    return obj;
+};
+
+_.defaults = function (target, source) {
+
+    for (var key in source) {
+        if (target[key] === undefined) {
+            target[key] = source[key];
+        }
+    }
+
+    return target;
+};
+
+_.extend = function (target) {
+
+    var args = array.slice.call(arguments, 1);
+
+    args.forEach(function (arg) {
+        merge(target, arg);
+    });
+
+    return target;
+};
+
+_.merge = function (target) {
+
+    var args = array.slice.call(arguments, 1);
+
+    args.forEach(function (arg) {
+        merge(target, arg, true);
+    });
+
+    return target;
+};
+
+function merge(target, source, deep) {
+    for (var key in source) {
+        if (deep && (_.isPlainObject(source[key]) || _.isArray(source[key]))) {
+            if (_.isPlainObject(source[key]) && !_.isPlainObject(target[key])) {
+                target[key] = {};
+            }
+            if (_.isArray(source[key]) && !_.isArray(target[key])) {
+                target[key] = [];
+            }
+            merge(target[key], source[key], deep);
+        } else if (source[key] !== undefined) {
+            target[key] = source[key];
+        }
+    }
+}
+
+},{}]},{},[7]);

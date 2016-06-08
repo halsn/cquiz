@@ -64,6 +64,16 @@ new Vue({
     }
   },
   methods: {
+    getAnalysis(evt) {
+      var uuid = window.location.pathname.split('/')[4];
+      this.$http.get('/api/analysis', {
+          uuid: uuid,
+          sno: this.no
+        })
+        .then(res => {
+          console.log(res.data);
+        }, err => tip(err.data, 'error'));
+    },
     paste(evt) {
       return evt.preventDefault();
     },
