@@ -2,7 +2,8 @@ include ../includes/head.jade
   link(href="/css/login.css", rel="stylesheet")
   title 登陆
 body
-  #app.mdl-layout.mdl-js-layout.mdl-layout--fixed-header.mdl-color--grey-200.item-center(style="background-size:cover;")
+  - day = (new Date).getDay()
+  #app.mdl-layout.mdl-js-layout.mdl-layout--fixed-header.mdl-color--grey-200.item-center(style="background-size:cover;background-image:url('/images/#{day}.jpg')")
     header.mdl-layout__header.mdl-layout__header--scroll
       .mdl-layout__header-row
         a.mdl-button.mdl-js-button.mdl-button--icon.back-button(href="/")

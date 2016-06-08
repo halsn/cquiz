@@ -20,7 +20,3 @@ var app = new Vue({
   }
 });
 bindClose();
-var app = document.querySelector('#app');
-setTimeout(() => {
-  app.style.backgroundImage = "url('https://source.unsplash.com/category/nature')";
-}, 100);

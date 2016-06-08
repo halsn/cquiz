@@ -6,7 +6,6 @@ var browserSync = require('browser-sync').create();
 var jade = require('gulp-jade');
 var browserify = require('browserify');
 var watchify = require('watchify');
-var hmr = require('browserify-hmr');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var uglify = require('gulp-uglify');
