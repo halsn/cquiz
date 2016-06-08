@@ -22,7 +22,7 @@ body
         - time = 'night'
         - greeting = '晚上好'
       header.home-drawer-header(style="background-image:url('/images/#{time}.jpg');background-size:cover;")
-        span #{greeting}
+        span #{greeting},#{hour}
         span.home-user-info #{useremail}
       nav.home-drawer-nav.mdl-navigation.mdl-color--blue-grey-800
         a.align-center.mdl-navigation__link(href="#", @click="setCourseTabs") 课程管理
