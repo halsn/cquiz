@@ -30,7 +30,7 @@ var getURLs = Array(7).fill().map(e => getURL('https://source.unsplash.com/categ
 
 Promise.all(getURLs)
   .then(urls => {
-    var imgs = urls.map((url, idx) => getImage(url, `${idx + 1}.jpg`));
+    var imgs = urls.map((url, idx) => getImage(url, `${idx}.jpg`));
     return Promise.all(imgs);
   })
   .then(() => {

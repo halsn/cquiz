@@ -1,5 +1,6 @@
-include ./includes/head.jade
+include ./includes/head
   script(src='/js/chart.min.js')
+  script(src='/js/raphael.min.js')
   link(href="/css/test.css", rel="stylesheet")
   title 答题中
 body
@@ -53,10 +54,17 @@ body
             button.full-width.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(@click="getAnalysis($event)") 查看评测分析
           .mdl-card__actions.mdl-card--border(v-if="!lock")
             button.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(style="width:100%", @click="send($event)") 提交
-        .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-show="finished")
-          p hello
-          canvas#score
-          canvas#pie
+        .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-show="showAnalysis")
+          h4.just-center 天梯榜
+          .my-info.just-center 我的积分：2010
+          .pyramid.just-center
+          .user-info.just-center 
+          h4.just-center 个人错误率
+          canvas#mypie
+          h4.just-center 总体错误率
+          canvas#totalpie
+          h4.just-center 战绩
+          canvas#route
       .mdl-card.mdl-shadow--6dp(style="margin:20px auto", v-if="!pass")
         .mdl-card__supporting-text
           .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label

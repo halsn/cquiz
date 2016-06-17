@@ -2,15 +2,18 @@ var Test = require('../../lib/test');
 
 function _get(req, res) {
   var uuid = req.query.uuid;
-  var sno = req.query.sno;
   Test.find()
     .where('uuid').equals(uuid)
-    .exec((err, test) => {
-      test = test[0];
-      if (err) return res.status(500).end(err.toString());
-      else if (!test.ref_students.every(s => s.isChecked)) return res.status(500).end('教师批改未完成');
-      else return res.json(test);
-    });
+    .exec()
+    .then(docs => {
+      var test = docs[0];
+      if (!test) return res.status(404).end('not found');
+      return Test.find().where('ref_class').equals(test.ref_class).exec();
+    })
+    .then(docs => {
+      return res.json(docs);
+    })
+    .catch(err => res.status(500).end('error'));
 }
 
 function _post(req, res) {
