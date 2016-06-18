@@ -283,12 +283,16 @@ function drawPyramid() {
   var txt3 = paper.text(x, y + 6.0 * pch, '白银').attr('stroke', '#eee').scale(1.3, 1.3);
   var txt4 = paper.text(x, y + 8.5 * pch, '青铜').attr('stroke', '#eee').scale(1.3, 1.3);
 
+  var tris = [tri1, tri2, tri3, tri4];
+  var txts = [txt1, txt2, txt3, txt4];
+
   var tip1 = paper.rect(0, 0, 100, 20, 5).attr('fill', '#10332e').attr('stroke', 'rgba(0, 0, 0, 0)')
   var tip2 = paper.path('M0,5L-5,10L0,15').attr('fill', '#10332e').attr('stroke', 'rgba(0, 0, 0, 0)');
   var tipText = paper.text(50, 10, '').attr('stroke', '#fff');
   var tip = paper.set();
   tip.push(tip1, tip2, tipText);
   tip.hide();
+  tip.transform(`t${txts[0].attr('x') + pcw},${txts[0].attr('y') - 0.4 * pch}`);
   tri1.attr('fill', '#33ccff');
   tri1.attr('stroke', 'rgba(0, 0, 0, 0)');
   tri2.attr('fill', '#ff9900');
@@ -297,8 +301,7 @@ function drawPyramid() {
   tri3.attr('stroke', 'rgba(0, 0, 0, 0)');
   tri4.attr('fill', '#2d4454');
   tri4.attr('stroke', 'rgba(0, 0, 0, 0)');
-  var tris = [tri1, tri2, tri3, tri4];
-  var txts = [txt1, txt2, txt3, txt4];
+
   var infos = ['0 ~ 299', '300 ~ 999', '1000 ~ 1999', '2000 ~'].reverse();
   var stus = ['学生1，学生7', '学生3，学生6，学生8，学生9', '学生2，学生4，学生5', '学生10'];
   tris.forEach(e => {
@@ -306,13 +309,21 @@ function drawPyramid() {
   });
   tris.forEach((e, idx) => {
     e.click(() => {
+      tris.forEach(e => e.animate({
+        transform: 's1'
+      }, 100));
+      e.animate({
+        transform: 's1.1'
+      }, 100);
       info.innerText = stus[idx];
     });
   });
   tris.forEach((el, idx) => {
     el.hover(() => {
       tipText.attr('text', infos[idx]);
-      tip.transform(`t${txts[idx].attr('x') + pcw},${txts[idx].attr('y') - 0.4 * pch}`);
+      tip.animate({
+        transform: `t${txts[idx].attr('x') + pcw},${txts[idx].attr('y') - 0.4 * pch}`
+      }, 100, 'ease-in-out');
       tip.show();
     }, () => tip.hide());
   });
