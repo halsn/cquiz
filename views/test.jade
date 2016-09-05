@@ -51,7 +51,7 @@ body
             p.flex(v-for="(didx, dis) in disanswered") {{ didx+1 }}.{{ dis }}
               i.material-icons.mdl-color-text--red-600(v-show="!icons[didx]") error
               i.material-icons.mdl-color-text--green-600(v-show="icons[didx]") done
-            button.full-width.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(@click="getAnalysis($event)") 查看评测分析
+            //button.full-width.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(@click="getAnalysis($event)") 查看评测分析
           .mdl-card__actions.mdl-card--border(v-if="!lock")
             button.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect(style="width:100%", @click="send($event)") 提交
         .mdl-cell.mdl-cell--12-col.mdl-card.mdl-shadow--2dp(v-show="showAnalysis")
