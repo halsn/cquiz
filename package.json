@@ -14,7 +14,7 @@
     "express": "^4.13.3",
     "express-session": "^1.11.3",
     "jade": "^1.11.0",
-    "mongo-express": "^0.28.4",
+    "mongo-express": "^0.39.2",
     "mongodb": "^2.0.43",
     "mongoose": "^4.4.20",
     "node-uuid": "^1.4.7",
