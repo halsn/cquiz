@@ -1,5 +1,7 @@
 # 过程化考核系统
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/halsn/cquiz.svg)](https://greenkeeper.io/)
+
 ## 使用说明
 
 ### Environment
